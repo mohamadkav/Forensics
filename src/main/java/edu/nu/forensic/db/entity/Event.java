@@ -1,61 +1,173 @@
-/*
 package edu.nu.forensic.db.entity;
 
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
-
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.util.UUID;
 
 @Entity
 public class Event {
-
+    @Id
     private UUID id;
 
-    public Long sequence;
+    private Long sequence;
 
-    public String type;
+    private String type;
 
-    public Integer threadId;
+    private Integer threadId;
 
     @ManyToOne
-    public UUID subject;
+    private Subject subject;
 
-    public UUID predicateObject;
+    @ManyToOne
+    private Object predicateObject;
 
-    public CharSequence predicateObjectPath;
+    private String predicateObjectPath;
 
-    public UUID predicateObject2;
+    @ManyToOne
+    private Object predicateObject2;
 
-    public CharSequence predicateObject2Path;
+    private String predicateObject2Path;
 
-    public long timestampNanos;
+    private long timestampNanos;
 
-    public List<CharSequence> names;
+    private String names;
 
-    public List<Value> parameters;
+    private Long location;
 
-    public Long location;
+    private Long size;
 
-    public Long size;
+    private String programPoint;
 
-    public CharSequence programPoint;
-
-    protected Event() {}
-
-    public Event(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public Event() {
     }
 
-    @Override
-    public String toString() {
-        return String.format(
-                "Customer[firstName='%s', lastName='%s']",
-                 firstName, lastName);
+    public Event(UUID id, Long sequence, String type, Integer threadId, Subject subject, Object predicateObject, String predicateObjectPath, Object predicateObject2, String predicateObject2Path, long timestampNanos, String names, Long location, Long size, String programPoint) {
+        this.id = id;
+        this.sequence = sequence;
+        this.type = type;
+        this.threadId = threadId;
+        this.subject = subject;
+        this.predicateObject = predicateObject;
+        this.predicateObjectPath = predicateObjectPath;
+        this.predicateObject2 = predicateObject2;
+        this.predicateObject2Path = predicateObject2Path;
+        this.timestampNanos = timestampNanos;
+        this.names = names;
+        this.location = location;
+        this.size = size;
+        this.programPoint = programPoint;
     }
 
-}*/
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public Long getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(Long sequence) {
+        this.sequence = sequence;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Integer getThreadId() {
+        return threadId;
+    }
+
+    public void setThreadId(Integer threadId) {
+        this.threadId = threadId;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
+    public Object getPredicateObject() {
+        return predicateObject;
+    }
+
+    public void setPredicateObject(Object predicateObject) {
+        this.predicateObject = predicateObject;
+    }
+
+    public String getPredicateObjectPath() {
+        return predicateObjectPath;
+    }
+
+    public void setPredicateObjectPath(String predicateObjectPath) {
+        this.predicateObjectPath = predicateObjectPath;
+    }
+
+    public Object getPredicateObject2() {
+        return predicateObject2;
+    }
+
+    public void setPredicateObject2(Object predicateObject2) {
+        this.predicateObject2 = predicateObject2;
+    }
+
+    public String getPredicateObject2Path() {
+        return predicateObject2Path;
+    }
+
+    public void setPredicateObject2Path(String predicateObject2Path) {
+        this.predicateObject2Path = predicateObject2Path;
+    }
+
+    public long getTimestampNanos() {
+        return timestampNanos;
+    }
+
+    public void setTimestampNanos(long timestampNanos) {
+        this.timestampNanos = timestampNanos;
+    }
+
+    public String getNames() {
+        return names;
+    }
+
+    public void setNames(String names) {
+        this.names = names;
+    }
+
+    public Long getLocation() {
+        return location;
+    }
+
+    public void setLocation(Long location) {
+        this.location = location;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
+
+    public String getProgramPoint() {
+        return programPoint;
+    }
+
+    public void setProgramPoint(String programPoint) {
+        this.programPoint = programPoint;
+    }
+}

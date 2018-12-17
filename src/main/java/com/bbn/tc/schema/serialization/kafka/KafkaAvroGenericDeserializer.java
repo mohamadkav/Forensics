@@ -5,8 +5,6 @@
 package com.bbn.tc.schema.serialization.kafka;
 
 import com.bbn.tc.schema.serialization.AvroGenericDeserializer;
-import org.apache.avro.generic.GenericContainer;
-import org.apache.avro.generic.GenericData;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;

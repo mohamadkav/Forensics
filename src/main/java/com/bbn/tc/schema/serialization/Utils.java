@@ -5,6 +5,7 @@
 package com.bbn.tc.schema.serialization;
 
 import org.apache.avro.Schema;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

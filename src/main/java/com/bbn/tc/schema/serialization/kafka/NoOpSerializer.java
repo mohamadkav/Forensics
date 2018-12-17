@@ -1,13 +1,12 @@
 package com.bbn.tc.schema.serialization.kafka;
 
-import java.util.Map;
-
+import com.bbn.tc.schema.serialization.AvroGenericSerializer;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.kafka.common.config.ConfigException;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
-import com.bbn.tc.schema.serialization.AvroGenericSerializer;
+import java.util.Map;
 
 /**
  * This "serializer" returns the same bytes every time

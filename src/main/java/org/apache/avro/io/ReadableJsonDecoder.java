@@ -26,18 +26,6 @@
  */
 package org.apache.avro.io;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import com.bbn.tc.schema.serialization.Utils;
 import org.apache.avro.AvroTypeException;
 import org.apache.avro.Schema;
@@ -45,13 +33,15 @@ import org.apache.avro.io.parsing.JsonGrammarGenerator;
 import org.apache.avro.io.parsing.Parser;
 import org.apache.avro.io.parsing.Symbol;
 import org.apache.avro.util.Utf8;
-import org.codehaus.jackson.Base64Variant;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonLocation;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonStreamContext;
-import org.codehaus.jackson.JsonToken;
-import org.codehaus.jackson.ObjectCodec;
+import org.codehaus.jackson.*;
+
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 /** A {@link Decoder} for Avro's JSON data encoding.
  * </p>

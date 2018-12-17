@@ -1,19 +1,19 @@
 package edu.nu.forensic.reader;
+
+import com.bbn.tc.schema.avro.cdm19.Principal;
 import com.bbn.tc.schema.avro.cdm19.Subject;
 import com.bbn.tc.schema.avro.cdm19.TCCDMDatum;
 import com.bbn.tc.schema.serialization.AvroConfig;
+import edu.nu.forensic.util.RecordConverter;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
@@ -37,6 +37,10 @@ public class KafkaReader {
     private String topic;
     @Value("${pollPeriod}")
     private Integer pollPeriod;
+
+    @Autowired
+    private RecordConverter recordConverter;
+
     public void readTrace() {
         Properties properties = new Properties();
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
@@ -71,12 +75,12 @@ public class KafkaReader {
         consumer.subscribe(Arrays.asList(topic.split(",")));
 
 
-        PrintWriter out=null;
+/*        PrintWriter out=null;
         try {
             out=new PrintWriter(new File("D:\\ta1-marple-ped-live-s1"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
         ConsumerRecords<String, GenericContainer> records = null;
         try{
             while (!shutdown.get()) {
@@ -86,8 +90,12 @@ public class KafkaReader {
                 while (recIter.hasNext()){
                     record = (ConsumerRecord<String, GenericContainer>)  recIter.next();
                     TCCDMDatum CDMdatum = (TCCDMDatum) record.value();
-                    out.println(CDMdatum);
-                    out.flush();
+                    if(CDMdatum.getDatum() instanceof Subject)
+                        recordConverter.saveAndConvertBBNSubjectToSubject((Subject)CDMdatum.getDatum());
+                    if(CDMdatum.getDatum() instanceof Principal)
+                        recordConverter.saveAndConvertBBNPrincipalToPrincipal((Principal) CDMdatum.getDatum());
+/*                    out.println(CDMdatum);
+                    out.flush();*/
                 }
             }
             closeConsumer();
