@@ -27,10 +27,9 @@ public class ApplicationController {
     @RequestMapping(method = RequestMethod.POST, value = "/read")
     public String read(@RequestBody ReadTraceRequest request){
         System.out.println(request.getTrace());
-        File file = new File(request.getTrace());
-        if(file.exists()&&!file.isDirectory())
+        if(request.getTrace()!=null && new File(request.getTrace()).exists())
             try {
-                avroReader.readTrace(file);
+                avroReader.readTrace(new File(request.getTrace()));
             }catch (IOException|SchemaNotInitializedException e){
                 e.printStackTrace();
                 return "ERROR";

@@ -1,5 +1,6 @@
 package edu.nu.forensic.db.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -22,11 +23,13 @@ public class Event {
     @ManyToOne
     private Object predicateObject;
 
+    @Column(length = 2048)
     private String predicateObjectPath;
 
     @ManyToOne
     private Object predicateObject2;
 
+    @Column(length = 2048)
     private String predicateObject2Path;
 
     private long timestampNanos;

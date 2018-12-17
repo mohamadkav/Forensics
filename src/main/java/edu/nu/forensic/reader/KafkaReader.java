@@ -1,8 +1,6 @@
 package edu.nu.forensic.reader;
 
-import com.bbn.tc.schema.avro.cdm19.Principal;
-import com.bbn.tc.schema.avro.cdm19.Subject;
-import com.bbn.tc.schema.avro.cdm19.TCCDMDatum;
+import com.bbn.tc.schema.avro.cdm19.*;
 import com.bbn.tc.schema.serialization.AvroConfig;
 import edu.nu.forensic.util.RecordConverter;
 import org.apache.avro.generic.GenericContainer;
@@ -90,10 +88,28 @@ public class KafkaReader {
                 while (recIter.hasNext()){
                     record = (ConsumerRecord<String, GenericContainer>)  recIter.next();
                     TCCDMDatum CDMdatum = (TCCDMDatum) record.value();
-                    if(CDMdatum.getDatum() instanceof Subject)
-                        recordConverter.saveAndConvertBBNSubjectToSubject((Subject)CDMdatum.getDatum());
-                    if(CDMdatum.getDatum() instanceof Principal)
-                        recordConverter.saveAndConvertBBNPrincipalToPrincipal((Principal) CDMdatum.getDatum());
+                    try {
+                        if (CDMdatum.getDatum() instanceof Subject)
+                            recordConverter.saveAndConvertBBNSubjectToSubject((Subject) CDMdatum.getDatum());
+                        else if (CDMdatum.getDatum() instanceof Principal)
+                            recordConverter.saveAndConvertBBNPrincipalToPrincipal((Principal) CDMdatum.getDatum());
+                        else if (CDMdatum.getDatum() instanceof FileObject)
+                            recordConverter.saveAndConvertBBNFileObjectToFileObject((FileObject) CDMdatum.getDatum());
+                        else if (CDMdatum.getDatum() instanceof RegistryKeyObject)
+                            recordConverter.saveAndConvertBBNRegistryKeyObjectToRegistryKeyObject((RegistryKeyObject) CDMdatum.getDatum());
+                        else if (CDMdatum.getDatum() instanceof NetFlowObject)
+                            recordConverter.saveAndConvertBBNNetFlowObjectToNetFlowObject((NetFlowObject) CDMdatum.getDatum());
+                        else if (CDMdatum.getDatum() instanceof Event)
+                            recordConverter.saveAndConvertBBNEventToEvent((Event) CDMdatum.getDatum());
+                        else if (CDMdatum.getDatum() instanceof UnitDependency)
+                            recordConverter.saveAndConvertBBNUnitDependencyToUnitDependency((UnitDependency) CDMdatum.getDatum());
+                        else
+                            System.err.println(CDMdatum.toString());
+                    }catch (Exception e){
+                        System.err.println("Darn! We have an unknown bug over: ");
+                        System.err.println(CDMdatum);
+                        e.printStackTrace();
+                    }
 /*                    out.println(CDMdatum);
                     out.flush();*/
                 }
