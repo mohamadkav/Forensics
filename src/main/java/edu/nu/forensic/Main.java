@@ -10,16 +10,4 @@ public class Main {
     public static void main(String[] args) {
         SpringApplication.run(Main.class,args);
     }
-
-/*    @Bean
-    public CommandLineRunner demo(CustomerRepository repository) {
-        return (args) -> {
-            // save a couple of customers
-        //    repository.save(new Customer("Jack", "Bauer"));
-            for (Customer customer : repository.findAll()) {
-                System.out.println(customer.toString());
-            }
-        };
-    }*/
-
 }

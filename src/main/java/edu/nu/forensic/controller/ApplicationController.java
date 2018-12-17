@@ -2,8 +2,6 @@ package edu.nu.forensic.controller;
 
 
 import com.bbn.tc.schema.SchemaNotInitializedException;
-import edu.nu.forensic.db.entity.Customer;
-import edu.nu.forensic.db.repository.CustomerRepository;
 import edu.nu.forensic.dto.ReadTraceRequest;
 import edu.nu.forensic.reader.AvroReader;
 import edu.nu.forensic.reader.KafkaReader;
@@ -19,8 +17,6 @@ import java.io.IOException;
 @RestController
 @RequestMapping("command")
 public class ApplicationController {
-    @Autowired
-    CustomerRepository customerRepository;
 
     @Autowired
     AvroReader avroReader;
@@ -41,9 +37,6 @@ public class ApplicationController {
             }
         else
             kafkaReader.readTrace();
-        for (Customer customer : customerRepository.findAll()) {
-            System.out.println(customer.toString());
-        }
         return "OK";
     }
 }
