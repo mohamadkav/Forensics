@@ -26,14 +26,8 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-data-jpa"){
-        exclude module: "spring-boot-starter-logging"
-        exclude module: "logback-classic"
-    }
-    compile("org.springframework.boot:spring-boot-starter-web"){
-        exclude module: "spring-boot-starter-logging"
-        exclude module: "logback-classic"
-    }
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.springframework.boot:spring-boot-starter-web")
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
 //    compile files("lib/tc-avro-1.0-SNAPSHOT-jar-with-dependencies.jar")
     compile group: 'org.apache.avro', name: 'avro', version: '1.8.2'

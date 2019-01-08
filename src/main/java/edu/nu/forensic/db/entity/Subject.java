@@ -2,6 +2,7 @@ package edu.nu.forensic.db.entity;
 
 import org.hibernate.annotations.Type;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -25,6 +26,7 @@ public class Subject {
 
     private Long startTimestampNanos;
 
+    @Column(length = 2048)
     private String cmdLine;
 
     private String privilegeLevel;
