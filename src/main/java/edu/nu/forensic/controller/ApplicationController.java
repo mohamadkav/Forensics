@@ -5,6 +5,7 @@ import com.bbn.tc.schema.SchemaNotInitializedException;
 import edu.nu.forensic.dto.ReadTraceRequest;
 import edu.nu.forensic.reader.AvroReader;
 import edu.nu.forensic.reader.KafkaReader;
+import edu.nu.forensic.reducer.Reducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,10 @@ public class ApplicationController {
     @Autowired
     KafkaReader kafkaReader;
 
+    @Autowired
+    Reducer reducer;
+
+
     @RequestMapping(method = RequestMethod.POST, value = "/read")
     public String read(@RequestBody ReadTraceRequest request){
         System.out.println(request.getTrace());
@@ -36,6 +41,12 @@ public class ApplicationController {
             }
         else
             kafkaReader.readTrace();
+        return "OK";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/reduce")
+    public String reduce(){
+        reducer.reduce();
         return "OK";
     }
 }
