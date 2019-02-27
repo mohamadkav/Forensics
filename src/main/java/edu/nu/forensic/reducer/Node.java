@@ -8,6 +8,7 @@ public class Node {
     private List<Node> children = new ArrayList<>();
     private Node parent = null;
     private Integer counter=0;
+    private double UtilizationRatio = 0;
 
     public Node(String fileName) {
         this.fileName = fileName;
@@ -30,6 +31,9 @@ public class Node {
         }
         this.children.addAll(children);
     }
+
+    public double getUtilizationRatio() {return UtilizationRatio;}
+    public void setUtilizationRatio(double Ratio) {this.UtilizationRatio = Ratio;}
 
     public List<Node> getChildren() {
         return children;
