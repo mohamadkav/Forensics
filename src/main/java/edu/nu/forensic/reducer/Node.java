@@ -35,6 +35,8 @@ public class Node {
         return children;
     }
 
+    public Integer getCounter() {return counter; }
+
     public String getFileName() {
         return fileName;
     }
@@ -63,4 +65,23 @@ public class Node {
             insert(files.subList(1,files.size()),newChild);
         }
     }
+
+    public boolean equals(Node node)
+    {
+        if(node.fileName.equals(this.fileName)) return true;
+        else return false;
+    }
+
+    public void delete(Node head, Node deletedNode) {
+        if(head.getChildren().contains(deletedNode)) {
+            head.children.remove(deletedNode);
+        }
+        else
+        {
+            for(Node it:head.getChildren()) {
+                delete(it, deletedNode);
+            }
+        }
+    }
+
 }
