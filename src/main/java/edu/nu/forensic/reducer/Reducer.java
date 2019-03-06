@@ -11,7 +11,11 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.*;
 
+import static edu.nu.forensic.reducer.FPGrowth.findFrequentItemsetWithSuffix;
+import static edu.nu.forensic.reducer.FSA.buildFSA;
 import static java.util.stream.Collectors.toMap;
+
+
 
 @Component
 public class Reducer {
@@ -88,5 +92,13 @@ public class Reducer {
         }
         /////////Done building FP tree
         System.out.println(fileToProcessesWhichHaveAccessedIt.size());
+        Set<Set<String>> CFAP = findFrequentItemsetWithSuffix(root, -1);
+        for(Set<String> it:CFAP)
+        {
+            System.out.println(it.toString());
+        }
+        StatementRoot FSARoot = new StatementRoot();
+        Map<String, Integer> FileToNum = new HashMap<>();
+        FSARoot = buildFSA(FileToNum, CFAP);
     }
 }

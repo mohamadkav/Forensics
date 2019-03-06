@@ -16,14 +16,32 @@ public class FPGrowth {
         }
         return result;
     }
-    public static List<Set<String>> findFrequentItemsetWithSuffix(Node head, int minSupportCount) {
-        List<Set<String>> frequentItemset = new ArrayList<Set<String>>();
-        Set<String> result = new HashSet<>();
+    public static Set<Set<String>> findFrequentItemsetWithSuffix(Node head, int minSupportCount) {
+        Set<Set<String>> frequentItemset = new LinkedHashSet<Set<String>>();
+        Set<String> result = new LinkedHashSet<>();
         for(Node it:head.getChildren())
         {
             frequentItemset.add(getCFAP(it, minSupportCount, result));
         }
         return frequentItemset;
+    }
+
+    public Map<String, Integer> getFileNum(Set<Set<String>> FileSequence)
+    {
+        Integer i = 1;
+        Map<String, Integer> temp = new HashMap<>();
+        for(Set<String> filesequence:FileSequence)
+        {
+            for(String it: filesequence)
+            {
+                if(!temp.containsKey(it))
+                {
+                    temp.put(it,i);
+                    i++;
+                }
+            }
+        }
+        return temp;
     }
 
     public static void CalculateUtilizationRatio(Node head)
