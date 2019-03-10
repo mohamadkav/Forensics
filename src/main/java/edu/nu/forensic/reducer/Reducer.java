@@ -8,13 +8,16 @@ import edu.nu.forensic.db.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
 import static edu.nu.forensic.reducer.FPGrowth.findFrequentItemsetWithSuffix;
 import static edu.nu.forensic.reducer.FSA.buildFSA;
+import static edu.nu.forensic.reducer.StatementRoot.printFSA;
 import static java.util.stream.Collectors.toMap;
-
 
 
 @Component
@@ -86,19 +89,31 @@ public class Reducer {
         //Building FP tree
         Node root=new Node(null);
         for(Integer pid:processIdToFiles.keySet()){
-            List<String> files=processIdToFiles.get(pid);
+            List<String> files = processIdToFiles.get(pid);
             files.sort(((o1, o2) -> fileToProcessesWhichHaveAccessedIt.get(o2).size() - fileToProcessesWhichHaveAccessedIt.get(o1).size()));
             root.insert(files,root);
         }
         /////////Done building FP tree
         System.out.println(fileToProcessesWhichHaveAccessedIt.size());
-        Set<Set<String>> CFAP = findFrequentItemsetWithSuffix(root, -1);
-        for(Set<String> it:CFAP)
-        {
-            System.out.println(it.toString());
-        }
-        StatementRoot FSARoot = new StatementRoot();
-        Map<String, Integer> FileToNum = new HashMap<>();
-        FSARoot = buildFSA(FileToNum, CFAP);
+//        for(Node node:root.getChildren())
+//        {
+//            System.out.println("root");
+//            Queue<Node> q = new LinkedList<>();
+//            q.add(node);
+//            while(q.size()!=0)
+//            {
+//                System.out.println(node.getFileName());
+//                Node temp = q.poll();
+//                q.addAll(temp.getChildren());
+//            }
+//        }
+//        Set<Set<String>> CFAP = findFrequentItemsetWithSuffix(root, -1);
+//        for(Set<String> it:CFAP) {
+//            System.out.println(it.toString());
+//        }
+//        StatementRoot FSARoot = new StatementRoot();
+//        Map<String, Integer> FileToNum = new HashMap<>();
+//        FSARoot = buildFSA(FileToNum, CFAP);
+//        printFSA(FSARoot);
     }
 }

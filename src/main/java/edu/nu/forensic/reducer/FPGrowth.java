@@ -9,33 +9,27 @@ public class FPGrowth {
         if(node.getCounter()>minSupportCount)
         {
             result.add(node.getFileName());
-            for(Node it: node.getChildren())
-            {
+            for(Node it: node.getChildren()) {
                 getCFAP(it, minSupportCount, result);
             }
         }
         return result;
     }
     public static Set<Set<String>> findFrequentItemsetWithSuffix(Node head, int minSupportCount) {
-        Set<Set<String>> frequentItemset = new LinkedHashSet<Set<String>>();
+        Set<Set<String>> frequentItemset = new HashSet<Set<String>>();
         Set<String> result = new LinkedHashSet<>();
-        for(Node it:head.getChildren())
-        {
+        for(Node it:head.getChildren()) {
             frequentItemset.add(getCFAP(it, minSupportCount, result));
         }
         return frequentItemset;
     }
 
-    public Map<String, Integer> getFileNum(Set<Set<String>> FileSequence)
-    {
+    public Map<String, Integer> getFileNum(Set<Set<String>> FileSequence) {
         Integer i = 1;
         Map<String, Integer> temp = new HashMap<>();
-        for(Set<String> filesequence:FileSequence)
-        {
-            for(String it: filesequence)
-            {
-                if(!temp.containsKey(it))
-                {
+        for(Set<String> filesequence:FileSequence) {
+            for(String it: filesequence) {
+                if(!temp.containsKey(it)) {
                     temp.put(it,i);
                     i++;
                 }

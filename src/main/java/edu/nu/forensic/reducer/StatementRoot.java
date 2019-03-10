@@ -26,15 +26,12 @@ public class StatementRoot
         PointerTable.add(newStatement);
     }
 
-    public void printFSA(StatementRoot root)
-    {
+    public static void printFSA(StatementRoot root) {
         Queue<FSA.Statement> q = new LinkedList<>();
         q.addAll(root.Head);
-        while(q.size()!=0)
-        {
+        while(q.size()!=0) {
             FSA.Statement statement = q.poll();
-            for(FSA.Transfer it:statement.getNext())
-            {
+            for(FSA.Transfer it:statement.getNext()) {
                 System.out.println(statement.getNum()+"->"+it.getNext().getNum());
                 q.add(it.getNext());
             }

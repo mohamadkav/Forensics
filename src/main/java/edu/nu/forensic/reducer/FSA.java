@@ -3,8 +3,7 @@ package edu.nu.forensic.reducer;
 import java.util.*;
 
 public class FSA {
-    public static class Statement
-    {
+    public static class Statement {
         private int num;
         private Set<Transfer> next;
         private Boolean LeafNode = false;
@@ -21,16 +20,15 @@ public class FSA {
             next.add(temp);
         }
 
-        public void SetLeafNode(Boolean temp){this.LeafNode = temp;}
+        public void SetLeafNode(Boolean temp){ this.LeafNode = temp;}
         public Boolean getLeafNode(){ return this.LeafNode;}
         public boolean equals(Statement temp) {
-            if(this.getNum() == temp.getNum()) return true;
+            if( this.getNum() == temp.getNum()) return true;
             else return false;
         }
     }
 
-    public static class Transfer
-    {
+    public static class Transfer {
         private int parameter;
         private Statement next;
 
@@ -45,19 +43,16 @@ public class FSA {
         public Statement getNext(){return next;}
         public void putNext(Statement temp){next = temp;}
 
-        public Boolean transferStatement(int num)
-        {
+        public Boolean transferStatement(int num) {
             if(function(num)==getNext().getNum()) return true;
             return false;
         }
     }
 
 
-    public static StatementRoot buildFSA(Map<String, Integer> FileNameToFileNum, Set<Set<String>>FileSequence)
-    {
+    public static StatementRoot buildFSA(Map<String, Integer> FileNameToFileNum, Set<Set<String>>FileSequence) {
         StatementRoot root = new StatementRoot();
-        for(Set<String>it: FileSequence)
-        {
+        for(Set<String>it: FileSequence) {
             Statement headnode = new Statement();
             headnode = buildFSANode(FileNameToFileNum,it,headnode);
             root.putHead(headnode);
@@ -65,8 +60,7 @@ public class FSA {
         return root;
     }
 
-    public static Statement buildFSANode(Map<String, Integer>FileNameToFileNum, Set<String>FileSequence, Statement lastNode)
-    {
+    public static Statement buildFSANode(Map<String, Integer>FileNameToFileNum, Set<String>FileSequence, Statement lastNode) {
         Transfer t = new Transfer();
         String temp = FileSequence.iterator().next();
         int n = FileNameToFileNum.get(temp);
@@ -77,8 +71,7 @@ public class FSA {
 
         Statement nextNode = new Statement();
         nextNode.setNum(n);
-        if(FileSequence.size()==0)
-        {
+        if(FileSequence.size()==0) {
             nextNode.SetLeafNode(true);
         }
         else nextNode = buildFSANode(FileNameToFileNum, FileSequence, nextNode);
@@ -86,31 +79,24 @@ public class FSA {
         return lastNode;
     }
 
-    public static String FSAreduce(String filename, StatementRoot root, Map<String, Integer> FileNameToFileNum)
-    {
+    public static String FSAreduce(String filename, StatementRoot root, Map<String, Integer> FileNameToFileNum) {
         String NotMatch = "not match";
         String Match = "match";
         String canReduce = "initial process";
         if(!FileNameToFileNum.containsKey(filename)) return NotMatch;
-        else
-        {
+        else {
             int fileNum = FileNameToFileNum.get(filename);
-            for(Statement statement: root.getPointerTable())
-            {
-                for(Transfer transfer: statement.getNext())
-                {
-                    if(transfer.transferStatement(fileNum))
-                    {
+            for(Statement statement: root.getPointerTable()) {
+                for(Transfer transfer: statement.getNext()) {
+                    if(transfer.transferStatement(fileNum)) {
                         root.UpdatePointerTable(statement, transfer.next);
                         if(transfer.next.getLeafNode()) return canReduce;
-                        else return  Match;
+                        else return Match;
                     }
                 }
             }
-            for(Statement statement: root.getHead())
-            {
-                if(statement.getNum()==fileNum)
-                {
+            for(Statement statement: root.getHead()) {
+                if(statement.getNum()==fileNum) {
                     root.putPointerTable(statement);
                     return Match;
                 }

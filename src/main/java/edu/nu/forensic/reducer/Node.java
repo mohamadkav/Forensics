@@ -66,7 +66,9 @@ public class Node {
         }
         else{
             Node newChild=node.addChild(files.get(0));
-            insert(files.subList(1,files.size()),newChild);
+            files = files.subList(1,files.size());
+            insert(files,newChild);
+            node.addChild(newChild);
         }
     }
 
