@@ -1,25 +1,27 @@
 package edu.nu.forensic.reducer;
 
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+
 import java.util.*;
 
 public class FPGrowth {
 
     public static Set<String> getCFAP (Node node, int minSupportCount, Set<String> result)
     {
-        if(node.getCounter()>minSupportCount)
-        {
+        if(node.getCounter()>minSupportCount) {
             result.add(node.getFileName());
-            for(Node it: node.getChildren()) {
-                getCFAP(it, minSupportCount, result);
+            for(Node item: node.getChildren()) {
+                getCFAP(item, minSupportCount, result);
             }
         }
         return result;
     }
     public static Set<Set<String>> findFrequentItemsetWithSuffix(Node head, int minSupportCount) {
-        Set<Set<String>> frequentItemset = new HashSet<Set<String>>();
-        Set<String> result = new LinkedHashSet<>();
+        Set<Set<String>> frequentItemset = new HashSet<>();
         for(Node it:head.getChildren()) {
-            frequentItemset.add(getCFAP(it, minSupportCount, result));
+            Set<String> result = new LinkedHashSet<>();
+            result = getCFAP(it, minSupportCount, result);
+            frequentItemset.add(result);
         }
         return frequentItemset;
     }

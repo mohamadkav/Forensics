@@ -89,12 +89,22 @@ public class Reducer {
         //Building FP tree
         Node root=new Node(null);
         for(Integer pid:processIdToFiles.keySet()){
+            Node head = new Node(null);
             List<String> files = processIdToFiles.get(pid);
             files.sort(((o1, o2) -> fileToProcessesWhichHaveAccessedIt.get(o2).size() - fileToProcessesWhichHaveAccessedIt.get(o1).size()));
-            root.insert(files,root);
+            for(Node temp: root.getChildren()) {
+                if(temp.getFileName().equals(files.get(0))){
+                    head = temp;
+                    break;
+                }
+            }
+            root.insert(files,head);
+            root.addChild(head);
         }
         /////////Done building FP tree
         System.out.println(fileToProcessesWhichHaveAccessedIt.size());
+
+//        int i=0;
 //        for(Node node:root.getChildren())
 //        {
 //            System.out.println("root");
@@ -102,18 +112,22 @@ public class Reducer {
 //            q.add(node);
 //            while(q.size()!=0)
 //            {
-//                System.out.println(node.getFileName());
+//                i++;
 //                Node temp = q.poll();
+//                System.out.println(temp.getFileName()+temp.getCounter());
 //                q.addAll(temp.getChildren());
 //            }
 //        }
-//        Set<Set<String>> CFAP = findFrequentItemsetWithSuffix(root, -1);
-//        for(Set<String> it:CFAP) {
-//            System.out.println(it.toString());
-//        }
-//        StatementRoot FSARoot = new StatementRoot();
-//        Map<String, Integer> FileToNum = new HashMap<>();
-//        FSARoot = buildFSA(FileToNum, CFAP);
-//        printFSA(FSARoot);
+//        System.out.println(i);
+
+        Set<Set<String>> CFAP = findFrequentItemsetWithSuffix(root, 0);
+        for(Set<String> it:CFAP) {
+            System.out.println(it.toString());
+        }
+
+        StatementRoot FSARoot = new StatementRoot();
+        Map<String, Integer> FileToNum = new HashMap<>();
+        FSARoot = buildFSA(FileToNum, CFAP);
+        printFSA(FSARoot);
     }
 }

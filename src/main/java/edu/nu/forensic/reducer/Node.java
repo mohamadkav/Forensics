@@ -7,7 +7,7 @@ public class Node {
     private String fileName = null;
     private List<Node> children = new ArrayList<>();
     private Node parent = null;
-    private Integer counter=0;
+    private Integer counter = 1;
     private double UtilizationRatio = 0;
 
     public Node(String fileName) {
@@ -16,6 +16,7 @@ public class Node {
 
     public void addChild(Node child) {
         child.setParent(this);
+        if(this.children.contains(child)) children.remove(child);
         this.children.add(child);
     }
 
@@ -60,23 +61,34 @@ public class Node {
     public void insert(List<String> files, Node node){
         if(files.size()==0)
             return;
-        if(files.get(0).equals(node.getFileName())){
+        if(node.fileName==null){
+            node.setFileName(files.get(0));
+            insert(files.subList(1,files.size()),node);
+        }
+        else if(files.get(0).equals(node.getFileName())){
             node.counter++;
             insert(files.subList(1,files.size()),node);
         }
         else{
-            Node newChild=node.addChild(files.get(0));
+            Node newChild= new Node(files.get(0));
             files = files.subList(1,files.size());
             insert(files,newChild);
             node.addChild(newChild);
         }
     }
 
-    public boolean equals(Node node)
+    @Override
+    public boolean equals(Object o)
     {
-        if(node.fileName.equals(this.fileName)) return true;
-        else return false;
+        if(this == o) return true;
+        if(o instanceof Node) {
+            if(((Node) o).fileName.equals(this.fileName)) return true;
+        }
+        return false;
     }
+
+    @Override
+    public int hashCode(){ return this.getFileName().hashCode();}
 
     public void delete(Node head, Node deletedNode) {
         if(head.getChildren().contains(deletedNode)) {
