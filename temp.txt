@@ -1,0 +1,381 @@
+896
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Libraries\Videos.library-ms
+C:\Users\Public\Libraries\RecordedTV.library-ms
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Libraries\Music.library-ms
+C:\Users\Public\desktop.ini
+C:\Users\Public\Libraries\desktop.ini
+C:\Users\desktop.ini
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Libraries\Pictures.library-ms
+6400
+C:\Users\Mohammad\Desktop\desktop.ini
+C:\Program Files (x86)\Windows Media Player\wmplayer.exe
+C:\Program Files (x86)\Windows Media Player\en-US\wmplayer.exe.mui
+C:\Program Files (x86)\Windows Media Player\setup_wm.exe
+C:\Program Files (x86)\desktop.ini
+C:\Windows\SysWOW64\ieframe.dll
+4
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\databases\Databases.db
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Cache\f_00040b
+C:\Windows\winsxs\FileMaps\program_files_internet_explorer_a421d1bfaf856e2b.cdf-ms
+C:\Program Files\WinRAR\rarext.dll
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\pkedcjkdefgpdelpbcmbmeomcjbeemfm\7118.1015.0.0_0\mirroring_common.js
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Local Storage\leveldb\000029.ldb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\ghbmnnjooekpmoecnnnilnnbdlolhkhi\1.7_1\_metadata\verified_contents.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Cache\index
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Sqm\iesqmdata2.sqm
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\chrome_child.dll
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\MEIPreload\preloaded_data.pb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\TransportSecurity
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Sqm\iesqmdata9.sqm
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlCsdWhitelist.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\CertificateRevocation\4861\crl-set
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\GPUCache\data_3
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Sqm\iesqmdata6.sqm
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlMalBin.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlSubresourceFilter.store
+C:\Program Files (x86)\Windows Media Player\setup_wm.exe
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlCsdDownloadWhitelist.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\History
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Local State
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Top Sites
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Visited Links
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlSuspiciousSite.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Network Action Predictor
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\felcaaldnbdncclmgdcncolpebgiejap\1.2_0\_metadata\verified_contents.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Shortcuts
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Preferences
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\GPUCache\index
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Recent\CustomDestinations\28c8b86deab549a1.customDestinations-ms
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache\index
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\previews_opt_out.db
+C:\Program Files\7-Zip\7-zip.dll
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Sqm\iesqmdata0.sqm
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Sqm\iesqmdata4.sqm
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\chrome.dll
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Sqm\iesqmdata5.sqm
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\page_load_capping_opt_out.db
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\pkedcjkdefgpdelpbcmbmeomcjbeemfm\7118.1015.0.0_0\_locales\en\messages.json
+C:\Users\Mohammad\AppData\Local\Microsoft\Internet Explorer\VersionManager\versionlist.xml
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Sqm\iesqmdata3.sqm
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Sqm\iesqmdata7.sqm
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Sqm\iesqmdata1.sqm
+584
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Protect\S-1-5-21-980218927-37472660-4234035459-1001\Preferred
+3596
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\chrome_watcher.dll
+6416
+C:\Program Files (x86)\Windows Media Player\setup_wm.exe
+C:\Windows\SysWOW64\en-US\wmploc.dll.mui
+C:\Users\desktop.ini
+C:\Windows\SysWOW64\en-US\wmploc.DLL.mui
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\BFRCWEZ2.txt
+C:\Windows\SysWOW64\AVRT.dll
+C:\Program Files (x86)\Windows Media Player\en-US\setup_wm.exe.mui
+C:\Windows\SysWOW64\ksuser.dll
+C:\Windows\SysWOW64\MF.dll
+C:\Windows\SysWOW64\wmp.dll
+C:\Users\Public\desktop.ini
+C:\Windows\SysWOW64\pdh.dll
+C:\Windows\SysWOW64\en-US\devenum.dll.mui
+C:\Windows\Fonts\staticcache.dat
+C:\Windows\SysWOW64\wmploc.dll
+C:\Users\Public\Music\desktop.ini
+C:\Users\Public\Documents\desktop.ini
+C:\Users\Mohammad\Desktop\desktop.ini
+C:\Windows\SysWOW64\MFPlat.DLL
+1232
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\6BADA8974A10C4BD62CC921D13E43B18_C9FB72B5AE80778A08024D8B0FDECC6F
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\A583E2A51BFBDC1E492A57B7C8325850
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\A3FC0B5CDBE91F5F5E74CA81F6727B97
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\6BADA8974A10C4BD62CC921D13E43B18_D9817BD5013875AD517DA73475345203
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\6BADA8974A10C4BD62CC921D13E43B18_88614FFAD35D353421B8A7E1FE18FCE4
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\3130B1871A126520A8C47861EFE3ED4D
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\6BADA8974A10C4BD62CC921D13E43B18_BEB37ABADF39714871232B4792417E04
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\696F3DE637E6DE85B458996D49D759AD
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\7B2238AACCEDC3F1FFE8E7EB5F575EC9
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\C0018BB1B5834735BFA60CD063B31956
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\4C7F163ED126D5C3CB9457F68EC64E9E
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\5457A8CE4B2A7499F8299A013B6E1C7C_CE50F893881D43DC0C815E4D80FAF2B4
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\B8CC409ACDBF2A2FE04C56F2875B1FD6
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\2CD1F910DD5DC23C234E99A91DE345C0
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\3B6E683A7A45CC59BF035C9BA8C7AB9D
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\1BB09BEEC155258835C193A7AA85AA5B_25DFFEF8E5B366C41ABCCFDCF489082A
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\36AC0BE60E1243344AE145F746D881FE
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\21253908F3CB05D51B1C2DA8B681A785
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\CFE86DBBE02D859DC92F1E17E0574EE8_FDB452422670E72EDD3FB3D65568F821
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\F90F18257CBB4D84216AC1E1F3BB2C76
+C:\Windows\system32\drivers\etc\hosts
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\57C8EDB95DF3F0AD4EE2DC2B8CFD4157
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\37C951188967C8EB88D99893D9D191FE
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\1D6F23D99D44085244DB44686B5A2A59
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\E48DDEA3BF68DF580551FA0F27950B54
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\7396C420A8E1BC1DA97F1AF0D10BAD21
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\F5F320A94D4D2B4465D8F17E2BB2D351_9472CC6ADFBED054C89C23803D94DA4E
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\F5F320A94D4D2B4465D8F17E2BB2D351_433222C17D4F6B8032E8E22A8749E2C3
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\F5F320A94D4D2B4465D8F17E2BB2D351_2D9F715504FEACBB126651DD176BDB8D
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\5080DC7A65DB6A5960ECD874088F3328_6CBA2C06D5985DD95AE59AF8FC7C6220
+4304
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\chrome_child.dll
+1488
+C:\Program Files (x86)\Microsoft Office\FilesystemMetadata.xml
+5332
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\resources.pak
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\chrome_child.dll
+6356
+C:\Users\Mohammad\Desktop\desktop.ini
+C:\Users\desktop.ini
+4248
+C:\Users\Mohammad\AppData\Local\Microsoft\VSApplicationInsights\vstelAIF-312cbd79-9dbb-4c48-a7da-3cc2a931cb70\20190219233127_6a962321b17b4c89bd7250d421196551.trn
+C:\Users\Mohammad\AppData\Local\Microsoft\VSApplicationInsights\vstelAIF-312cbd79-9dbb-4c48-a7da-3cc2a931cb70\20190219233027_1afa159ac2764cb792bf55eaa38c9eca.trn
+C:\Users\Mohammad\AppData\Local\Microsoft\VSApplicationInsights\vstelAIF-312cbd79-9dbb-4c48-a7da-3cc2a931cb70\20190219233157_dda3d42e53b34f4892e52f38618fcb96.trn
+4632
+C:\Windows\system32\mssitlb.dll
+C:\Windows\system32\stdole2.tlb
+476
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\ghbmnnjooekpmoecnnnilnnbdlolhkhi\1.7_1\_metadata\verified_contents.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Service Worker\CacheStorage\28da9c56fde4021055a681112c092453f74d8dd8\00bc5e3c-d071-4873-bef3-b6a3e2f868ec\index
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\pnacl\0.57.44.2492\manifest.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\GPUCache\data_2
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Top Sites
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\chrome_200_percent.pak
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\000015.ldb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Service Worker\ScriptCache\34ae79d109d04ad5_0
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Sync Extension Settings\pkedcjkdefgpdelpbcmbmeomcjbeemfm\000003.log
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache\f_000005
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\InterventionPolicyDatabase\2018.9.6.0\manifest.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\History
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\previews_opt_out.db
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Local Storage\leveldb\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\pkedcjkdefgpdelpbcmbmeomcjbeemfm\7118.1015.0.0_0\mirroring_common.js
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlBilling.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlMalware.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\ghbmnnjooekpmoecnnnilnnbdlolhkhi\1.7_1\dasherSettingSchema.json
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\MEIPreload\preloaded_data.pb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlCsdWhitelist.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Network Persistent State
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\File System\Origins\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache\data_2
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\pnacl\0.57.44.2492\_platform_specific\x86_64\pnacl_public_pnacl_json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache\f_000006
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlSoceng.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Subresource Filter\Unindexed Rules\9.1\manifest.fingerprint
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Thumbnails\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\previews_opt_out.db-wal
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Windows Explorer.lnk
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\MEIPreload\manifest.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\000005.ldb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\aohghmighlieiainnegkcijnfilokake\0.10_0\_metadata\verified_contents.json
+C:\Program Files (x86)\Microsoft Office\root\VFS\ProgramFilesCommonX64\Microsoft Shared\Office16\msoshext.dll
+C:\Users\Mohammad\AppData\Roaming\Microsoft\SystemCertificates\My\Certificates\A374C5D82BD6105B1D97D90338A0E867D028E24B
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Service Worker\CacheStorage\28da9c56fde4021055a681112c092453f74d8dd8\00bc5e3c-d071-4873-bef3-b6a3e2f868ec\index-dir\the-real-index
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\resources.pak
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Session Storage\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Service Worker\Database\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\CertificateTransparency\958\manifest.fingerprint
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\BrowserMetrics\BrowserMetrics-5C6C91C3-1DC.pma
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Secure Preferences
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\aapocclcgogkmnckokdopfmhonfmgoek\0.10_0\_metadata\computed_hashes.json
+C:\ProgramData\VMware\VMware Tools\tools.conf
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlUws.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\data_reduction_proxy_leveldb\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Subresource Filter\Unindexed Rules\9.1\manifest.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\BudgetDatabase\000003.log
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\ChromeUrlClientIncident.store
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\chrome.dll
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extension State\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Sync Extension Settings\pkedcjkdefgpdelpbcmbmeomcjbeemfm\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Thumbnails\000003.log
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\F5F320A94D4D2B4465D8F17E2BB2D351_433222C17D4F6B8032E8E22A8749E2C3
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\felcaaldnbdncclmgdcncolpebgiejap\1.2_0\_metadata\verified_contents.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\aohghmighlieiainnegkcijnfilokake\0.10_0\_metadata\computed_hashes.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache\f_000002
+C:\Program Files\desktop.ini
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Windows Media Player.lnk
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\pkedcjkdefgpdelpbcmbmeomcjbeemfm\7118.1015.0.0_0\_locales\en\messages.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Visited Links
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\CFE86DBBE02D859DC92F1E17E0574EE8_FDB452422670E72EDD3FB3D65568F821
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Local Storage\leveldb\000029.ldb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\PepperFlash\32.0.0.101\manifest.json
+C:\Program Files (x86)\Microsoft Office\root\VFS\ProgramFilesX64\Microsoft Office\Office16\VISSHE.DLL
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\GPUCache\data_3
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\CertificateRevocation\4861\manifest.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlSuspiciousSite.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Service Worker\CacheStorage\28da9c56fde4021055a681112c092453f74d8dd8\index.txt
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Local State
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Local Storage\leveldb\MANIFEST-000001
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\InterventionPolicyDatabase\2018.9.6.0\manifest.fingerprint
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Sync Extension Settings\pkedcjkdefgpdelpbcmbmeomcjbeemfm\MANIFEST-000001
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\pkedcjkdefgpdelpbcmbmeomcjbeemfm\7118.1015.0.0_0\_metadata\computed_hashes.json
+C:\Windows\system32\mscms.dll
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\data_reduction_proxy_leveldb\MANIFEST-000094
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Service Worker\ScriptCache\index-dir\the-real-index
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Session Storage\000011.ldb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Session Storage\000005.ldb
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\chrome_elf.dll
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\SSLErrorAssistant\6\manifest.fingerprint
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\SwReporter\36.183.201\manifest.fingerprint
+C:\Windows\system32\drivers\etc\hosts
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\icudtl.dat
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\data_reduction_proxy_leveldb\000095.log
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\SwReporter\36.183.201\manifest.json
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\locales\en-US.pak
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Service Worker\ScriptCache\index
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\chrome_100_percent.pak
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\CertificateRevocation\4861\crl-set
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache\f_000004
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache\f_000001
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\ChromeExtMalware.store
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Internet Explorer.lnk
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\pkedcjkdefgpdelpbcmbmeomcjbeemfm\7118.1015.0.0_0\background_script.js
+C:\Program Files (x86)\Microsoft Office\root\VFS\ProgramFilesX64\Microsoft Office\Office16\ONFILTER.DLL
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\000016.log
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Shortcuts
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\CertCsdDownloadWhitelist.store
+C:\Windows\System32\webcheck.dll
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\TransportSecurity
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\InterventionPolicyDatabase\2018.9.6.0\intervention_policy_database.pb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\FileTypePolicies\24\manifest.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\ghbmnnjooekpmoecnnnilnnbdlolhkhi\1.7_1\_metadata\computed_hashes.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\BudgetDatabase\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\BudgetDatabase\MANIFEST-000001
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\pnacl\0.57.44.2492\manifest.fingerprint
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\MANIFEST-000014
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extension State\MANIFEST-000001
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\SSLErrorAssistant\6\manifest.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\felcaaldnbdncclmgdcncolpebgiejap\1.2_0\_metadata\computed_hashes.json
+C:\Windows\System32\spool\drivers\color\sRGB Color Space Profile.icm
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\File System\Origins\000003.log
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Local Storage\leveldb\000031.ldb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Sync Data\LevelDB\000003.log
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\F5F320A94D4D2B4465D8F17E2BB2D351_433222C17D4F6B8032E8E22A8749E2C3
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Sync Data\LevelDB\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache\index
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\File System\001\t\.usage
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Session Storage\000008.ldb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\IpMalware.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing
+C:\Program Files (x86)\desktop.ini
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\File System\Origins\MANIFEST-000001
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Google Chrome.lnk
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\DownloadMetadata
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\000008.ldb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\CertificateRevocation\4861\manifest.fingerprint
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\ShaderCache\GPUCache\f_000003
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\GPUCache\index
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\aapocclcgogkmnckokdopfmhonfmgoek\0.10_0\_metadata\verified_contents.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Local Storage\leveldb\000032.log
+C:\Program Files\7-Zip\7-zip.dll
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Local Storage\leveldb\000026.ldb
+C:\Program Files (x86)\Google\Chrome\Application\72.0.3626.109\WidevineCdm\manifest.json
+C:\Windows\System32\shdocvw.dll
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Preferences
+C:\Windows\Fonts\staticcache.dat
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Sublime Text 3.lnk
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Thumbnails\MANIFEST-000001
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.youtube.com_0.indexeddb.leveldb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.google.com_0.indexeddb.leveldb\MANIFEST-000001
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\databases\Databases.db
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Site Characteristics Database\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlCsdDownloadWhitelist.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\pkedcjkdefgpdelpbcmbmeomcjbeemfm\7118.1015.0.0_0\_metadata\verified_contents.json
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\CertificateTransparency\958\manifest.json
+C:\Windows\system32\spool\drivers\color\sRGB Color Space Profile.icm
+C:\Program Files\WinRAR\rarext.dll
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\FileTypePolicies\24\manifest.fingerprint
+C:\Windows\system32\WINUSB.DLL
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\CFE86DBBE02D859DC92F1E17E0574EE8_FDB452422670E72EDD3FB3D65568F821
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Cache\index
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Extensions\pkedcjkdefgpdelpbcmbmeomcjbeemfm\7118.1015.0.0_0\common.js
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\FileTypePolicies\24\download_file_types.pb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Session Storage\MANIFEST-000001
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Sync Data\LevelDB\MANIFEST-000001
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Network Action Predictor
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\page_load_capping_opt_out.db
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Translate Ranker Model
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Service Worker\Database\MANIFEST-000001
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Cache\f_00040b
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlMalBin.store
+C:\Windows\System32\mf.dll
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.google.com_0.indexeddb.leveldb\CURRENT
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\PepperFlash\32.0.0.101\manifest.fingerprint
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\SSLErrorAssistant\6\ssl_error_assistant.pb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\File System\000\t\.usage
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Safe Browsing\UrlSubresourceFilter.store
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\IndexedDB\https_www.google.com_0.indexeddb.leveldb
+C:\Users\Mohammad\AppData\Local\Google\Chrome\User Data\Default\Site Characteristics Database\MANIFEST-000001
+C:\Program Files (x86)\Microsoft Office\root\VFS\ProgramFilesX64\Microsoft Office\Office16\GROOVEEX.DLL
+1820
+C:\Program Files (x86)\Windows Media Player\wmplayer.exe
+C:\Windows\SysWOW64\config\systemprofile\AppData\Local\Microsoft\Windows\Temporary Internet Files\counters.dat
+C:\Program Files (x86)\Windows Media Player\setup_wm.exe
+156
+C:\Program Files (x86)\Microsoft Office\root\Office16\URLREDIR.DLL
+C:\Windows\SysWOW64\ieframe.dll
+C:\Program Files (x86)\Internet Explorer\iexplore.exe
+3296
+C:\Windows\system32\mssitlb.dll
+6880
+C:\Program Files (x86)\Microsoft Office\root\Office16\msoia.exe
+C:\Program Files\Common Files\Microsoft Shared\ClickToRun\AppvIsvStream32.dll
+C:\Program Files\Common Files\Microsoft Shared\ClickToRun\C2R32.dll
+C:\Program Files\Common Files\Microsoft Shared\ClickToRun\AppvIsvSubsystems32.dll
+484
+C:\Windows\WinSxS\manifests\x86_microsoft.windows.c..-controls.resources_6595b64144ccf1df_6.0.7600.16385_en-us_581cd2bf5825dde9.manifest
+C:\Program Files (x86)\Windows Media Player\wmplayer.exe
+C:\Windows\WinSxS\manifests\amd64_microsoft.windows.c..-controls.resources_6595b64144ccf1df_6.0.7600.16385_en-us_106f9be843a9b4e3.manifest
+C:\Windows\WinSxS\manifests\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.7601.18837_none_fa3b1e3d17594757.manifest
+C:\Windows\WinSxS\manifests\x86_microsoft.windows.common-controls_6595b64144ccf1df_6.0.7601.18837_none_41e855142bd5705d.manifest
+6568
+C:\Windows\SysWOW64\stdole2.tlb
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\60B8SXCP.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\8LKWE0J7.txt
+C:\Windows\System32\C_20127.NLS
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\4XSH4YRC.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\3HEMOJR9.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\G7PBRZSI.txt
+C:\Windows\SysWOW64\jsIntl.dll
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\CFE86DBBE02D859DC92F1E17E0574EE8_FDB452422670E72EDD3FB3D65568F821
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\8ZVH6N6O.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\8XKY85LW.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\62E3387X.txt
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\6BADA8974A10C4BD62CC921D13E43B18_D9817BD5013875AD517DA73475345203
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\VF62XNG6.txt
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5\PGNLJ2IH\qsml[1].xml
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\6RG0H9F7.txt
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5\PGNLJ2IH\qsml[2].xml
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\6BADA8974A10C4BD62CC921D13E43B18_C9FB72B5AE80778A08024D8B0FDECC6F
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\BLL13TW1.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\I6YN103K.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\83FKWVOT.txt
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\CFE86DBBE02D859DC92F1E17E0574EE8_FDB452422670E72EDD3FB3D65568F821
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\UDJ1NWPN.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\DX5LXON6.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\KZYMQD9W.txt
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\7396C420A8E1BC1DA97F1AF0D10BAD21
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\PM5AIZJP.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\7CBL1B30.txt
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\6BADA8974A10C4BD62CC921D13E43B18_D9817BD5013875AD517DA73475345203
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\THR2AUVO.txt
+C:\Windows\SysWOW64\vm3dum_10.dll
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\8LA7JWVH.txt
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\6BADA8974A10C4BD62CC921D13E43B18_C9FB72B5AE80778A08024D8B0FDECC6F
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\KNHRTMRY.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\SystemCertificates\My\Certificates\A374C5D82BD6105B1D97D90338A0E867D028E24B
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\696F3DE637E6DE85B458996D49D759AD
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\EUHBOOZG.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\97FQE735.txt
+C:\Program Files (x86)\Microsoft Office\root\VFS\ProgramFilesX64\Microsoft Office\Office16\URLREDIR.DLL
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\5457A8CE4B2A7499F8299A013B6E1C7C_CE50F893881D43DC0C815E4D80FAF2B4
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\7LQIPKL4.txt
+C:\Windows\SysWOW64\ieapfltr.dat
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\F5F320A94D4D2B4465D8F17E2BB2D351_433222C17D4F6B8032E8E22A8749E2C3
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\Content\696F3DE637E6DE85B458996D49D759AD
+C:\Users\Mohammad\AppData\LocalLow\Microsoft\CryptnetUrlCache\MetaData\F5F320A94D4D2B4465D8F17E2BB2D351_2D9F715504FEACBB126651DD176BDB8D
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\HZC1UNIM.txt
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\DAPDP5S1.txt
+C:\Windows\Fonts\staticcache.dat
+C:\Windows\SysWOW64\UIAnimation.dll
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Cookies\80X59MXF.txt
+C:\Users\Mohammad\AppData\Local\Microsoft\Windows\Temporary Internet Files\Low\AntiPhishing\4A72F430-B40C-4D36-A068-CE33ADA5ADF9.dat
+C:\Users\Mohammad\AppData\Roaming\Microsoft\Windows\Coo
