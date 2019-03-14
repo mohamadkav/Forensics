@@ -47,40 +47,69 @@ public class FSA {
             if(function(num)==getNext().getNum()) return true;
             return false;
         }
+
     }
 
 
     public static StatementRoot buildFSA(Map<String, Integer> FileNameToFileNum, Set<Set<String>>FileSequence, Integer n) {
         StatementRoot root = new StatementRoot();
+        Map<Integer, Statement> filenumTofileNode = new HashMap<>();
         for(Set<String>it: FileSequence) {
             Statement headnode = new Statement();
-            headnode = buildFSANode(FileNameToFileNum, it, headnode, n);
+            String head = it.iterator().next();
+            it.remove(head);
+            int headnum;
+            if(FileNameToFileNum.containsKey(head)) headnum = FileNameToFileNum.get(head);
+            else{
+                n++;
+                headnum = n;
+                FileNameToFileNum.put(head,headnum);
+            }
+            headnode.setNum(headnum);
+            headnode = buildFSANode(FileNameToFileNum, it, headnode, n, filenumTofileNode);
+            filenumTofileNode.put(headnum, headnode);
             root.putHead(headnode);
         }
         return root;
     }
 
-    public static Statement buildFSANode(Map<String, Integer>FileNameToFileNum, Set<String>FileSequence, Statement lastNode, Integer n) {
-        Transfer t = new Transfer();
+    public static Statement buildFSANode(Map<String, Integer>FileNameToFileNum, Set<String>FileSequence, Statement lastNode, Integer n, Map<Integer, Statement> FileNumToFileNode) {
+        if(FileSequence.size()==0) {
+            lastNode.SetLeafNode(true);
+            return lastNode;
+        }
+        Boolean repeat = false;
+        Transfer transfer = new Transfer();
         String temp = FileSequence.iterator().next();
+        FileSequence.remove(temp);
+        Statement nextNode = new Statement();
         int i;
+
         if(FileNameToFileNum.containsKey(temp)) i = FileNameToFileNum.get(temp);
         else{
             n++;
             i = n;
+            FileNameToFileNum.put(temp,i);
         }
-        FileSequence.remove(temp);
+        if(FileNameToFileNum.containsKey(i)) nextNode = FileNumToFileNode.get(i);
+        else nextNode.setNum(i);
 
-        t.setParameter(lastNode.getNum(),i);
-        lastNode.putNext(t);
 
-        Statement nextNode = new Statement();
-        nextNode.setNum(i);
-        if(FileSequence.size()==0) {
-            nextNode.SetLeafNode(true);
+        nextNode = buildFSANode(FileNameToFileNum, FileSequence, nextNode, n, FileNumToFileNode);
+        FileNumToFileNode.put(i, nextNode);
+
+        for(Transfer t :lastNode.next)
+        {
+            if(t.next!=null&&t.next.getNum()==i) {
+                repeat = true;
+                break;
+            }
         }
-        else nextNode = buildFSANode(FileNameToFileNum, FileSequence, nextNode, n);
-        t.putNext(nextNode);
+        if(!repeat){
+            transfer.putNext(nextNode);
+            transfer.setParameter(lastNode.getNum(), i);
+            lastNode.next.add(transfer);
+        }
         return lastNode;
     }
 

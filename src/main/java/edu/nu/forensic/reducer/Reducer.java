@@ -102,9 +102,9 @@ public class Reducer {
             root.addChild(head);
         }
         /////////Done building FP tree
-        System.out.println(fileToProcessesWhichHaveAccessedIt.size());
+//        System.out.println(fileToProcessesWhichHaveAccessedIt.size());
 
-//        int i=0;
+//        System.out.println("FP-tree");
 //        for(Node node:root.getChildren())
 //        {
 //            System.out.println("root");
@@ -112,26 +112,28 @@ public class Reducer {
 //            q.add(node);
 //            while(q.size()!=0)
 //            {
-//                i++;
 //                Node temp = q.poll();
 //                System.out.println(temp.getFileName()+temp.getCounter());
 //                q.addAll(temp.getChildren());
 //            }
 //        }
-//        System.out.println(i);
 
         Set<Set<String>> CFAP = findFrequentItemsetWithSuffix(root, 0);
 
-        for(Set<String> it:CFAP) {
-            System.out.println(it.toString());
-        }
+//        System.out.println("frequent scequence");
+//        for(Set<String> it:CFAP) {
+//            System.out.println(it.toString());
+//        }
 
         StatementRoot FSARoot = new StatementRoot();
         Map<String, Integer> FileToNum = new HashMap<>();
         Integer n =0;
         FSARoot = buildFSA(FileToNum, CFAP, n);
 
-        for(String it:FileToNum.keySet()) System.out.println(it+" "+FileToNum.get(it));
-//        printFSA(FSARoot);
+//        System.out.println("number to file name");
+//        for(String it:FileToNum.keySet()) System.out.println(it+" "+FileToNum.get(it));
+
+        System.out.println("finite state automaton");
+        printFSA(FSARoot);
     }
 }

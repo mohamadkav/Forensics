@@ -12,7 +12,7 @@ public class StatementRoot
         PointerTable = new LinkedList<>();
     }
 
-    public Set<FSA.Statement> getHead (){return getHead();}
+    public Set<FSA.Statement> getHead (){return Head;}
     public void putHead(FSA.Statement temp) {
         Head.add(temp);
     }

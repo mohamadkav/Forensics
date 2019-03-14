@@ -21,7 +21,7 @@ public class FPGrowth {
         for(Node it:head.getChildren()) {
             Set<String> result = new LinkedHashSet<>();
             result = getCFAP(it, minSupportCount, result);
-            frequentItemset.add(result);
+            if(result.size()!=0) frequentItemset.add(result);
         }
         return frequentItemset;
     }
