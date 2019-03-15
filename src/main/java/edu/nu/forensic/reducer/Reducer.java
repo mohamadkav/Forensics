@@ -118,7 +118,7 @@ public class Reducer {
 //            }
 //        }
 
-        Set<Set<String>> CFAP = findFrequentItemsetWithSuffix(root, 0);
+        Set<List<String>> CFAP = findFrequentItemsetWithSuffix(root, 0);
 
 //        System.out.println("frequent scequence");
 //        for(Set<String> it:CFAP) {
@@ -130,7 +130,7 @@ public class Reducer {
         Integer n =0;
         FSARoot = buildFSA(FileToNum, CFAP, n);
 
-//        System.out.println("number to file name");
+        System.out.println("number to file name");
 //        for(String it:FileToNum.keySet()) System.out.println(it+" "+FileToNum.get(it));
 
         System.out.println("finite state automaton");

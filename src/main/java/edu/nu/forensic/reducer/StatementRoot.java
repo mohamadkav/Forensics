@@ -29,12 +29,19 @@ public class StatementRoot
     public static void printFSA(StatementRoot root) {
         Queue<FSA.Statement> q = new LinkedList<>();
         q.addAll(root.Head);
+        for(FSA.Statement tempstatement: root.Head) {
+            System.out.println("noderoot -> node"+tempstatement.getNum()+";");
+        }
         while(q.size()!=0) {
             FSA.Statement statement = q.poll();
             for(FSA.Transfer it:statement.getNext()) {
-                System.out.println(statement.getNum()+"->"+it.getNext().getNum());
+                System.out.println("node"+statement.getNum()+" -> node"+it.getNext().getNum()+";");
                 q.add(it.getNext());
             }
         }
+     }
+
+     public void RemoveHead(StatementRoot root, FSA.Statement statement) {
+         if(root.Head.contains(statement)) root.Head.remove(statement);
      }
 }

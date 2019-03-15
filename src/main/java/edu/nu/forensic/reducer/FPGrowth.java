@@ -6,20 +6,20 @@ import java.util.*;
 
 public class FPGrowth {
 
-    public static Set<String> getCFAP (Node node, int minSupportCount, Set<String> result)
+    public static List<String> getCFAP (Node node, int minSupportCount, List<String> result)
     {
         if(node.getCounter()>minSupportCount) {
-            result.add(node.getFileName());
+            if(!result.contains(node.getFileName())) result.add(node.getFileName());
             for(Node item: node.getChildren()) {
                 getCFAP(item, minSupportCount, result);
             }
         }
         return result;
     }
-    public static Set<Set<String>> findFrequentItemsetWithSuffix(Node head, int minSupportCount) {
-        Set<Set<String>> frequentItemset = new HashSet<>();
+    public static Set<List<String>> findFrequentItemsetWithSuffix(Node head, int minSupportCount) {
+        Set<List<String>> frequentItemset = new HashSet<>();
         for(Node it:head.getChildren()) {
-            Set<String> result = new LinkedHashSet<>();
+            List<String> result = new LinkedList<>();
             result = getCFAP(it, minSupportCount, result);
             if(result.size()!=0) frequentItemset.add(result);
         }

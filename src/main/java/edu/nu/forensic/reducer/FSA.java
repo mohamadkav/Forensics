@@ -51,63 +51,68 @@ public class FSA {
     }
 
 
-    public static StatementRoot buildFSA(Map<String, Integer> FileNameToFileNum, Set<Set<String>>FileSequence, Integer n) {
+    public static StatementRoot buildFSA(Map<String, Integer> FileNameToFileNum, Set<List<String>>FileSequence, Integer n) {
         StatementRoot root = new StatementRoot();
         Map<Integer, Statement> filenumTofileNode = new HashMap<>();
-        for(Set<String>it: FileSequence) {
-            Statement headnode = new Statement();
-            String head = it.iterator().next();
-            it.remove(head);
-            int headnum;
-            if(FileNameToFileNum.containsKey(head)) headnum = FileNameToFileNum.get(head);
-            else{
-                n++;
-                headnum = n;
-                FileNameToFileNum.put(head,headnum);
+        for(List<String>its: FileSequence) {
+            List<Integer> tempFileNumSequence = new LinkedList<>();
+            for(String it:its)
+            {
+                if(FileNameToFileNum.containsKey(it)) tempFileNumSequence.add(FileNameToFileNum.get(it));
+                else{
+                    n++;
+                    tempFileNumSequence.add(n);
+                    FileNameToFileNum.put(it,n);
+                }
             }
-            headnode.setNum(headnum);
-            headnode = buildFSANode(FileNameToFileNum, it, headnode, n, filenumTofileNode);
-            filenumTofileNode.put(headnum, headnode);
+            tempFileNumSequence.sort((o1, o2) -> o1-o2);
+            Statement headnode = new Statement();
+            Integer head = tempFileNumSequence.iterator().next();
+            tempFileNumSequence.remove(head);
+            if(filenumTofileNode.containsKey(head)) {
+                headnode = filenumTofileNode.get(head);
+                filenumTofileNode.remove(head);
+                root.RemoveHead(root, headnode);
+            }
+            else headnode.setNum(head);
+            headnode = buildFSANode(tempFileNumSequence, headnode, n, filenumTofileNode);
+            filenumTofileNode.put(head, headnode);
             root.putHead(headnode);
         }
         return root;
     }
 
-    public static Statement buildFSANode(Map<String, Integer>FileNameToFileNum, Set<String>FileSequence, Statement lastNode, Integer n, Map<Integer, Statement> FileNumToFileNode) {
-        if(FileSequence.size()==0) {
+    public static Statement buildFSANode( List<Integer>FilenumSequence, Statement lastNode, Integer n, Map<Integer, Statement> FileNumToFileNode) {
+        if(FilenumSequence.size()==0) {
             lastNode.SetLeafNode(true);
             return lastNode;
         }
+
         Boolean repeat = false;
         Transfer transfer = new Transfer();
-        String temp = FileSequence.iterator().next();
-        FileSequence.remove(temp);
+        Integer temp = FilenumSequence.iterator().next();
+        FilenumSequence.remove(temp);
         Statement nextNode = new Statement();
-        int i;
-
-        if(FileNameToFileNum.containsKey(temp)) i = FileNameToFileNum.get(temp);
-        else{
-            n++;
-            i = n;
-            FileNameToFileNum.put(temp,i);
-        }
-        if(FileNameToFileNum.containsKey(i)) nextNode = FileNumToFileNode.get(i);
-        else nextNode.setNum(i);
-
-
-        nextNode = buildFSANode(FileNameToFileNum, FileSequence, nextNode, n, FileNumToFileNode);
-        FileNumToFileNode.put(i, nextNode);
 
         for(Transfer t :lastNode.next)
         {
-            if(t.next!=null&&t.next.getNum()==i) {
+            if(t.next!=null&&t.next.getNum()==temp) {
                 repeat = true;
                 break;
             }
         }
         if(!repeat){
+            if(FileNumToFileNode.containsKey(temp)) {
+                nextNode = FileNumToFileNode.get(temp);
+                FileNumToFileNode.remove(temp);
+            }
+            else nextNode.setNum(temp);
+
+            nextNode = buildFSANode(FilenumSequence, nextNode, n, FileNumToFileNode);
+            FileNumToFileNode.put(temp, nextNode);
+
             transfer.putNext(nextNode);
-            transfer.setParameter(lastNode.getNum(), i);
+            transfer.setParameter(lastNode.getNum(), temp);
             lastNode.next.add(transfer);
         }
         return lastNode;
