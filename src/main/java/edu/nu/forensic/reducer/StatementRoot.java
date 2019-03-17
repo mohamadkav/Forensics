@@ -32,11 +32,23 @@ public class StatementRoot
         for(FSA.Statement tempstatement: root.Head) {
             System.out.println("noderoot -> node"+tempstatement.getNum()+";");
         }
+<<<<<<< HEAD
+        List<FSA.Statement> temp = new LinkedList<>();
+        while(q.size()!=0) {
+            FSA.Statement statement = q.poll();
+            if(!temp.contains(statement)) {
+                for (FSA.Transfer it : statement.getNext()) {
+                    System.out.println("node" + statement.getNum() + " -> node" + it.getNext().getNum() + ";");
+                    q.add(it.getNext());
+                }
+                temp.add(statement);
+=======
         while(q.size()!=0) {
             FSA.Statement statement = q.poll();
             for(FSA.Transfer it:statement.getNext()) {
                 System.out.println("node"+statement.getNum()+" -> node"+it.getNext().getNum()+";");
                 q.add(it.getNext());
+>>>>>>> d55f6e4596dcafc9652073a782e21e3e3e2694fa
             }
         }
      }
