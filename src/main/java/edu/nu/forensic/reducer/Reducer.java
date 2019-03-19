@@ -131,9 +131,9 @@ public class Reducer {
         FSARoot = buildFSA(FileToNum, CFAP, n);
 
         System.out.println("number to file name");
-//        for(String it:FileToNum.keySet()) System.out.println(it+" "+FileToNum.get(it));
+        for(String it:FileToNum.keySet()) System.out.println(it+" "+FileToNum.get(it));
 
-        System.out.println("finite state automaton");
-        printFSA(FSARoot);
+//        System.out.println("finite state automaton");
+//        printFSA(FSARoot);
     }
 }

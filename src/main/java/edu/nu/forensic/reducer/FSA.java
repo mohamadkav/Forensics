@@ -1,10 +1,5 @@
 package edu.nu.forensic.reducer;
 
-<<<<<<< HEAD
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-
-=======
->>>>>>> d55f6e4596dcafc9652073a782e21e3e3e2694fa
 import java.util.*;
 
 public class FSA {
@@ -52,10 +47,6 @@ public class FSA {
             if(function(num)==getNext().getNum()) return true;
             return false;
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> d55f6e4596dcafc9652073a782e21e3e3e2694fa
     }
 
 
@@ -74,44 +65,33 @@ public class FSA {
                 }
             }
             tempFileNumSequence.sort((o1, o2) -> o1-o2);
-<<<<<<< HEAD
+
             System.out.println(tempFileNumSequence.toString());
             Statement headnode = new Statement();
             Integer head = tempFileNumSequence.get(0);
             tempFileNumSequence = tempFileNumSequence.subList(1, tempFileNumSequence.size());
-=======
-            Statement headnode = new Statement();
-            Integer head = tempFileNumSequence.iterator().next();
-            tempFileNumSequence.remove(head);
->>>>>>> d55f6e4596dcafc9652073a782e21e3e3e2694fa
+
             if(filenumTofileNode.containsKey(head)) {
                 headnode = filenumTofileNode.get(head);
                 filenumTofileNode.remove(head);
                 root.RemoveHead(root, headnode);
             }
             else headnode.setNum(head);
-<<<<<<< HEAD
+
             headnode = buildFSANode(tempFileNumSequence, headnode, filenumTofileNode);
-=======
-            headnode = buildFSANode(tempFileNumSequence, headnode, n, filenumTofileNode);
->>>>>>> d55f6e4596dcafc9652073a782e21e3e3e2694fa
             filenumTofileNode.put(head, headnode);
             root.putHead(headnode);
         }
         return root;
     }
 
-<<<<<<< HEAD
     public static Statement buildFSANode( List<Integer>FilenumSequence, Statement lastNode, Map<Integer, Statement> FileNumToFileNode) {
-=======
-    public static Statement buildFSANode( List<Integer>FilenumSequence, Statement lastNode, Integer n, Map<Integer, Statement> FileNumToFileNode) {
->>>>>>> d55f6e4596dcafc9652073a782e21e3e3e2694fa
+
         if(FilenumSequence.size()==0) {
             lastNode.SetLeafNode(true);
             return lastNode;
         }
 
-<<<<<<< HEAD
         Transfer transfer = new Transfer();
         Integer temp = FilenumSequence.get(0);
         FilenumSequence = FilenumSequence.subList(1,FilenumSequence.size());
@@ -136,35 +116,7 @@ public class FSA {
         transfer.setParameter(lastNode.getNum(), temp);
         lastNode.next.add(transfer);
 
-=======
-        Boolean repeat = false;
-        Transfer transfer = new Transfer();
-        Integer temp = FilenumSequence.iterator().next();
-        FilenumSequence.remove(temp);
-        Statement nextNode = new Statement();
 
-        for(Transfer t :lastNode.next)
-        {
-            if(t.next!=null&&t.next.getNum()==temp) {
-                repeat = true;
-                break;
-            }
-        }
-        if(!repeat){
-            if(FileNumToFileNode.containsKey(temp)) {
-                nextNode = FileNumToFileNode.get(temp);
-                FileNumToFileNode.remove(temp);
-            }
-            else nextNode.setNum(temp);
-
-            nextNode = buildFSANode(FilenumSequence, nextNode, n, FileNumToFileNode);
-            FileNumToFileNode.put(temp, nextNode);
-
-            transfer.putNext(nextNode);
-            transfer.setParameter(lastNode.getNum(), temp);
-            lastNode.next.add(transfer);
-        }
->>>>>>> d55f6e4596dcafc9652073a782e21e3e3e2694fa
         return lastNode;
     }
 
