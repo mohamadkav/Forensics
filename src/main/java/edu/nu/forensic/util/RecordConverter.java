@@ -7,6 +7,8 @@ import edu.nu.forensic.db.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -27,6 +29,8 @@ public class RecordConverter {
     private EventRepository eventRepository;
     @Autowired
     private UnitDependencyRepository unitDependencyRepository;
+
+    private List<Event> eventList=new ArrayList<>();
     public Subject saveAndConvertBBNSubjectToSubject(com.bbn.tc.schema.avro.cdm19.Subject bbnSubject){
         Subject parentSubject=null;
         Principal localPrincipal=null;
@@ -96,7 +100,12 @@ public class RecordConverter {
                 bbnEvent.getThreadId(),subject,predicateObject,bbnEvent.getPredicateObjectPath()!=null?bbnEvent.getPredicateObjectPath().toString():null,
                 predicateObject2,bbnEvent.getPredicateObject2Path()!=null?bbnEvent.getPredicateObject2Path().toString():null,bbnEvent.getTimestampNanos(),
                 eventNames!=null?eventNames.toString():null,bbnEvent.getLocation(),bbnEvent.getSize(),bbnEvent.getProgramPoint()!=null?bbnEvent.getProgramPoint().toString():null);
-        return eventRepository.save(event);
+        eventList.add(event);
+        if(eventList.size()>1000) {
+            eventRepository.saveAll(eventList);
+            eventList=new ArrayList<>();
+        }
+        return null;
     }
     public UnitDependency saveAndConvertBBNUnitDependencyToUnitDependency(com.bbn.tc.schema.avro.cdm19.UnitDependency bbnUnitDependency){
         Subject oldSubject=null,newSubject=null;
