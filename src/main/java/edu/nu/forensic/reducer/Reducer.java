@@ -27,13 +27,17 @@ public class Reducer {
 
     private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt=new HashMap<>();
     private HashSet<Integer> test=new HashSet<>();
+
+    final private String READ = "EVENT_READ";
+    final private String WRITE = "EVENT_WRITE";
+
     public void reduce(){
         //Extract all file reads and writes
-        Set<Event> allFileAccesses=eventRepository.findByNamesEqualsOrNamesEqualsOrderByTimestampNanosAsc("FileIoRead","FileIoWrite");
+        Set<Event> allFileAccesses=eventRepository.findByNamesEqualsOrNamesEqualsOrderByTimestampNanosAsc(READ,WRITE);
         HashMap<Integer,List<String>> processIdToFiles=new HashMap<>();
 
         //Begin extract Read-Only files
-        Set<Event> fileIoWrites=eventRepository.findByNamesEquals("FileIoWrite");
+        Set<Event> fileIoWrites=eventRepository.findByNamesEquals(WRITE);
         Set<String> fileIoWriteFileNames=new HashSet<>();
         for(Event event:fileIoWrites)
             fileIoWriteFileNames.add(event.getPredicateObjectPath());

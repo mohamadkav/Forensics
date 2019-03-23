@@ -16,6 +16,7 @@ import org.apache.avro.io.ReadableJsonDecoder;
 import org.apache.avro.specific.SpecificDatumReader;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class AvroGenericDeserializer extends AvroGenericAbstractDeSerializer {
     private File inputFile;
     DataFileReader<GenericContainer> dataFileReader;
     private boolean isInputFileInitialized = false;
+    private FileInputStream inputStream ;
 
     public AvroGenericDeserializer(){}
 
@@ -66,6 +68,7 @@ public class AvroGenericDeserializer extends AvroGenericAbstractDeSerializer {
             throws IOException, IllegalArgumentException{
         super(readerSchemaFilename, writerSchemaFilename, isSpecific);
         this.inputFile = inputFile;
+        inputStream = new FileInputStream(this.inputFile);
     }
 
     @Override
@@ -173,6 +176,15 @@ public class AvroGenericDeserializer extends AvroGenericAbstractDeSerializer {
         List<GenericContainer> records = deserializeNRecordsFromFile(1);
         if(records == null || records.isEmpty()) return null;
         return records.get(0);
+    }
+
+    public GenericContainer deserializeNextRecordFromFile(int length)
+            throws SchemaNotInitializedException, IOException{
+        if(inputFile == null || !inputFile.exists())
+            throw new IllegalArgumentException("File can not be null and must exist");
+        final byte[] data = new byte[length];
+        inputStream.read(data);
+        return deserializeBytes(data);
     }
 
     public boolean isSpecific() {
