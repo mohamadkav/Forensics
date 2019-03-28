@@ -21,6 +21,8 @@ public class Subject {
     @ManyToOne
     private Subject parentSubject;
 
+    private UUID parentSubjectUUID;
+
     @ManyToOne
     private Principal localPrincipal;
 
@@ -45,6 +47,14 @@ public class Subject {
         this.privilegeLevel = privilegeLevel;
     }
 
+    public Subject(UUID uuid, int cid, UUID parentSubjectUUID, Long startTimestampNanos, String cmdLine){
+        this.uuid = uuid;
+        this.cid = cid;
+        this.parentSubjectUUID = parentSubjectUUID;
+        this.startTimestampNanos = startTimestampNanos;
+        this.cmdLine = cmdLine;
+    }
+
     public UUID getUuid() {
         return uuid;
     }
@@ -52,6 +62,8 @@ public class Subject {
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
+
+    public UUID getParentSubjectUUID() { return parentSubjectUUID; }
 
     public String getType() {
         return type;

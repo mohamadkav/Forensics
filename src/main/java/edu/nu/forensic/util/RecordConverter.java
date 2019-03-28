@@ -31,6 +31,8 @@ public class RecordConverter {
     private UnitDependencyRepository unitDependencyRepository;
 
     private List<Event> eventList=new ArrayList<>();
+    private List<Subject> subjectList = new ArrayList<>();
+
     public Subject saveAndConvertBBNSubjectToSubject(com.bbn.tc.schema.avro.cdm19.Subject bbnSubject){
         Subject parentSubject=null;
         Principal localPrincipal=null;
@@ -41,7 +43,12 @@ public class RecordConverter {
         Subject subject=new Subject(UUID.nameUUIDFromBytes(bbnSubject.getUuid().bytes()),bbnSubject.getType().name(),
                 bbnSubject.getCid(),parentSubject,localPrincipal,bbnSubject.getStartTimestampNanos(),
                 bbnSubject.getCmdLine()==null?null:bbnSubject.getCmdLine().toString(),bbnSubject.getPrivilegeLevel()==null?null:bbnSubject.getPrivilegeLevel().name());
-        return subjectRepository.save(subject);
+        subjectList.add(subject);
+        if(subjectList.size()>=10000){
+            subjectRepository.saveAll(subjectList);
+            subjectList = new ArrayList<>();
+        }
+        return null;
     }
 
     public Principal saveAndConvertBBNPrincipalToPrincipal(com.bbn.tc.schema.avro.cdm19.Principal bbnPrincipal){
@@ -101,7 +108,7 @@ public class RecordConverter {
                 predicateObject2,bbnEvent.getPredicateObject2Path()!=null?bbnEvent.getPredicateObject2Path().toString():null,bbnEvent.getTimestampNanos(),
                 eventNames!=null?eventNames.toString():null,bbnEvent.getLocation(),bbnEvent.getSize(),bbnEvent.getProgramPoint()!=null?bbnEvent.getProgramPoint().toString():null);
         eventList.add(event);
-        if(eventList.size()>1000) {
+        if(eventList.size()>10000) {
             eventRepository.saveAll(eventList);
             eventList=new ArrayList<>();
         }

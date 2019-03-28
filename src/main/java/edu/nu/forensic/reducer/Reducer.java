@@ -37,7 +37,7 @@ public class Reducer {
         HashMap<Integer,List<String>> processIdToFiles=new HashMap<>();
 
         //Begin extract Read-Only files
-        Set<Event> fileIoWrites=eventRepository.findByNamesEquals(WRITE);
+        Set<Event> fileIoWrites = eventRepository.findByNamesEquals(WRITE);
         Set<String> fileIoWriteFileNames=new HashSet<>();
         for(Event event:fileIoWrites)
             fileIoWriteFileNames.add(event.getPredicateObjectPath());

@@ -34,5 +34,6 @@ dependencies {
     compile group: 'org.apache.avro', name: 'avro', version: '1.8.2'
     compile files("lib/tc-schema-1.0-SNAPSHOT.jar")
     compile group: 'org.apache.kafka', name: 'kafka-clients', version: '2.1.0'
+    compile group: 'org.neo4j', name: 'neo4j', version: '3.5.3'
     testCompile("junit:junit")
 }

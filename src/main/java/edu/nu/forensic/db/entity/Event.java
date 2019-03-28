@@ -42,6 +42,8 @@ public class Event {
 
     private String programPoint;
 
+    private UUID subjectUUID;
+
     public Event() {
     }
 
@@ -61,6 +63,17 @@ public class Event {
         this.size = size;
         this.programPoint = programPoint;
     }
+
+    public Event(UUID id, String type, Integer threadId, UUID subjectUUID, long timestampNanos, String predicateObjectPath){
+        this.id = id;
+        this.threadId = threadId;
+        this.type = type;//event type
+        this.subjectUUID = subjectUUID;
+        this.timestampNanos = timestampNanos;
+        this.predicateObjectPath = predicateObjectPath;
+    }
+
+    public UUID getSubjectUUID() { return subjectUUID;}
 
     public UUID getId() {
         return id;
