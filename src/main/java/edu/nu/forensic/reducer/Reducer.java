@@ -2,16 +2,19 @@ package edu.nu.forensic.reducer;
 
 
 import com.bbn.tc.schema.avro.cdm19.SubjectType;
+import com.bbn.tc.schema.avro.cdm19.TCCDMDatum;
+import com.bbn.tc.schema.avro.cdm19.UnitDependency;
+import com.bbn.tc.schema.serialization.AvroGenericDeserializer;
+import edu.nu.forensic.db.DBApi.PostGreSqlApi;
 import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.db.entity.Subject;
 import edu.nu.forensic.db.repository.EventRepository;
+import org.apache.avro.generic.GenericContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.sql.ResultSet;
 import java.util.*;
 
 import static edu.nu.forensic.reducer.FPGrowth.findFrequentItemsetWithSuffix;
@@ -22,121 +25,110 @@ import static java.util.stream.Collectors.toMap;
 
 @Component
 public class Reducer {
-    @Autowired
-    EventRepository eventRepository;
 
-    private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt=new HashMap<>();
+    private PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
+
+//    private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt=new HashMap<>();
     private HashSet<Integer> test=new HashSet<>();
 
-    final private String READ = "EVENT_READ";
-    final private String WRITE = "EVENT_WRITE";
-
     public void reduce(){
+
+
         //Extract all file reads and writes
-        Set<Event> allFileAccesses=eventRepository.findByNamesEqualsOrNamesEqualsOrderByTimestampNanosAsc(READ,WRITE);
-        HashMap<Integer,List<String>> processIdToFiles=new HashMap<>();
-
-        //Begin extract Read-Only files
-        Set<Event> fileIoWrites = eventRepository.findByNamesEquals(WRITE);
-        Set<String> fileIoWriteFileNames=new HashSet<>();
-        for(Event event:fileIoWrites)
-            fileIoWriteFileNames.add(event.getPredicateObjectPath());
-        Set<Event> results=new HashSet<>();
-        for(Event event:allFileAccesses){
-            if(!fileIoWriteFileNames.contains(event.getPredicateObjectPath()))
-                results.add(event);
-        }
-        allFileAccesses=results;
-        ////////////////// End calculating read-only files
-
-
-        //In this section, we find the process which has accessed a file, Generating FAP
-        for(Event event:allFileAccesses){
-            Subject process=event.getSubject();
-            while(!process.getType().equals(SubjectType.SUBJECT_PROCESS.name())){
-                process=process.getParentSubject();
-                if(process==null)
-                    throw new RuntimeException("Dude; the process did not have a parent. No can do.");
-            }
-            //We build the unsorted FAP but we use fileToProcessesWhichHaveAccessedIt to get the ranked table
-            if(processIdToFiles.containsKey(process.getCid())){
-                if(!processIdToFiles.get(process.getCid()).contains(event.getPredicateObjectPath()))
-                    processIdToFiles.get(process.getCid()).add(event.getPredicateObjectPath());
-            }
-            else {
-                List<String> newVal=new ArrayList<String>(){{add(event.getPredicateObjectPath());}};
-                processIdToFiles.put(process.getCid(),newVal);
-            }
-            ///////////End generating the unsorted FAP
-            if(!fileToProcessesWhichHaveAccessedIt.containsKey(event.getPredicateObjectPath())){
-                HashSet<Integer> newVal=new HashSet<>();
-                newVal.add(process.getCid());
-                fileToProcessesWhichHaveAccessedIt.put(event.getPredicateObjectPath(),newVal);
-            }
-            else {
-                fileToProcessesWhichHaveAccessedIt.get(event.getPredicateObjectPath()).add(process.getCid());
-            }
-        }
-        /////////////////End generating FAP
-
-        //Sort them so we'll have the ranked FAP to build the tree
-        fileToProcessesWhichHaveAccessedIt = fileToProcessesWhichHaveAccessedIt
-                .entrySet()
-                .stream()
-                .sorted((Comparator<Map.Entry<String, HashSet<Integer>>> & Serializable)
-                        (c1, c2) -> Integer.compare(c2.getValue().size(), c1.getValue().size()))
-                .collect(
-                        toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
-                                LinkedHashMap::new));
-        ////////////End sorting
+        Map<String,Map<String, Integer>> processIdToFileFrequences = postGreSqlApi.getProcessToFileFrequences();
 
         //Building FP tree
         Node root=new Node(null);
-        for(Integer pid:processIdToFiles.keySet()){
+        for(String process: processIdToFileFrequences.keySet()){
             Node head = new Node(null);
-            List<String> files = processIdToFiles.get(pid);
-            files.sort(((o1, o2) -> fileToProcessesWhichHaveAccessedIt.get(o2).size() - fileToProcessesWhichHaveAccessedIt.get(o1).size()));
-            for(Node temp: root.getChildren()) {
-                if(temp.getFileName().equals(files.get(0))){
-                    head = temp;
-                    break;
+            Map<String, Integer> fileFrequences = processIdToFileFrequences.get(process);
+            if(fileFrequences.size()!=0) {
+                for (Node temp : root.getChildren()) {
+                    if (temp.getFileName().equals(fileFrequences.keySet().iterator().next())) {
+                        head = temp;
+                        break;
+                    }
                 }
+                root.insert(fileFrequences, head);
+                root.addChild(head);
             }
-            root.insert(files,head);
-            root.addChild(head);
         }
         /////////Done building FP tree
-//        System.out.println(fileToProcessesWhichHaveAccessedIt.size());
+        System.out.println(processIdToFileFrequences.size());
 
-//        System.out.println("FP-tree");
-//        for(Node node:root.getChildren())
-//        {
-//            System.out.println("root");
-//            Queue<Node> q = new LinkedList<>();
-//            q.add(node);
-//            while(q.size()!=0)
-//            {
-//                Node temp = q.poll();
-//                System.out.println(temp.getFileName()+temp.getCounter());
-//                q.addAll(temp.getChildren());
-//            }
-//        }
+        System.out.println("FP-tree");
+        for(Node node:root.getChildren())
+        {
+            System.out.println("root");
+            Queue<Node> q = new LinkedList<>();
+            q.add(node);
+            while(q.size()!=0)
+            {
+                Node temp = q.poll();
+                System.out.println(temp.getFileName()+" "+temp.counter);
+                q.addAll(temp.getChildren());
+            }
+        }
 
-        Set<List<String>> CFAP = findFrequentItemsetWithSuffix(root, 0);
-
+//        Set<List<String>> CFAP = findFrequentItemsetWithSuffix(root, 0);
+//        Set<String> filelists = new HashSet<>();
+//
 //        System.out.println("frequent scequence");
-//        for(Set<String> it:CFAP) {
+//        for(List<String> it:CFAP) {
 //            System.out.println(it.toString());
+//            filelists.addAll(it);
+//        }
+//        List<String> judgeprocessID = new ArrayList<>();
+//
+//        try {
+//            AvroGenericDeserializer avroGenericDeserializer = new AvroGenericDeserializer("schema/TCCDMDatum.avsc", "schema/TCCDMDatum.avsc",
+//                    true, new File("C:\\Data\\ta1-marple-e4-A.log"));
+//            final Scanner scanner = new Scanner(new FileReader("C:\\Data\\ta1-marple-e4-A.index"));
+//            int i = 0;
+//            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("C:\\Data\\test.json")));
+//
+//            //init db
+////        Neo4jApi neo4jApi = new Neo4jApi("C:\\Data\\neo4j-community-3.5.3\\data\\databases\\graph.db");
+//            while (scanner.hasNextInt()) {
+//                final int length = scanner.nextInt();
+////            GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
+//                GenericContainer data = (GenericContainer) avroGenericDeserializer.deserializeNextRecordFromFile(length);
+//                if (data == null) break;
+//                TCCDMDatum CDMdatum = (TCCDMDatum) data;
+//                try {
+//                    if (i % 10000 == 0) System.out.println(i);
+//                    i++;
+//                    if (CDMdatum.getDatum() instanceof Event) {
+//                        if (((Event) CDMdatum.getDatum()).getNames().contains("FileIoRead") || ((Event) CDMdatum.getDatum()).getNames().contains("FileIoWrite")) {
+//                            if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubjectUUID().toString())&&filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
+//                                judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubjectUUID().toString());
+//                                String temp = CDMdatum.getDatum().toString();
+//                                temp = temp.replace(((Event)CDMdatum.getDatum()).getPredicateObjectPath(),"Initial process");
+//                                bufferedWriter.append(temp+"\r\n");
+//                            }
+//                        }
+//                    }
+//                    else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
+//                } catch (Exception e) {
+//                    System.err.println("Darn! We have an unknown bug over: ");
+////                System.err.println(CDMdatum);
+//                    e.printStackTrace();
+//                }
+//            }
+//            bufferedWriter.flush();
+//            bufferedWriter.close();
+//        }catch (Exception e){
+//            e.printStackTrace();
 //        }
 
-        StatementRoot FSARoot = new StatementRoot();
-        Map<String, Integer> FileToNum = new HashMap<>();
-        Integer n =0;
-        FSARoot = buildFSA(FileToNum, CFAP, n);
-
-        System.out.println("number to file name");
-        for(String it:FileToNum.keySet()) System.out.println(it+" "+FileToNum.get(it));
-
+//        StatementRoot FSARoot = new StatementRoot();
+//        Map<String, Integer> FileToNum = new HashMap<>();
+//        Integer n =0;
+//        FSARoot = buildFSA(FileToNum, CFAP, n);
+//
+//        System.out.println("number to file name");
+//        for(String it:FileToNum.keySet()) System.out.println(it+" "+FileToNum.get(it));
+//
 //        System.out.println("finite state automaton");
 //        printFSA(FSARoot);
     }

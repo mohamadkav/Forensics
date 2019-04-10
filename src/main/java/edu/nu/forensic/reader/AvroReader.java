@@ -4,6 +4,7 @@ import com.bbn.tc.schema.SchemaNotInitializedException;
 import com.bbn.tc.schema.avro.cdm19.*;
 import com.bbn.tc.schema.serialization.AvroGenericDeserializer;
 import edu.nu.forensic.db.DBApi.Neo4jApi;
+import edu.nu.forensic.db.DBApi.PostGreSqlApi;
 import edu.nu.forensic.util.RecordConverter;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.avro.generic.GenericData;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -43,7 +45,8 @@ public class AvroReader {
         Map<UUID,UUID> UnitToDependency = new HashMap<>();
 
         //init db
-        Neo4jApi neo4jApi = new Neo4jApi("C:\\Data\\neo4j-community-3.5.3\\data\\databases\\graph.db");
+//        Neo4jApi neo4jApi = new Neo4jApi("C:\\Data\\neo4j-community-3.5.3\\data\\databases\\graph.db");
+        PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
 
         while(scanner.hasNextInt()){
             final int length  = scanner.nextInt();
@@ -86,30 +89,36 @@ public class AvroReader {
                 if(CDMdatum.getDatum() instanceof Subject) {
                     if (((Subject) CDMdatum.getDatum()).getType().toString().contains("THREAD")) {
                         UUID threadID = UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getUuid().bytes());
-                        UUID processID = ((Subject) CDMdatum.getDatum()).getParentSubject() != null ? UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getParentSubject().bytes()) : null;
-                        ThreadIDToProcessID.put(threadID,processID);
+                        UUID processID =  UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getParentSubject().bytes());
+                        if(processID!=null) ThreadIDToProcessID.put(threadID,processID);
                     } else {
+//                        System.out.println(CDMdatum.getDatum().toString());
+
                         UUID processID = UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getUuid().bytes());
                         UUID parentID = ((Subject) CDMdatum.getDatum()).getParentSubject() != null ? UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getParentSubject().bytes()) : null;
 
                         //thread
-                        if(ThreadIDToProcessID.containsKey(processID)) processID = ThreadIDToProcessID.get(processID);
-                        if(parentID!=null&&ThreadIDToProcessID.containsKey(parentID)) parentID = ThreadIDToProcessID.get(parentID);
+                        while(ThreadIDToProcessID.containsKey(processID)) processID = ThreadIDToProcessID.get(processID);
+                        while(parentID!=null&&ThreadIDToProcessID.containsKey(parentID)) parentID = ThreadIDToProcessID.get(parentID);
 
                         //unitdependent
-                        if(UnitToDependency.containsKey(processID)) processID = UnitToDependency.get(processID);
-                        if(UnitToDependency.containsKey(parentID)) parentID = UnitToDependency.get(parentID);
+                        while(UnitToDependency.containsKey(processID)) {
+                            processID = UnitToDependency.get(processID);
+                        }
+                        while((parentID!=null)&&UnitToDependency.containsKey(parentID)) {
+                            parentID = UnitToDependency.get(parentID);
+                        }
 
                         edu.nu.forensic.db.entity.Subject subject = new edu.nu.forensic.db.entity.Subject(
                                 processID
                                 , ((Subject) CDMdatum.getDatum()).getCid()
                                 , parentID
                                 , ((Subject) CDMdatum.getDatum()).getStartTimestampNanos()
-                                ,((Subject) CDMdatum.getDatum()).getCmdLine() != null ? ((Subject) CDMdatum.getDatum()).getCmdLine().toString() : "thread");
+                                ,((Subject) CDMdatum.getDatum()).getCmdLine() != null ? ((Subject) CDMdatum.getDatum()).getCmdLine().toString().replaceAll("\"","").replaceAll("'","") : null);
                         subjectList.add(subject);
                         if (subjectList.size() > 100) {
-                            neo4jApi.storeSubject(subjectList);
-                            subjectList = new ArrayList<>();
+                            postGreSqlApi.storeSubject(subjectList);
+                            subjectList.clear();
                             System.out.println(11111);
                         }
                     }
@@ -120,9 +129,11 @@ public class AvroReader {
                             UUID processID = UUID.nameUUIDFromBytes(((Event) CDMdatum.getDatum()).getSubject().bytes());
 
                             //thread
-                            if(ThreadIDToProcessID.containsKey(processID)) processID = ThreadIDToProcessID.get(processID);
+                            while(ThreadIDToProcessID.containsKey(processID)) processID = ThreadIDToProcessID.get(processID);
                             //dependent
-                            if(UnitToDependency.containsKey(processID)) processID = UnitToDependency.get(processID);
+                            while(UnitToDependency.containsKey(processID)) {
+                                processID = UnitToDependency.get(processID);
+                            }
 
                             edu.nu.forensic.db.entity.Event event = new edu.nu.forensic.db.entity.Event(
                                     UUID.nameUUIDFromBytes(((Event) CDMdatum.getDatum()).getUuid().bytes())
@@ -135,15 +146,15 @@ public class AvroReader {
                         }
                     }
                     if(eventList.size()>3000){
-                        neo4jApi.storeEvent(eventList);
-                        eventList = new ArrayList<>();
+                        postGreSqlApi.storeEvent(eventList);
+                        eventList.clear();
                         System.out.println(22222);
                     }
                 }
                 else if(CDMdatum.getDatum() instanceof UnitDependency){
                     UUID unit = UUID.nameUUIDFromBytes(((UnitDependency)CDMdatum.getDatum()).getUnit().bytes());
                     UUID dependentUnit = UUID.nameUUIDFromBytes(((UnitDependency)CDMdatum.getDatum()).getDependentUnit().bytes());
-                    UnitToDependency.put(unit,dependentUnit);
+                    UnitToDependency.put(dependentUnit,unit);
                 }
             }catch (Exception e){
                 System.err.println("Darn! We have an unknown bug over: ");
@@ -151,8 +162,11 @@ public class AvroReader {
                 e.printStackTrace();
             }
         }
-        neo4jApi.storeSubject(subjectList);
-        neo4jApi.storeEvent(eventList);
+        postGreSqlApi.storeSubject(subjectList);
+        postGreSqlApi.storeEvent(eventList);
+        Date day=new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println(df.format(day));
         avroGenericDeserializer.close();
     }
 }

@@ -8,7 +8,7 @@ public class FPGrowth {
 
     public static List<String> getCFAP (Node node, int minSupportCount, List<String> result)
     {
-        if(node.getCounter()>minSupportCount) {
+        if(node.counter>minSupportCount) {
             if(!result.contains(node.getFileName())) result.add(node.getFileName());
             for(Node item: node.getChildren()) {
                 getCFAP(item, minSupportCount, result);
@@ -42,7 +42,7 @@ public class FPGrowth {
 
     public static void CalculateUtilizationRatio(Node head)
     {
-        int rootNum = head.getCounter();
+        int rootNum = head.counter;
         for(Node it:head.getChildren())
         {
             calculateUtilizationRatio(rootNum, it);
@@ -50,7 +50,7 @@ public class FPGrowth {
     }
     private static void calculateUtilizationRatio(int rootNum, Node node)
     {
-        node.setUtilizationRatio(node.getCounter()/rootNum);
+        node.setUtilizationRatio(node.counter/rootNum);
         for(Node it: node.getChildren())
         {
             calculateUtilizationRatio(rootNum, it);

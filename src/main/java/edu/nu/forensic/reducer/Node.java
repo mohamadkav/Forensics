@@ -1,13 +1,16 @@
 package edu.nu.forensic.reducer;
 
+import org.neo4j.register.Register;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Node {
     private String fileName = null;
     private List<Node> children = new ArrayList<>();
     private Node parent = null;
-    private Integer counter = 1;
+    public Integer counter = 1;
     private double UtilizationRatio = 0;
 
     public Node(String fileName) {
@@ -40,8 +43,6 @@ public class Node {
         return children;
     }
 
-    public Integer getCounter() {return counter; }
-
     public String getFileName() {
         return fileName;
     }
@@ -58,22 +59,24 @@ public class Node {
         return parent;
     }
 
-    public void insert(List<String> files, Node node){
-        if(files.size()==0)
+    public void insert(Map<String, Integer> fileFrequences, Node node){
+        if(fileFrequences.size()==0)
             return;
-        if(node.fileName==null){
-            node.setFileName(files.get(0));
-            insert(files.subList(1,files.size()),node);
-        }
-        else if(files.get(0).equals(node.getFileName())){
-            node.counter++;
-            insert(files.subList(1,files.size()),node);
-        }
-        else{
-            Node newChild= new Node(files.get(0));
-            files = files.subList(1,files.size());
-            insert(files,newChild);
-            node.addChild(newChild);
+        for(String it:fileFrequences.keySet()){
+            if(node.fileName==null){
+                node.setFileName(it);
+                System.out.println(it+" "+fileFrequences.get(it));
+                node.counter = fileFrequences.get(it);
+            }
+            else if(it.equals(node.getFileName())){
+                node.counter +=fileFrequences.get(it);
+            }
+            else {
+                Node newChild = new Node(it);
+                newChild.counter = fileFrequences.get(it);
+                node.addChild(newChild);
+                node = newChild;
+            }
         }
     }
 

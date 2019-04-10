@@ -109,7 +109,12 @@ public class Neo4jApi extends Thread{
             e.getMessage();
         }
     }
-    public synchronized void run(List<Event> eventList){
-        storeEvent(eventList);
+
+    public void closeConnection(){
+        try{
+            db.shutdown();
+        }catch (Exception e){
+            System.err.println("error when shutting down");
+        }
     }
 }
