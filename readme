@@ -1,0 +1,17 @@
+Here is Node Merge doc：
+
+--------Here are some info about how to run the program--------
+
+1. You need to download and install postgresql and postman first.
+
+2. When you run this code, you must run read first, and input the file of data source in postman,
+   the head is: localhost:8080/command/read, the body is: {"trace":"C:\\Data\\ta1-marple-e4-A.log"},
+   You need to set the index of data file in class AvroReader, line 39,
+   for example: if the data file is C:\\Data\\ta1-marple-e4-A.log, the index is ta1-marple-e4-a.index;
+
+3. When you finish running "read", you can run "reduce", you also need to input the file of data source.
+   the same to 1. the class is Reducer, the line is 86, the head is localhost:8080/command/reduce;
+
+4. I set result text as "temp.txt" in class Reducer line 88, the result text stores all the events after reducing.
+   For result text, we can get the size of this text to evaluate the result of system.
+   The size of Marple-A is 60G before reduction, and Marple-B is 69G.

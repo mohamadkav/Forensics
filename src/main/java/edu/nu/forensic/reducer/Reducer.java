@@ -31,7 +31,7 @@ public class Reducer {
 //    private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt=new HashMap<>();
     private HashSet<Integer> test=new HashSet<>();
 
-    public void reduce(){
+    public void reduce(File source){
 
 
         //Extract all file reads and writes
@@ -70,56 +70,56 @@ public class Reducer {
             }
         }
 
-//        Set<List<String>> CFAP = findFrequentItemsetWithSuffix(root, 0);
-//        Set<String> filelists = new HashSet<>();
-//
-//        System.out.println("frequent scequence");
-//        for(List<String> it:CFAP) {
-//            System.out.println(it.toString());
-//            filelists.addAll(it);
-//        }
-//        List<String> judgeprocessID = new ArrayList<>();
-//
-//        try {
-//            AvroGenericDeserializer avroGenericDeserializer = new AvroGenericDeserializer("schema/TCCDMDatum.avsc", "schema/TCCDMDatum.avsc",
-//                    true, new File("C:\\Data\\ta1-marple-e4-A.log"));
-//            final Scanner scanner = new Scanner(new FileReader("C:\\Data\\ta1-marple-e4-A.index"));
-//            int i = 0;
-//            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("C:\\Data\\test.json")));
-//
-//            //init db
-////        Neo4jApi neo4jApi = new Neo4jApi("C:\\Data\\neo4j-community-3.5.3\\data\\databases\\graph.db");
-//            while (scanner.hasNextInt()) {
-//                final int length = scanner.nextInt();
-////            GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
-//                GenericContainer data = (GenericContainer) avroGenericDeserializer.deserializeNextRecordFromFile(length);
-//                if (data == null) break;
-//                TCCDMDatum CDMdatum = (TCCDMDatum) data;
-//                try {
-//                    if (i % 10000 == 0) System.out.println(i);
-//                    i++;
-//                    if (CDMdatum.getDatum() instanceof Event) {
-//                        if (((Event) CDMdatum.getDatum()).getNames().contains("FileIoRead") || ((Event) CDMdatum.getDatum()).getNames().contains("FileIoWrite")) {
-//                            if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubjectUUID().toString())&&filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
-//                                judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubjectUUID().toString());
-//                                String temp = CDMdatum.getDatum().toString();
-//                                temp = temp.replace(((Event)CDMdatum.getDatum()).getPredicateObjectPath(),"Initial process");
-//                                bufferedWriter.append(temp+"\r\n");
-//                            }
-//                        }
-//                    }
-//                    else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
-//                } catch (Exception e) {
-//                    System.err.println("Darn! We have an unknown bug over: ");
-////                System.err.println(CDMdatum);
-//                    e.printStackTrace();
-//                }
-//            }
-//            bufferedWriter.flush();
-//            bufferedWriter.close();
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
+        Set<List<String>> CFAP = findFrequentItemsetWithSuffix(root, 0);
+        Set<String> filelists = new HashSet<>();
+
+        System.out.println("frequent scequence");
+        for(List<String> it:CFAP) {
+            System.out.println(it.toString());
+            filelists.addAll(it);
+        }
+        List<String> judgeprocessID = new ArrayList<>();
+
+        try {
+            AvroGenericDeserializer avroGenericDeserializer = new AvroGenericDeserializer("schema/TCCDMDatum.avsc", "schema/TCCDMDatum.avsc",
+                    true, source);
+            final Scanner scanner = new Scanner(new FileReader("C:\\Data\\ta1-marple-e4-A.index"));
+            int i = 0;
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("C:\\Data\\test.json")));
+
+            //init db
+//        Neo4jApi neo4jApi = new Neo4jApi("C:\\Data\\neo4j-community-3.5.3\\data\\databases\\graph.db");
+            while (scanner.hasNextInt()) {
+                final int length = scanner.nextInt();
+//            GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
+                GenericContainer data = (GenericContainer) avroGenericDeserializer.deserializeNextRecordFromFile(length);
+                if (data == null) break;
+                TCCDMDatum CDMdatum = (TCCDMDatum) data;
+                try {
+                    if (i % 10000 == 0) System.out.println(i);
+                    i++;
+                    if (CDMdatum.getDatum() instanceof Event) {
+                        if (((Event) CDMdatum.getDatum()).getNames().contains("FileIoRead") || ((Event) CDMdatum.getDatum()).getNames().contains("FileIoWrite")) {
+                            if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubjectUUID().toString())&&filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
+                                judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubjectUUID().toString());
+                                String temp = CDMdatum.getDatum().toString();
+                                temp = temp.replace(((Event)CDMdatum.getDatum()).getPredicateObjectPath(),"Initial process");
+                                bufferedWriter.append(temp+"\r\n");
+                            }
+                        }
+                    }
+                    else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
+                } catch (Exception e) {
+                    System.err.println("Darn! We have an unknown bug over: ");
+//                System.err.println(CDMdatum);
+                    e.printStackTrace();
+                }
+            }
+            bufferedWriter.flush();
+            bufferedWriter.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
 //        StatementRoot FSARoot = new StatementRoot();
 //        Map<String, Integer> FileToNum = new HashMap<>();

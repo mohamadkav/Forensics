@@ -45,8 +45,16 @@ public class ApplicationController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/reduce")
-    public String reduce(){
-        reducer.reduce();
+    public String reduce(@RequestBody ReadTraceRequest request){
+        if(request.getTrace()!=null && new File(request.getTrace()).exists()){
+            try{
+                reducer.reduce(new File(request.getTrace()));
+            }catch (Exception e){
+                e.printStackTrace();
+                return "ERROR";
+            }
+        }
+        else return "File Not Existed";
         return "OK";
     }
 }
