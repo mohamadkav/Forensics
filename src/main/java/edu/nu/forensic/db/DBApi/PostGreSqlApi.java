@@ -78,6 +78,8 @@ public class PostGreSqlApi {
                     e.getMessage();
                 }
             }
+            statement.close();
+            c.commit();
         } catch (Exception e) {
             e.printStackTrace();
             e.getMessage();
@@ -179,6 +181,7 @@ public class PostGreSqlApi {
                 if(temp.size()!=0&&temp.size()!=1) result.put(SubjectName, temp);
                 else result.remove(SubjectName);
             }
+            statement.close();
             return result;
         }catch (Exception e){
             e.getMessage();

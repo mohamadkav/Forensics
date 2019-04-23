@@ -78,7 +78,7 @@ public class Reducer {
             System.out.println(it.toString());
             filelists.addAll(it);
         }
-        List<String> judgeprocessID = new ArrayList<>();
+
 
         try {
             AvroGenericDeserializer avroGenericDeserializer = new AvroGenericDeserializer("schema/TCCDMDatum.avsc", "schema/TCCDMDatum.avsc",
@@ -87,8 +87,8 @@ public class Reducer {
             int i = 0;
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("C:\\Data\\test.json")));
 
-            //init db
-//        Neo4jApi neo4jApi = new Neo4jApi("C:\\Data\\neo4j-community-3.5.3\\data\\databases\\graph.db");
+            List<String> judgeprocessID = new ArrayList<>();
+            List<String> writeFiles = new LinkedList<>();
             while (scanner.hasNextInt()) {
                 final int length = scanner.nextInt();
 //            GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
@@ -99,13 +99,13 @@ public class Reducer {
                     if (i % 10000 == 0) System.out.println(i);
                     i++;
                     if (CDMdatum.getDatum() instanceof Event) {
-                        if (((Event) CDMdatum.getDatum()).getNames().contains("FileIoRead") || ((Event) CDMdatum.getDatum()).getNames().contains("FileIoWrite")) {
-                            if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubjectUUID().toString())&&filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
-                                judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubjectUUID().toString());
-                                String temp = CDMdatum.getDatum().toString();
-                                temp = temp.replace(((Event)CDMdatum.getDatum()).getPredicateObjectPath(),"Initial process");
-                                bufferedWriter.append(temp+"\r\n");
-                            }
+                        if (((Event) CDMdatum.getDatum()).getNames().contains("FileIoRead")) {
+                            // how to deal with this issue
+                        }
+                        else if(((Event) CDMdatum.getDatum()).getNames().contains("FileIoWrite")){
+                            String WrittenFile = ((Event)CDMdatum.getDatum()).getPredicateObjectPath();
+                            if(!writeFiles.contains(WrittenFile)) writeFiles.add(WrittenFile);
+                            // remove read file
                         }
                     }
                     else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
