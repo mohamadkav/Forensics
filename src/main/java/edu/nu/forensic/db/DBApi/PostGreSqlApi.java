@@ -160,11 +160,12 @@ public class PostGreSqlApi {
                 String SubjectSheetName = FileSheetName.replace("file","subject");
                 String SubjectName = FildSubjectName(SubjectSheetName, statement);
                 Map<String, Integer> temp = new TreeMap<>();
-                String sqlFindFiles = "SELECT * FROM \""+FileSheetName +"\"";
+                String sqlFindFiles = "SELECT FILENAME, EVENTTYPE, COUNT(*) as count FROM \""+FileSheetName +"\" GROUP BY FILENAME, EVENTTYPE";
                 ResultSet fileResult = statement.executeQuery(sqlFindFiles);
                 while(fileResult.next()){
                     String filename = fileResult.getString("FILENAME");
                     String eventtype = fileResult.getString("EVENTTYPE");
+                    int count = fileResult.getInt("count");
                     if(eventtype.contains("Write")) {
                         if(!NotReadOnlyFiles.contains(filename)) {
                             NotReadOnlyFiles.add(filename);
@@ -172,12 +173,7 @@ public class PostGreSqlApi {
                         }
                     }
                     else if(!NotReadOnlyFiles.contains(filename)){
-                        if(!temp.containsKey(filename)) temp.put(filename,1);
-                        else{
-                            Integer i = temp.get(filename);
-                            i++;
-                            temp.put(filename,i);
-                        }
+                        if(!temp.containsKey(filename)) temp.put(filename,count);
                     }
                 }
                 if(temp.size()!=0&&temp.size()!=1) result.put(SubjectName, temp);
