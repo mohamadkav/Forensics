@@ -100,12 +100,21 @@ public class Reducer {
                     i++;
                     if (CDMdatum.getDatum() instanceof Event) {
                         if (((Event) CDMdatum.getDatum()).getNames().contains("FileIoRead")) {
-                            // how to deal with this issue
+                            if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubjectUUID().toString())
+                                    &&filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
+                                judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubjectUUID().toString());
+                                String temp = CDMdatum.getDatum().toString();
+                                temp = temp.replace(((Event)CDMdatum.getDatum()).getPredicateObjectPath(),"Initial process");
+                                bufferedWriter.append(temp+"\r\n");
+                            }
+                            else if(!filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
+                                bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
+                            }
                         }
                         else if(((Event) CDMdatum.getDatum()).getNames().contains("FileIoWrite")){
                             String WrittenFile = ((Event)CDMdatum.getDatum()).getPredicateObjectPath();
                             if(!writeFiles.contains(WrittenFile)) writeFiles.add(WrittenFile);
-                            // remove read file
+                            if(filelists.contains(WrittenFile)) filelists.remove(WrittenFile);
                         }
                     }
                     else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
