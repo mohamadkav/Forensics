@@ -34,7 +34,8 @@ public class ApplicationController {
         System.out.println(request.getTrace());
         if(request.getTrace()!=null && new File(request.getTrace()).exists())
             try {
-                avroReader.readTrace(new File(request.getTrace()));
+                avroReader.readTraceWithoutIndex(new File(request.getTrace()));
+//                avroReader.readTrace(new File(request.getTrace()));
             }catch (IOException|SchemaNotInitializedException e){
                 e.printStackTrace();
                 return "ERROR";
