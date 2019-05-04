@@ -1,7 +1,5 @@
 package edu.nu.forensic.reducer;
 
-import org.neo4j.register.Register;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

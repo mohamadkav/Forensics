@@ -1,29 +1,17 @@
 package edu.nu.forensic.reducer;
 
-
-import com.bbn.tc.schema.avro.cdm19.SubjectType;
+import com.bbn.tc.schema.avro.cdm19.Event;
 import com.bbn.tc.schema.avro.cdm19.TCCDMDatum;
-import com.bbn.tc.schema.avro.cdm19.UnitDependency;
 import com.bbn.tc.schema.serialization.AvroGenericDeserializer;
 import edu.nu.forensic.db.DBApi.PostGreSqlApi;
-import edu.nu.forensic.db.entity.Event;
-import edu.nu.forensic.db.entity.Subject;
-import edu.nu.forensic.db.repository.EventRepository;
 import org.apache.avro.generic.GenericContainer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.sql.ResultSet;
 import java.util.*;
+import edu.nu.forensic.reader.RuducerReader;
 
 import static edu.nu.forensic.reducer.FPGrowth.findFrequentItemsetWithSuffix;
-import static edu.nu.forensic.reducer.FSA.buildFSA;
-import static edu.nu.forensic.reducer.StatementRoot.printFSA;
-import static java.util.stream.Collectors.toMap;
 
-
-@Component
 public class Reducer {
 
     private PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
@@ -80,29 +68,26 @@ public class Reducer {
         }
 
 
-        try {
-            AvroGenericDeserializer avroGenericDeserializer = new AvroGenericDeserializer("schema/TCCDMDatum.avsc", "schema/TCCDMDatum.avsc",
-                    true, source);
-            final Scanner scanner = new Scanner(new FileReader("C:\\Data\\ta1-marple-e4-A.index"));
-            int i = 0;
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("C:\\Data\\test.json")));
-
+        try{
+            AvroGenericDeserializer avroGenericDeserializer=new AvroGenericDeserializer("schema/TCCDMDatum.avsc","schema/TCCDMDatum.avsc",
+                    true,source);
+            int i=0;
             List<String> judgeprocessID = new ArrayList<>();
             List<String> writeFiles = new LinkedList<>();
-            while (scanner.hasNextInt()) {
-                final int length = scanner.nextInt();
-//            GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
-                GenericContainer data = (GenericContainer) avroGenericDeserializer.deserializeNextRecordFromFile(length);
-                if (data == null) break;
-                TCCDMDatum CDMdatum = (TCCDMDatum) data;
+            BufferedWriter  bufferedWriter = new BufferedWriter(new FileWriter("temp.txt"));
+            while(true){
+                GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
+                if(data==null)
+                    break;
+                TCCDMDatum CDMdatum=(TCCDMDatum) data;
                 try {
                     if (i % 10000 == 0) System.out.println(i);
                     i++;
                     if (CDMdatum.getDatum() instanceof Event) {
                         if (((Event) CDMdatum.getDatum()).getNames().contains("FileIoRead")) {
-                            if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubjectUUID().toString())
+                            if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubject().toString())
                                     &&filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
-                                judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubjectUUID().toString());
+                                judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubject().toString());
                                 String temp = CDMdatum.getDatum().toString();
                                 temp = temp.replace(((Event)CDMdatum.getDatum()).getPredicateObjectPath(),"Initial process");
                                 bufferedWriter.append(temp+"\r\n");
@@ -112,7 +97,7 @@ public class Reducer {
                             }
                         }
                         else if(((Event) CDMdatum.getDatum()).getNames().contains("FileIoWrite")){
-                            String WrittenFile = ((Event)CDMdatum.getDatum()).getPredicateObjectPath();
+                            String WrittenFile = ((Event)CDMdatum.getDatum()).getPredicateObjectPath().toString();
                             if(!writeFiles.contains(WrittenFile)) writeFiles.add(WrittenFile);
                             if(filelists.contains(WrittenFile)) filelists.remove(WrittenFile);
                         }
@@ -126,9 +111,60 @@ public class Reducer {
             }
             bufferedWriter.flush();
             bufferedWriter.close();
+            avroGenericDeserializer.close();
         }catch (Exception e){
             e.printStackTrace();
         }
+
+//        try {
+//            AvroGenericDeserializer avroGenericDeserializer = new AvroGenericDeserializer("schema/TCCDMDatum.avsc", "schema/TCCDMDatum.avsc",
+//                    true, source);
+//            final Scanner scanner = new Scanner(new FileReader("C:\\Data\\ta1-marple-e4-A.index"));
+//            int i = 0;
+//            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(new File("C:\\Data\\test.json")));
+//
+//            List<String> judgeprocessID = new ArrayList<>();
+//            List<String> writeFiles = new LinkedList<>();
+//            while (scanner.hasNextInt()) {
+//                final int length = scanner.nextInt();
+////            GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
+//                GenericContainer data = (GenericContainer) avroGenericDeserializer.deserializeNextRecordFromFile(length);
+//                if (data == null) break;
+//                TCCDMDatum CDMdatum = (TCCDMDatum) data;
+//                try {
+//                    if (i % 10000 == 0) System.out.println(i);
+//                    i++;
+//                    if (CDMdatum.getDatum() instanceof Event) {
+//                        if (((Event) CDMdatum.getDatum()).getNames().contains("FileIoRead")) {
+//                            if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubjectUUID().toString())
+//                                    &&filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
+//                                judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubjectUUID().toString());
+//                                String temp = CDMdatum.getDatum().toString();
+//                                temp = temp.replace(((Event)CDMdatum.getDatum()).getPredicateObjectPath(),"Initial process");
+//                                bufferedWriter.append(temp+"\r\n");
+//                            }
+//                            else if(!filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
+//                                bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
+//                            }
+//                        }
+//                        else if(((Event) CDMdatum.getDatum()).getNames().contains("FileIoWrite")){
+//                            String WrittenFile = ((Event)CDMdatum.getDatum()).getPredicateObjectPath();
+//                            if(!writeFiles.contains(WrittenFile)) writeFiles.add(WrittenFile);
+//                            if(filelists.contains(WrittenFile)) filelists.remove(WrittenFile);
+//                        }
+//                    }
+//                    else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
+//                } catch (Exception e) {
+//                    System.err.println("Darn! We have an unknown bug over: ");
+////                System.err.println(CDMdatum);
+//                    e.printStackTrace();
+//                }
+//            }
+//            bufferedWriter.flush();
+//            bufferedWriter.close();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
 
 //        StatementRoot FSARoot = new StatementRoot();
 //        Map<String, Integer> FileToNum = new HashMap<>();

@@ -1,7 +1,5 @@
 package edu.nu.forensic.reducer;
 
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
-
 import java.util.*;
 
 public class FPGrowth {
