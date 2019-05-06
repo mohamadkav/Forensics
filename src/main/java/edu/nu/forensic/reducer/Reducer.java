@@ -8,10 +8,12 @@ import org.apache.avro.generic.GenericContainer;
 
 import java.io.*;
 import java.util.*;
-import edu.nu.forensic.reader.RuducerReader;
+import org.springframework.stereotype.Component;
 
 import static edu.nu.forensic.reducer.FPGrowth.findFrequentItemsetWithSuffix;
 
+
+@Component
 public class Reducer {
 
     private PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
