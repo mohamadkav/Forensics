@@ -16,17 +16,15 @@ import static edu.nu.forensic.reducer.FPGrowth.findFrequentItemsetWithSuffix;
 @Component
 public class Reducer {
 
-    private PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
+
 
 //    private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt=new HashMap<>();
     private HashSet<Integer> test=new HashSet<>();
 
     public void reduce(File source){
-
-
+        PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
         //Extract all file reads and writes
         Map<String,Map<String, Integer>> processIdToFileFrequences = postGreSqlApi.getProcessToFileFrequences();
-
         //Building FP tree
         Node root=new Node(null);
         for(String process: processIdToFileFrequences.keySet()){
@@ -68,7 +66,6 @@ public class Reducer {
             System.out.println(it.toString());
             filelists.addAll(it);
         }
-
 
         try{
             AvroGenericDeserializer avroGenericDeserializer=new AvroGenericDeserializer("schema/TCCDMDatum.avsc","schema/TCCDMDatum.avsc",
@@ -178,5 +175,6 @@ public class Reducer {
 //
 //        System.out.println("finite state automaton");
 //        printFSA(FSARoot);
+        postGreSqlApi.closeConnection();
     }
 }

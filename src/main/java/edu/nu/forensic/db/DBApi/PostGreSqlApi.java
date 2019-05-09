@@ -10,12 +10,14 @@ public class PostGreSqlApi {
 
     private Connection c = null;
     private List<UUID> StoreSubjectLists = new LinkedList<>();
+    private Statement stmt = null;
 
     public PostGreSqlApi() {
         Connection c = null;
         try {
             Class.forName("org.postgresql.Driver");
             c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/testdb", "postgres", "123456");
+            stmt = c.createStatement();
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
@@ -27,13 +29,12 @@ public class PostGreSqlApi {
 
     public synchronized void storeSubject(List<Subject> subjectlists) {
         try {
-            Statement stmt = c.createStatement();
             for (Subject subject : subjectlists) {
                 String parentSubjectUUID = null;
                 if(subject.getParentSubjectUUID()!=null) parentSubjectUUID = subject.getParentSubjectUUID().toString();
                 try{
                     if(!StoreSubjectLists.contains(subject.getUuid())) {
-                        createsheet(subject.getUuid(), stmt);
+                        createsheet(subject.getUuid());
                         StoreSubjectLists.add(subject.getUuid());
                         String sql = "INSERT INTO \"subject_" + subject.getUuid().toString() + "\" (UUID,PID,NAME,PARENTUUID,TIMESTAMP) VALUES ('" +
                                 subject.getUuid().toString() + "' , '" +
@@ -44,7 +45,7 @@ public class PostGreSqlApi {
                         stmt.execute(sql);
                     }
                     else{
-                        mergeSubject(subject, stmt, parentSubjectUUID);
+                        mergeSubject(subject, parentSubjectUUID);
                     }
                 }catch (Exception e){
                     e.printStackTrace();
@@ -52,7 +53,6 @@ public class PostGreSqlApi {
                     System.exit(0);
                 }
             }
-            stmt.close();
             c.commit();
         } catch (Exception e) {
             e.getMessage();
@@ -65,7 +65,7 @@ public class PostGreSqlApi {
             for (Event event : eventlists) {
                 try{
                     if(!StoreSubjectLists.contains(event.getSubjectUUID())) {
-                        createsheet(event.getSubjectUUID(), statement);
+                        createsheet(event.getSubjectUUID());
                         StoreSubjectLists.add(event.getSubjectUUID());
                     }
                     String sql = "INSERT INTO \"file_" + event.getSubjectUUID().toString() + "\" (UUID,FILENAME,EVENTTYPE,TIMESTAMP) VALUES ('" +
@@ -86,9 +86,9 @@ public class PostGreSqlApi {
         }
     }
 
-    public void mergeSubject(Subject subject, Statement statement, String parentSubjectUUID){
+    public void mergeSubject(Subject subject, String parentSubjectUUID){
         try{
-            ResultSet resultSet = statement.executeQuery("SELECT "+subject.getUuid().toString()+"FROM \"subject_"+subject.getUuid().toString()+"\"");
+            ResultSet resultSet = stmt.executeQuery("SELECT "+subject.getUuid().toString()+"FROM \"subject_"+subject.getUuid().toString()+"\"");
             if(resultSet.next()){
                 String temp = resultSet.getString("TIMESTAMP");
                 System.out.println(temp);
@@ -98,7 +98,7 @@ public class PostGreSqlApi {
                         subject.getCmdLine() + "' , '" +
                         parentSubjectUUID + "' , '" +
                         temp + " ');";
-                statement.execute(sql);
+                stmt.execute(sql);
             }
         }catch (Exception e){
             e.getMessage();
@@ -106,7 +106,7 @@ public class PostGreSqlApi {
 
     }
 
-    public void createsheet(UUID uuid, Statement stmt){
+    public void createsheet(UUID uuid){
         try {
             String sqlsubject = "CREATE TABLE \"subject_"+uuid.toString() +
                     "\" (UUID  VARCHAR PRIMARY KEY    NOT NULL," +
@@ -130,16 +130,17 @@ public class PostGreSqlApi {
 
     public void closeConnection(){
         try{
+            stmt.close();
             c.close();
         }catch (Exception e){
             System.err.println("error when shutting down");
         }
     }
 
-    public List<String> FindTables(Statement statement){
+    public List<String> FindTables(){
         try {
             String sqlfindfiles = "SELECT tablename FROM  pg_tables  WHERE tablename LIKE 'file%'";
-            ResultSet resultSet = statement.executeQuery(sqlfindfiles);
+            ResultSet resultSet = stmt.executeQuery(sqlfindfiles);
             List<String> filetables = new LinkedList<>();
             while(resultSet.next()){
                 String FileSheetName = resultSet.getString("tablename");
@@ -155,12 +156,12 @@ public class PostGreSqlApi {
     public synchronized Map<String, Map<String,Integer>> getProcessToFileFrequences(){
         try{
             Statement statement = c.createStatement();
-            List<String> filetables = FindTables(statement);
+            List<String> filetables = FindTables();
             Map<String, Map<String, Integer>> result = new HashMap<>();
             List<String> NotReadOnlyFiles = new LinkedList<>();
             for(String FileSheetName: filetables){
                 String SubjectSheetName = FileSheetName.replace("file","subject");
-                String SubjectName = FildSubjectName(SubjectSheetName, statement);
+                String SubjectName = FildSubjectName(SubjectSheetName);
                 Map<String, Integer> temp = new TreeMap<>();
                 String sqlFindFiles = "SELECT FILENAME, EVENTTYPE, COUNT(*) as count FROM \""+FileSheetName +"\" GROUP BY FILENAME, EVENTTYPE";
                 ResultSet fileResult = statement.executeQuery(sqlFindFiles);
@@ -190,10 +191,10 @@ public class PostGreSqlApi {
         }
     }
 
-    public String FildSubjectName(String SubjectSheetName, Statement statement){
+    public String FildSubjectName(String SubjectSheetName){
         try{
             String sqlfindSubject = "SELECT * FROM \""+SubjectSheetName +"\"";
-            ResultSet resultSet = statement.executeQuery(sqlfindSubject);
+            ResultSet resultSet = stmt.executeQuery(sqlfindSubject);
             String result = null;
             if(resultSet.next()){
                 result = resultSet.getString("NAME");

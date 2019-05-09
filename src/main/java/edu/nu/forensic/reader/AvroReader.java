@@ -298,6 +298,7 @@ public class AvroReader {
         }
         postGreSqlApi.storeSubject(subjectList);
         postGreSqlApi.storeEvent(eventList);
+        postGreSqlApi.closeConnection();
         Date day=new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println(df.format(day));
