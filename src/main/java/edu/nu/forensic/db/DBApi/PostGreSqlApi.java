@@ -61,7 +61,6 @@ public class PostGreSqlApi {
 
     public synchronized void storeEvent(List<Event> eventlists) {
         try {
-            Statement statement = c.createStatement();
             for (Event event : eventlists) {
                 try{
                     if(!StoreSubjectLists.contains(event.getSubjectUUID())) {
@@ -73,12 +72,11 @@ public class PostGreSqlApi {
                                 event.getPredicateObjectPath() + "' , '" +
                                 event.getType() + "' , '" +
                                 event.getTimestampNanos() + " ');";
-                    statement.execute(sql);
+                    stmt.execute(sql);
                 }catch (Exception e){
                     e.getMessage();
                 }
             }
-            statement.close();
             c.commit();
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,7 +153,6 @@ public class PostGreSqlApi {
 
     public synchronized Map<String, Map<String,Integer>> getProcessToFileFrequences(){
         try{
-            Statement statement = c.createStatement();
             List<String> filetables = FindTables();
             Map<String, Map<String, Integer>> result = new HashMap<>();
             List<String> NotReadOnlyFiles = new LinkedList<>();
@@ -164,7 +161,7 @@ public class PostGreSqlApi {
                 String SubjectName = FildSubjectName(SubjectSheetName);
                 Map<String, Integer> temp = new TreeMap<>();
                 String sqlFindFiles = "SELECT FILENAME, EVENTTYPE, COUNT(*) as count FROM \""+FileSheetName +"\" GROUP BY FILENAME, EVENTTYPE";
-                ResultSet fileResult = statement.executeQuery(sqlFindFiles);
+                ResultSet fileResult = stmt.executeQuery(sqlFindFiles);
                 while(fileResult.next()){
                     String filename = fileResult.getString("FILENAME");
                     String eventtype = fileResult.getString("EVENTTYPE");
@@ -182,7 +179,6 @@ public class PostGreSqlApi {
                 if(temp.size()!=0&&temp.size()!=1) result.put(SubjectName, temp);
                 else result.remove(SubjectName);
             }
-            statement.close();
             return result;
         }catch (Exception e){
             e.getMessage();
