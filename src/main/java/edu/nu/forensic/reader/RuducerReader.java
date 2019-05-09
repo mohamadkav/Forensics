@@ -5,7 +5,10 @@ import com.bbn.tc.schema.avro.cdm20.*;
 import com.bbn.tc.schema.serialization.AvroGenericDeserializer;
 import edu.nu.forensic.reducer.Reducer;
 import edu.nu.forensic.util.RecordConverter;
+import org.apache.avro.file.DataFileReader;
 import org.apache.avro.generic.GenericContainer;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.specific.SpecificDatumReader;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
@@ -58,16 +61,19 @@ public class RuducerReader {
         avroGenericDeserializer.close();
     }
 
+    //CDM20
     public void ReadTraceforReduceWithoutIndex(File source) throws IOException, SchemaNotInitializedException {
-        AvroGenericDeserializer avroGenericDeserializer=new AvroGenericDeserializer("schema/TCCDMDatum.avsc","schema/TCCDMDatum.avsc",
-                true,source);
         int i=0;
         BufferedWriter  bufferedWriter = new BufferedWriter(new FileWriter("temp.txt"));
-        while(true){
-            GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
-            if(data==null)
+        DatumReader<TCCDMDatum> reader = new SpecificDatumReader<>(TCCDMDatum.class);
+
+        DataFileReader<TCCDMDatum> dataFileReader = new DataFileReader<>(source, reader);
+        TCCDMDatum CDMdatum = null;
+        while (dataFileReader.hasNext()) {
+            CDMdatum = dataFileReader.next();
+
+            if(CDMdatum==null)
                 break;
-            TCCDMDatum CDMdatum=(TCCDMDatum) data;
             try {
                 if(i%10000==0) System.out.println(i);
                 i++;
@@ -85,6 +91,5 @@ public class RuducerReader {
         }
         bufferedWriter.flush();
         bufferedWriter.close();
-        avroGenericDeserializer.close();
     }
 }

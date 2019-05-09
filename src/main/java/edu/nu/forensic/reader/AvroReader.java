@@ -173,6 +173,7 @@ public class AvroReader {
         avroGenericDeserializer.close();
     }
 
+    //CDM20
     public void readTraceWithoutIndex(File source) throws IOException, SchemaNotInitializedException {
         AvroGenericDeserializer avroGenericDeserializer=new AvroGenericDeserializer("schema/TCCDMDatum.avsc","schema/TCCDMDatum.avsc",
                 true,source);

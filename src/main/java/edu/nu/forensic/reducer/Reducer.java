@@ -4,10 +4,14 @@ import com.bbn.tc.schema.avro.cdm20.Event;
 import com.bbn.tc.schema.avro.cdm20.TCCDMDatum;
 import com.bbn.tc.schema.serialization.AvroGenericDeserializer;
 import edu.nu.forensic.db.DBApi.PostGreSqlApi;
+import org.apache.avro.file.DataFileReader;
 import org.apache.avro.generic.GenericContainer;
 
 import java.io.*;
 import java.util.*;
+
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.specific.SpecificDatumReader;
 import org.springframework.stereotype.Component;
 
 import static edu.nu.forensic.reducer.FPGrowth.findFrequentItemsetWithSuffix;
@@ -68,17 +72,19 @@ public class Reducer {
         }
 
         try{
-            AvroGenericDeserializer avroGenericDeserializer=new AvroGenericDeserializer("schema/TCCDMDatum.avsc","schema/TCCDMDatum.avsc",
-                    true,source);
             int i=0;
             List<String> judgeprocessID = new ArrayList<>();
             List<String> writeFiles = new LinkedList<>();
             BufferedWriter  bufferedWriter = new BufferedWriter(new FileWriter("temp.txt"));
-            while(true){
-                GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
-                if(data==null)
+            DatumReader<TCCDMDatum> reader = new SpecificDatumReader<>(TCCDMDatum.class);
+
+            DataFileReader<TCCDMDatum> dataFileReader = new DataFileReader<>(source, reader);
+            TCCDMDatum CDMdatum = null;
+            while (dataFileReader.hasNext()) {
+                CDMdatum = dataFileReader.next();
+
+                if(CDMdatum==null)
                     break;
-                TCCDMDatum CDMdatum=(TCCDMDatum) data;
                 try {
                     if (i % 10000 == 0) System.out.println(i);
                     i++;
@@ -110,7 +116,6 @@ public class Reducer {
             }
             bufferedWriter.flush();
             bufferedWriter.close();
-            avroGenericDeserializer.close();
         }catch (Exception e){
             e.printStackTrace();
         }
