@@ -1,7 +1,7 @@
 package edu.nu.forensic.reader;
 
 import com.bbn.tc.schema.SchemaNotInitializedException;
-import com.bbn.tc.schema.avro.cdm19.*;
+import com.bbn.tc.schema.avro.cdm20.*;
 import com.bbn.tc.schema.serialization.AvroGenericDeserializer;
 import edu.nu.forensic.reducer.Reducer;
 import edu.nu.forensic.util.RecordConverter;

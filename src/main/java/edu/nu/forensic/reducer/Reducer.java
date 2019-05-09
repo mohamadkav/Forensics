@@ -1,7 +1,7 @@
 package edu.nu.forensic.reducer;
 
-import com.bbn.tc.schema.avro.cdm19.Event;
-import com.bbn.tc.schema.avro.cdm19.TCCDMDatum;
+import com.bbn.tc.schema.avro.cdm20.Event;
+import com.bbn.tc.schema.avro.cdm20.TCCDMDatum;
 import com.bbn.tc.schema.serialization.AvroGenericDeserializer;
 import edu.nu.forensic.db.DBApi.PostGreSqlApi;
 import org.apache.avro.generic.GenericContainer;

@@ -1,6 +1,6 @@
 package edu.nu.forensic.reader;
 
-import com.bbn.tc.schema.avro.cdm19.*;
+import com.bbn.tc.schema.avro.cdm20.*;
 import com.bbn.tc.schema.serialization.AvroConfig;
 import edu.nu.forensic.util.RecordConverter;
 import org.apache.avro.generic.GenericContainer;

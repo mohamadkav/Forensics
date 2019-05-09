@@ -33,7 +33,7 @@ public class RecordConverter {
     private List<Event> eventList=new ArrayList<>();
     private List<Subject> subjectList = new ArrayList<>();
 
-    public Subject saveAndConvertBBNSubjectToSubject(com.bbn.tc.schema.avro.cdm19.Subject bbnSubject){
+    public Subject saveAndConvertBBNSubjectToSubject(com.bbn.tc.schema.avro.cdm20.Subject bbnSubject){
         Subject parentSubject=null;
         Principal localPrincipal=null;
         if(bbnSubject.getParentSubject()!=null)
@@ -51,7 +51,7 @@ public class RecordConverter {
         return null;
     }
 
-    public Principal saveAndConvertBBNPrincipalToPrincipal(com.bbn.tc.schema.avro.cdm19.Principal bbnPrincipal){
+    public Principal saveAndConvertBBNPrincipalToPrincipal(com.bbn.tc.schema.avro.cdm20.Principal bbnPrincipal){
         StringBuilder groupIds= new StringBuilder();
         if(bbnPrincipal.getGroupIds()!=null)
             for(CharSequence cs:bbnPrincipal.getGroupIds())
@@ -66,12 +66,12 @@ public class RecordConverter {
         return principalRepository.save(principal);
     }
 
-    public RegistryKeyObject saveAndConvertBBNRegistryKeyObjectToRegistryKeyObject(com.bbn.tc.schema.avro.cdm19.RegistryKeyObject bbnRegistryKeyObject){
+    public RegistryKeyObject saveAndConvertBBNRegistryKeyObjectToRegistryKeyObject(com.bbn.tc.schema.avro.cdm20.RegistryKeyObject bbnRegistryKeyObject){
         RegistryKeyObject registryKeyObject=new RegistryKeyObject(UUID.nameUUIDFromBytes(bbnRegistryKeyObject.getUuid().bytes()),bbnRegistryKeyObject.getSize(),
                 bbnRegistryKeyObject.getKey()!=null?bbnRegistryKeyObject.getKey().toString():null);
         return registryKeyObjectRepository.save(registryKeyObject);
     }
-    public FileObject saveAndConvertBBNFileObjectToFileObject(com.bbn.tc.schema.avro.cdm19.FileObject bbnFileObject){
+    public FileObject saveAndConvertBBNFileObjectToFileObject(com.bbn.tc.schema.avro.cdm20.FileObject bbnFileObject){
         Principal localPrincipal=null;
         if(bbnFileObject.getLocalPrincipal()!=null)
             localPrincipal=principalRepository.findById(UUID.nameUUIDFromBytes(bbnFileObject.getLocalPrincipal().bytes())).orElse(null);
@@ -79,13 +79,13 @@ public class RecordConverter {
                 localPrincipal,bbnFileObject.getSize());
         return fileObjectRepository.save(fileObject);
     }
-    public NetFlowObject saveAndConvertBBNNetFlowObjectToNetFlowObject(com.bbn.tc.schema.avro.cdm19.NetFlowObject bbnNetFlowObject){
+    public NetFlowObject saveAndConvertBBNNetFlowObjectToNetFlowObject(com.bbn.tc.schema.avro.cdm20.NetFlowObject bbnNetFlowObject){
         NetFlowObject netFlowObject=new NetFlowObject(UUID.nameUUIDFromBytes(bbnNetFlowObject.getUuid().bytes()),bbnNetFlowObject.getLocalAddress()!=null?bbnNetFlowObject.getLocalAddress().toString():
                 null,bbnNetFlowObject.getLocalPort(),bbnNetFlowObject.getRemoteAddress()!=null?bbnNetFlowObject.getRemoteAddress().toString():null,bbnNetFlowObject.getRemotePort(),
                 bbnNetFlowObject.getIpProtocol());
         return netFlowObjectRepository.save(netFlowObject);
     }
-    public Event saveAndConvertBBNEventToEvent(com.bbn.tc.schema.avro.cdm19.Event bbnEvent){
+    public Event saveAndConvertBBNEventToEvent(com.bbn.tc.schema.avro.cdm20.Event bbnEvent){
         Subject subject=null;
         if(bbnEvent.getSubject()!=null)
             subject=subjectRepository.findById(UUID.nameUUIDFromBytes(bbnEvent.getSubject().bytes())).orElse(null);
@@ -114,7 +114,7 @@ public class RecordConverter {
         }
         return null;
     }
-    public UnitDependency saveAndConvertBBNUnitDependencyToUnitDependency(com.bbn.tc.schema.avro.cdm19.UnitDependency bbnUnitDependency){
+    public UnitDependency saveAndConvertBBNUnitDependencyToUnitDependency(com.bbn.tc.schema.avro.cdm20.UnitDependency bbnUnitDependency){
         Subject oldSubject=null,newSubject=null;
         oldSubject=subjectRepository.findById(UUID.nameUUIDFromBytes(bbnUnitDependency.getUnit().bytes())).orElse(null);
         newSubject=subjectRepository.findById(UUID.nameUUIDFromBytes(bbnUnitDependency.getDependentUnit().bytes())).orElse(null);

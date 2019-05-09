@@ -1,14 +1,17 @@
 package edu.nu.forensic.reader;
 
 import com.bbn.tc.schema.SchemaNotInitializedException;
-import com.bbn.tc.schema.avro.cdm19.*;
+import com.bbn.tc.schema.avro.cdm20.*;
 import com.bbn.tc.schema.serialization.AvroGenericDeserializer;
 import edu.nu.forensic.db.DBApi.Neo4jApi;
 import edu.nu.forensic.db.DBApi.PostGreSqlApi;
 import edu.nu.forensic.util.RecordConverter;
+import org.apache.avro.file.DataFileReader;
 import org.apache.avro.generic.GenericContainer;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.IndexedRecord;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.specific.SpecificDatumReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -183,12 +186,15 @@ public class AvroReader {
         //init db
 //        Neo4jApi neo4jApi = new Neo4jApi("C:\\Data\\neo4j-community-3.5.3\\data\\databases\\graph.db");
         PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
+        DatumReader<TCCDMDatum> reader = new SpecificDatumReader<>(TCCDMDatum.class);
 
-        while(true){
-            GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
-            if(data==null)
+        DataFileReader<TCCDMDatum> dataFileReader = new DataFileReader<>(source, reader);
+        TCCDMDatum CDMdatum = null;
+        while (dataFileReader.hasNext()) {
+            CDMdatum = dataFileReader.next();
+
+            if(CDMdatum==null)
                 break;
-            TCCDMDatum CDMdatum=(TCCDMDatum) data;
             try {
                 if(i%10000==0) System.out.println(i);
                 i++;
