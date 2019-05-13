@@ -7,7 +7,7 @@ public class FPGrowth {
     public static List<String> getCFAP (Node node, int minSupportCount, List<String> result)
     {
         if(node.counter>minSupportCount) {
-            if(!result.contains(node.getFileName())) result.add(node.getFileName());
+            if(!result.contains(node.getFileName())) result.add(node.getFileName().substring(1));
             for(Node item: node.getChildren()) {
                 getCFAP(item, minSupportCount, result);
             }

@@ -25,9 +25,6 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.UUID;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 
 @Component
@@ -236,7 +233,8 @@ public class AvroReader {
 //                        System.out.println(CDMdatum.getDatum().toString());
 
                         UUID processID = UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getUuid().bytes());
-                        UUID parentID = ((Subject) CDMdatum.getDatum()).getParentSubject() != null ? UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getParentSubject().bytes()) : null;
+                        UUID parentID = ((Subject) CDMdatum.getDatum()).getParentSubject() != null ?
+                                UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getParentSubject().bytes()) : null;
 
                         //thread
                         while(ThreadIDToProcessID.containsKey(processID)) processID = ThreadIDToProcessID.get(processID);
@@ -255,7 +253,9 @@ public class AvroReader {
                                 , ((Subject) CDMdatum.getDatum()).getCid()
                                 , parentID
                                 , ((Subject) CDMdatum.getDatum()).getStartTimestampNanos()
-                                ,((Subject) CDMdatum.getDatum()).getCmdLine() != null ? ((Subject) CDMdatum.getDatum()).getCmdLine().toString().replaceAll("\"","").replaceAll("'","") : null);
+                                ,((Subject) CDMdatum.getDatum()).getCmdLine() != null ?
+                                 ((Subject) CDMdatum.getDatum()).getCmdLine().toString().replaceAll("\"","").
+                                         replaceAll("'","") : null);
                         subjectList.add(subject);
                         if (subjectList.size() > 100) {
                             postGreSqlApi.storeSubject(subjectList);
@@ -264,38 +264,41 @@ public class AvroReader {
                         }
                     }
                 }
-                else if(CDMdatum.getDatum() instanceof Event){
-                    if(((Event) CDMdatum.getDatum()).toString().contains("FileIoWrite")||((Event) CDMdatum.getDatum()).toString().contains("FileIoRead")) {
-                        if(!((Event) CDMdatum.getDatum()).toString().contains("UNKNOWN")) {
+                else if(CDMdatum.getDatum() instanceof Event) {
+                    if (((Event) CDMdatum.getDatum()).getType().toString().contains("EVENT_WRITE")
+                            || ((Event) CDMdatum.getDatum()).getType().toString().contains("EVENT_READ")) {
+                        if (!((Event) CDMdatum.getDatum()).toString().contains("UNKNOWN")) {
                             UUID processID = UUID.nameUUIDFromBytes(((Event) CDMdatum.getDatum()).getSubject().bytes());
 
                             //thread
-                            while(ThreadIDToProcessID.containsKey(processID)) processID = ThreadIDToProcessID.get(processID);
-                            //dependent
-                            while(UnitToDependency.containsKey(processID)) {
+                            while (ThreadIDToProcessID.containsKey(processID))
+                                processID = ThreadIDToProcessID.get(processID);
+                                //dependent
+                            while (UnitToDependency.containsKey(processID)) {
                                 processID = UnitToDependency.get(processID);
                             }
 
                             edu.nu.forensic.db.entity.Event event = new edu.nu.forensic.db.entity.Event(
                                     UUID.nameUUIDFromBytes(((Event) CDMdatum.getDatum()).getUuid().bytes())
-                                    , ((Event) CDMdatum.getDatum()).getNames().toString()
+                                    , ((Event) CDMdatum.getDatum()).getType().toString()
                                     , ((Event) CDMdatum.getDatum()).getThreadId()
                                     , processID
                                     , ((Event) CDMdatum.getDatum()).getTimestampNanos()
-                                    , ((Event) CDMdatum.getDatum()).getPredicateObjectPath() != null ? ((Event) CDMdatum.getDatum()).getPredicateObjectPath().toString() : ((Event) CDMdatum.getDatum()).getPredicateObject2Path().toString());
+                                    , ((Event) CDMdatum.getDatum()).getPredicateObjectPath() != null
+                                      ? ((Event) CDMdatum.getDatum()).getPredicateObjectPath().toString() :
+                                      ((Event) CDMdatum.getDatum()).getPredicateObject2Path().toString());
                             eventList.add(event);
                         }
+                        if (eventList.size() > 3000) {
+                            postGreSqlApi.storeEvent(eventList);
+                            eventList.clear();
+                            System.out.println(22222);
+                        }
+                    } else if (CDMdatum.getDatum() instanceof UnitDependency) {
+                        UUID unit = UUID.nameUUIDFromBytes(((UnitDependency) CDMdatum.getDatum()).getUnit().bytes());
+                        UUID dependentUnit = UUID.nameUUIDFromBytes(((UnitDependency) CDMdatum.getDatum()).getDependentUnit().bytes());
+                        UnitToDependency.put(dependentUnit, unit);
                     }
-                    if(eventList.size()>3000){
-                        postGreSqlApi.storeEvent(eventList);
-                        eventList.clear();
-                        System.out.println(22222);
-                    }
-                }
-                else if(CDMdatum.getDatum() instanceof UnitDependency){
-                    UUID unit = UUID.nameUUIDFromBytes(((UnitDependency)CDMdatum.getDatum()).getUnit().bytes());
-                    UUID dependentUnit = UUID.nameUUIDFromBytes(((UnitDependency)CDMdatum.getDatum()).getDependentUnit().bytes());
-                    UnitToDependency.put(dependentUnit,unit);
                 }
             }catch (Exception e){
                 System.err.println("Darn! We have an unknown bug over: ");

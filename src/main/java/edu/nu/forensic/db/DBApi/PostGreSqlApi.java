@@ -11,6 +11,8 @@ public class PostGreSqlApi {
     private Connection c = null;
     private List<UUID> StoreSubjectLists = new LinkedList<>();
     private Statement stmt = null;
+    private int CountInTable = 0;
+    private int NumInTable = 0;
 
     public PostGreSqlApi() {
         Connection c = null;
@@ -18,12 +20,29 @@ public class PostGreSqlApi {
             Class.forName("org.postgresql.Driver");
             c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/testdb", "postgres", "123456");
             stmt = c.createStatement();
+            CreateSubjectSheet();
+            createFileTable(NumInTable);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
             System.exit(0);
         }
         System.out.println("Opened database successfully");
+        this.c = c;
+    }
+
+    public PostGreSqlApi(String url, String user, String passwd){
+        Connection c = null;
+        try {
+            Class.forName("org.postgresql.Driver");
+            c = DriverManager.getConnection(url, user, passwd);
+            stmt = c.createStatement();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getClass().getName()+": "+e.getMessage());
+            System.exit(0);
+        }
+        System.out.println("Open database successfully");
         this.c = c;
     }
 
@@ -34,18 +53,14 @@ public class PostGreSqlApi {
                 if(subject.getParentSubjectUUID()!=null) parentSubjectUUID = subject.getParentSubjectUUID().toString();
                 try{
                     if(!StoreSubjectLists.contains(subject.getUuid())) {
-                        createsheet(subject.getUuid());
                         StoreSubjectLists.add(subject.getUuid());
-                        String sql = "INSERT INTO \"subject_" + subject.getUuid().toString() + "\" (UUID,PID,NAME,PARENTUUID,TIMESTAMP) VALUES ('" +
+                        String sql = "INSERT INTO \"SubjectInfo\" (UUID,PID,NAME,PARENTUUID,TIMESTAMP) VALUES ('" +
                                 subject.getUuid().toString() + "' , '" +
                                 subject.getCid() + "' , '" +
                                 subject.getCmdLine() + "' , '" +
                                 parentSubjectUUID+ "' , '" +
                                 subject.getStartTimestampNanos() + " ');";
                         stmt.execute(sql);
-                    }
-                    else{
-                        mergeSubject(subject, parentSubjectUUID);
                     }
                 }catch (Exception e){
                     e.printStackTrace();
@@ -63,62 +78,73 @@ public class PostGreSqlApi {
         try {
             for (Event event : eventlists) {
                 try{
-                    if(!StoreSubjectLists.contains(event.getSubjectUUID())) {
-                        createsheet(event.getSubjectUUID());
-                        StoreSubjectLists.add(event.getSubjectUUID());
+                    if(CountInTable>10000000){
+                        NumInTable++;
+                        createFileTable(NumInTable);
                     }
-                    String sql = "INSERT INTO \"file_" + event.getSubjectUUID().toString() + "\" (UUID,FILENAME,EVENTTYPE,TIMESTAMP) VALUES ('" +
+                    String sql = "INSERT INTO \"file_" +NumInTable+ "\" (UUID,FILENAME,EVENTTYPE,TIMESTAMP,SUBJECTUUID) VALUES ('" +
                                 event.getId().toString() + "' , '+" +
                                 event.getPredicateObjectPath() + "' , '" +
                                 event.getType() + "' , '" +
-                                event.getTimestampNanos() + " ');";
+                                event.getTimestampNanos() +"' , '" +
+                                event.getSubjectUUID()+ " ');";
                     stmt.execute(sql);
+                    CountInTable++;
                 }catch (Exception e){
                     e.getMessage();
                 }
             }
-            c.commit();
+//            c.commit();
         } catch (Exception e) {
             e.printStackTrace();
             e.getMessage();
         }
     }
 
-    public void mergeSubject(Subject subject, String parentSubjectUUID){
-        try{
-            ResultSet resultSet = stmt.executeQuery("SELECT "+subject.getUuid().toString()+"FROM \"subject_"+subject.getUuid().toString()+"\"");
-            if(resultSet.next()){
-                String temp = resultSet.getString("TIMESTAMP");
-                System.out.println(temp);
-                String sql = "INSERT INTO \"subject_" + subject.getUuid().toString() + "\" (UUID,PID,NAME,PARENTUUID, TIMESTAMP) VALUES ('" +
-                        subject.getUuid().toString() + "' , '" +
-                        subject.getCid() + "' , '" +
-                        subject.getCmdLine() + "' , '" +
-                        parentSubjectUUID + "' , '" +
-                        temp + " ');";
-                stmt.execute(sql);
-            }
-        }catch (Exception e){
-            e.getMessage();
-        }
+//    public void mergeSubject(Subject subject, String parentSubjectUUID){
+//        try{
+//            ResultSet resultSet = stmt.executeQuery("SELECT "+subject.getUuid().toString()+"FROM \"subject_"+subject.getUuid().toString()+"\"");
+//            if(resultSet.next()){
+//                String temp = resultSet.getString("TIMESTAMP");
+//                System.out.println(temp);
+//                String sql = "INSERT INTO \"subject\" (UUID,PID,NAME,PARENTUUID, TIMESTAMP) VALUES ('" +
+//                        subject.getUuid().toString() + "' , '" +
+//                        subject.getCid() + "' , '" +
+//                        subject.getCmdLine() + "' , '" +
+//                        parentSubjectUUID + "' , '" +
+//                        temp + " ');";
+//                stmt.execute(sql);
+//            }
+//        }catch (Exception e){
+//            e.getMessage();
+//        }
+//    }
 
+    public void createFileTable(int num){
+        try {
+            String sqlfile = "CREATE TABLE \"file_"+num+
+                    "\" (UUID   VARCHAR     NOT NULL," +
+                    " FILENAME       VARCHAR    NOT NULL, " +
+                    " EVENTTYPE      VARCHAR   NOT NULL, "+
+                    " TIMESTAMP       VARCHAR PRIMARY KEY  NOT NULL, " +
+                    " SUBJECTUUID  VARCHAR NOT NULL)";
+            stmt.executeUpdate(sqlfile);
+        } catch (Exception e) {
+            System.err.println(e.getClass().getName() + ": " + e.getMessage());
+            e.printStackTrace();
+            System.exit(0);
+        }
     }
 
-    public void createsheet(UUID uuid){
+    public void CreateSubjectSheet(){
         try {
-            String sqlsubject = "CREATE TABLE \"subject_"+uuid.toString() +
-                    "\" (UUID  VARCHAR PRIMARY KEY    NOT NULL," +
+            String sqlsubject = "CREATE TABLE \"SubjectInfo\" " +
+                    "(UUID  VARCHAR PRIMARY KEY    NOT NULL," +
                     " PID        VARCHAR    NOT NULL, " +
                     " NAME       VARCHAR    NOT NULL, " +
                     " PARENTUUID   VARCHAR , " +
                     " TIMESTAMP     VARCHAR  NOT NULL)";
             stmt.executeUpdate(sqlsubject);
-            String sqlfile = "CREATE TABLE \"file_"+uuid.toString() +
-                    "\" (UUID   VARCHAR     NOT NULL," +
-                    " FILENAME       VARCHAR    NOT NULL, " +
-                    " EVENTTYPE      VARCHAR   NOT NULL, "+
-                    " TIMESTAMP       VARCHAR PRIMARY KEY  NOT NULL)";
-            stmt.executeUpdate(sqlfile);
         } catch (Exception e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
             e.printStackTrace();
@@ -153,31 +179,39 @@ public class PostGreSqlApi {
 
     public synchronized Map<String, Map<String,Integer>> getProcessToFileFrequences(){
         try{
+            int threshold = 0;
             List<String> filetables = FindTables();
             Map<String, Map<String, Integer>> result = new HashMap<>();
             List<String> NotReadOnlyFiles = new LinkedList<>();
             for(String FileSheetName: filetables){
-                String SubjectSheetName = FileSheetName.replace("file","subject");
-                String SubjectName = FildSubjectName(SubjectSheetName);
                 Map<String, Integer> temp = new TreeMap<>();
-                String sqlFindFiles = "SELECT FILENAME, EVENTTYPE, COUNT(*) as count FROM \""+FileSheetName +"\" GROUP BY FILENAME, EVENTTYPE";
+                String sqlFindFiles = "SELECT SUBJECTUUID, FILENAME, EVENTTYPE, COUNT(*) as count FROM \""+FileSheetName
+                        +"\" GROUP BY SUBJECTUUID, FILENAME, EVENTTYPE";
                 ResultSet fileResult = stmt.executeQuery(sqlFindFiles);
+                String lastSubjectUUID = null;
                 while(fileResult.next()){
                     String filename = fileResult.getString("FILENAME");
                     String eventtype = fileResult.getString("EVENTTYPE");
+                    String SubjectUUID = fileResult.getString("SUBJECTUUID");
                     int count = fileResult.getInt("count");
+                    if(SubjectUUID!=lastSubjectUUID){
+                        if(lastSubjectUUID!=null){
+                            if(temp.size()!=0&&temp.size()!=1) result.put(lastSubjectUUID, temp);
+                        }
+                        lastSubjectUUID = SubjectUUID;
+                    }
                     if(eventtype.contains("Write")) {
                         if(!NotReadOnlyFiles.contains(filename)) {
                             NotReadOnlyFiles.add(filename);
                             temp.remove(filename);
                         }
                     }
-                    else if(!NotReadOnlyFiles.contains(filename)){
+                    else if(!NotReadOnlyFiles.contains(filename)&&count>threshold){
                         if(!temp.containsKey(filename)) temp.put(filename,count);
                     }
+                    if(!fileResult.next()) lastSubjectUUID = SubjectUUID;
                 }
-                if(temp.size()!=0&&temp.size()!=1) result.put(SubjectName, temp);
-                else result.remove(SubjectName);
+                if(temp.size()!=0&&temp.size()!=1) result.put(lastSubjectUUID, temp);
             }
             return result;
         }catch (Exception e){

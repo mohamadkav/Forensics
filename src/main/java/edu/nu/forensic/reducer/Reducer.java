@@ -20,13 +20,14 @@ import static edu.nu.forensic.reducer.FPGrowth.findFrequentItemsetWithSuffix;
 @Component
 public class Reducer {
 
-
-
 //    private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt=new HashMap<>();
     private HashSet<Integer> test=new HashSet<>();
 
     public void reduce(File source){
-        PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
+        String url = "jdbc:postgresql://localhost:5432/testdb";
+        String user = "postgres";
+        String passwd = "123456";
+        PostGreSqlApi postGreSqlApi = new PostGreSqlApi(url, user, passwd);
         //Extract all file reads and writes
         Map<String,Map<String, Integer>> processIdToFileFrequences = postGreSqlApi.getProcessToFileFrequences();
         //Building FP tree
@@ -85,27 +86,22 @@ public class Reducer {
 
                 if(CDMdatum==null)
                     break;
+//                bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
                 try {
                     if (i % 10000 == 0) System.out.println(i);
                     i++;
                     if (CDMdatum.getDatum() instanceof Event) {
-                        if (((Event) CDMdatum.getDatum()).getNames().contains("FileIoRead")) {
-                            if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubject().toString())
-                                    &&filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
-                                judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubject().toString());
-                                String temp = CDMdatum.getDatum().toString();
-                                temp = temp.replace(((Event)CDMdatum.getDatum()).getPredicateObjectPath(),"Initial process");
-                                bufferedWriter.append(temp+"\r\n");
-                            }
-                            else if(!filelists.contains(((Event)CDMdatum.getDatum()).getPredicateObjectPath())){
-                                bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
-                            }
+                        if (((Event) CDMdatum.getDatum()).getType().toString().contains("EVENT_READ")) {
+                            if (filelists.contains(((Event) CDMdatum.getDatum()).getPredicateObjectPath().toString())){
+                                if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubject().toString())) {
+                                    judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubject().toString());
+                                    String temp = CDMdatum.getDatum().toString();
+                                    temp = temp.replace(((Event) CDMdatum.getDatum()).getPredicateObjectPath().toString(), "Initial process");
+                                    bufferedWriter.append(temp + "\r\n");
+                                }
+                            } else bufferedWriter.append(CDMdatum.getDatum().toString() + "\r\n");
                         }
-                        else if(((Event) CDMdatum.getDatum()).getNames().contains("FileIoWrite")){
-                            String WrittenFile = ((Event)CDMdatum.getDatum()).getPredicateObjectPath().toString();
-                            if(!writeFiles.contains(WrittenFile)) writeFiles.add(WrittenFile);
-                            if(filelists.contains(WrittenFile)) filelists.remove(WrittenFile);
-                        }
+                        else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
                     }
                     else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
                 } catch (Exception e) {
