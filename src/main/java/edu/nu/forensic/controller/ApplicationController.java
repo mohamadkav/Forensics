@@ -4,6 +4,7 @@ package edu.nu.forensic.controller;
 import com.bbn.tc.schema.SchemaNotInitializedException;
 import edu.nu.forensic.dto.ReadTraceRequest;
 import edu.nu.forensic.reader.AvroReader;
+import edu.nu.forensic.reader.JsonReader;
 import edu.nu.forensic.reader.KafkaReader;
 import edu.nu.forensic.reducer.Reducer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,20 @@ public class ApplicationController {
     @Autowired
     Reducer reducer;
 
+    @Autowired
+    JsonReader jsonReader;
+
 
     @RequestMapping(method = RequestMethod.POST, value = "/read")
     public String read(@RequestBody ReadTraceRequest request){
         System.out.println(request.getTrace());
         if(request.getTrace()!=null && new File(request.getTrace()).exists())
             try {
-                avroReader.readTrace(new File(request.getTrace()));
+                if(request.getTrace().contains(".bin"))
+                    avroReader.readTrace(new File(request.getTrace()));
+                else
+                    jsonReader.readTrace(new File(request.getTrace()));
+
             }catch (IOException|SchemaNotInitializedException e){
                 e.printStackTrace();
                 return "ERROR";
