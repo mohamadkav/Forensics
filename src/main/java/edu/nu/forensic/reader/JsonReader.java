@@ -89,7 +89,7 @@ public class JsonReader {
                                 null, jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString(), null, null, timeStamp, eventName.equals("FileIoRead") ? "FileIoRead" : "FileIoWrite",
                                 null, null, null);
                         toBeSavedEvents.add(event);
-                        if(toBeSavedEvents.size()>10000) {
+                        if(toBeSavedEvents.size()>1000) {
                             System.out.println("Saving...");
                             eventRepository.saveAll(toBeSavedEvents);
                             toBeSavedEvents=new ArrayList<>();
