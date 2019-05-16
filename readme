@@ -15,3 +15,11 @@ Here is Node Merge doc：
 4. I set result text as "temp.txt" in class Reducer line 88, the result text stores all the events after reducing.
    For result text, we can get the size of this text to evaluate the result of system.
    The size of Marple-A is 60G before reduction, and Marple-B is 69G.
+   
+5. You can read how to call these function in main function, the Node Merge need two data input: 
+   The first one is reading data to database, in fact the function receives subjects and events that is set by Mohammad, not CDM subject and event.
+   The second one is reading data to reduce, here the input is also set by Mohammad.
+   
+6. You can read subject and event info in folder db.entity;
+   Instead of the whole system, I leave some interfaces so that you can merge Node Merge to your system.
+   I think you can store subjects and events to database before all the reduction systems begin, it is only my suggestion.

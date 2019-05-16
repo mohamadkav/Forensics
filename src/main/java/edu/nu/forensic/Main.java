@@ -39,6 +39,6 @@ public class Main {
         List<Event> events = new ArrayList<>();
         //Here you should put some event in events, after this, you can call reduce function;
         events = reducer.reduce(events, fileList);
-        //Here 
+        //Here
     }
 }
