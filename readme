@@ -23,3 +23,7 @@ Here is Node Merge doc：
 6. You can read subject and event info in folder db.entity;
    Instead of the whole system, I leave some interfaces so that you can merge Node Merge to your system.
    I think you can store subjects and events to database before all the reduction systems begin, it is only my suggestion.
+
+7. I write a sample in ReadJsonToDB, and upload Json format. But I don't know how will you test your data, so I don't write parser
+   that parses Json data to Subject and Event.
+   Now you can not run this program in Json format, but you can run it in CDM format if you cancel "//" in Reducer and main function.

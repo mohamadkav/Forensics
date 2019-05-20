@@ -8,11 +8,11 @@ import java.util.*;
 
 public class PostGreSqlApi {
 
-    private Connection c = null;
-    private List<UUID> StoreSubjectLists = new LinkedList<>();
-    private Statement stmt = null;
-    private int CountInTable = 0;
-    private int NumInTable = 0;
+    private static Connection c = null;
+    private static List<UUID> StoreSubjectLists = new LinkedList<>();
+    private static Statement stmt = null;
+    private static int CountInTable = 0;
+    private static int NumInTable = 0;
 
     public PostGreSqlApi() {
         Connection c = null;
@@ -46,7 +46,7 @@ public class PostGreSqlApi {
         this.c = c;
     }
 
-    public synchronized void storeSubject(List<Subject> subjectlists) {
+    public static synchronized void storeSubject(List<Subject> subjectlists) {
         try {
             for (Subject subject : subjectlists) {
                 String parentSubjectUUID = null;
@@ -74,7 +74,7 @@ public class PostGreSqlApi {
         }
     }
 
-    public synchronized void storeEvent(List<Event> eventlists) {
+    public static synchronized void storeEvent(List<Event> eventlists) {
         try {
             for (Event event : eventlists) {
                 try{
@@ -120,7 +120,7 @@ public class PostGreSqlApi {
 //        }
 //    }
 
-    public void CreateFileTable(int num){
+    private static void CreateFileTable(int num){
         try {
             String sqlfile = "CREATE TABLE \"file_"+num+
                     "\" (UUID   VARCHAR     NOT NULL," +
@@ -136,7 +136,7 @@ public class PostGreSqlApi {
         }
     }
 
-    public void CreateSubjectTable(){
+    private static void CreateSubjectTable(){
         try {
             String sqlsubject = "CREATE TABLE \"SubjectInfo\" " +
                     "(UUID  VARCHAR PRIMARY KEY    NOT NULL," +
