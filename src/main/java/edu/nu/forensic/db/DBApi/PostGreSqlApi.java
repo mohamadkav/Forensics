@@ -20,8 +20,8 @@ public class PostGreSqlApi {
             Class.forName("org.postgresql.Driver");
             c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/testdb", "postgres", "123456");
             stmt = c.createStatement();
-            CreateSubjectSheet();
-            createFileTable(NumInTable);
+            CreateSubjectTable();
+            CreateFileTable(NumInTable);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
@@ -80,7 +80,7 @@ public class PostGreSqlApi {
                 try{
                     if(CountInTable>10000000){
                         NumInTable++;
-                        createFileTable(NumInTable);
+                        CreateFileTable(NumInTable);
                     }
                     String sql = "INSERT INTO \"file_" +NumInTable+ "\" (UUID,FILENAME,EVENTTYPE,TIMESTAMP,SUBJECTUUID) VALUES ('" +
                                 event.getId().toString() + "' , '+" +
@@ -120,7 +120,7 @@ public class PostGreSqlApi {
 //        }
 //    }
 
-    public void createFileTable(int num){
+    public void CreateFileTable(int num){
         try {
             String sqlfile = "CREATE TABLE \"file_"+num+
                     "\" (UUID   VARCHAR     NOT NULL," +
@@ -136,7 +136,7 @@ public class PostGreSqlApi {
         }
     }
 
-    public void CreateSubjectSheet(){
+    public void CreateSubjectTable(){
         try {
             String sqlsubject = "CREATE TABLE \"SubjectInfo\" " +
                     "(UUID  VARCHAR PRIMARY KEY    NOT NULL," +
