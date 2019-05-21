@@ -24,4 +24,6 @@ Here is Node Merge doc：
    Instead of the whole system, I leave some interfaces so that you can merge Node Merge to your system.
    I think you can store subjects and events to database before all the reduction systems begin, it is only my suggestion.
 
-7. My test file is: 47g.out and ta1-marple-1-e5-bgt-2.bin.1
+7. My test file is: 47g.out and ta1-marple-1-e5-bgt-2.bin.1.
+   There may be problems that the stack is overflow in Module reduce, you can add threshold in PostGreSqlApi to avoid this problem.
+   The format of input file has some problems, you can read it when you run my code.

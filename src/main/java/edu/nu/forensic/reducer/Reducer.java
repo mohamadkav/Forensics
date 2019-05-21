@@ -104,19 +104,22 @@ public class Reducer {
             List<String> judgeprocessID = new ArrayList<>();
             String line = null;
             Gson gson = new Gson();
-            while((line = bufferedReader.readLine())!=null){
-                ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);
-                if(line.contains("FileIoRead")){
-                    if(filelists.contains(etwEvent.arguments.FileName)){
-                        if(!judgeprocessID.contains(String.valueOf(etwEvent.processID))){
-                            judgeprocessID.add(String.valueOf(etwEvent.processID));
-                            line.replace(etwEvent.arguments.FileName, "Init Process");
-                            bufferedWriter.append(line+"\r\n");
-                        }
-                    }
-                    else bufferedWriter.append(line+"\r\n");
+            while((line = bufferedReader.readLine())!=null) {
+                try {
+                    ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);
+                    if (line.contains("FileIoRead")) {
+                        if (filelists.contains(etwEvent.arguments.FileName)) {
+                            if (!judgeprocessID.contains(String.valueOf(etwEvent.processID))) {
+                                judgeprocessID.add(String.valueOf(etwEvent.processID));
+                                line.replace(etwEvent.arguments.FileName, "Init Process");
+                                bufferedWriter.append(line + "\r\n");
+                            }
+                        } else bufferedWriter.append(line + "\r\n");
+                    } else bufferedWriter.append(line + "\r\n");
+                }catch (Exception e){
+                    System.out.println(line);
+                    e.printStackTrace();
                 }
-                else bufferedWriter.append(line+"\r\n");
             }
             bufferedReader.close();
             bufferedWriter.close();
