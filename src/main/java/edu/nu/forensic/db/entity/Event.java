@@ -9,7 +9,7 @@ import java.util.UUID;
 @Entity
 public class Event {
     @Id
-    private UUID id;
+    private String id;
 
     private Long sequence;
 
@@ -42,12 +42,12 @@ public class Event {
 
     private String programPoint;
 
-    private UUID subjectUUID;
+    private String subjectUUID;
 
     public Event() {
     }
 
-    public Event(UUID id, Long sequence, String type, Integer threadId, Subject subject, Object predicateObject, String predicateObjectPath, Object predicateObject2, String predicateObject2Path, long timestampNanos, String names, Long location, Long size, String programPoint) {
+    public Event(String id, Long sequence, String type, Integer threadId, Subject subject, Object predicateObject, String predicateObjectPath, Object predicateObject2, String predicateObject2Path, long timestampNanos, String names, Long location, Long size, String programPoint) {
         this.id = id;
         this.sequence = sequence;
         this.type = type;
@@ -64,7 +64,7 @@ public class Event {
         this.programPoint = programPoint;
     }
 
-    public Event(UUID id, String type, Integer threadId, UUID subjectUUID, long timestampNanos, String predicateObjectPath){
+    public Event(String id, String type, Integer threadId, String subjectUUID, long timestampNanos, String predicateObjectPath){
         this.id = id;
         this.threadId = threadId;
         this.type = type;//event type
@@ -73,13 +73,15 @@ public class Event {
         this.predicateObjectPath = predicateObjectPath;
     }
 
-    public UUID getSubjectUUID() { return subjectUUID;}
+    public void setSubjectUUID(String uuid){this.subjectUUID = uuid; }
 
-    public UUID getId() {
+    public String getSubjectUUID() { return subjectUUID;}
+
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -30,13 +30,13 @@ public class UnitDependency {
 
 @Embeddable
 class UnitDepId implements Serializable {
-    private UUID oldSubject;
-    private UUID newSubject;
+    private String oldSubject;
+    private String newSubject;
 
     public UnitDepId() {
     }
 
-    public UnitDepId(UUID oldSubject, UUID newSubject) {
+    public UnitDepId(String oldSubject, String newSubject) {
         this.oldSubject = oldSubject;
         this.newSubject = newSubject;
     }

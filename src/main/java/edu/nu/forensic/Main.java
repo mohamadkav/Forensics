@@ -3,6 +3,7 @@ package edu.nu.forensic;
 import com.bbn.tc.schema.SchemaNotInitializedException;
 import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.reader.AvroReader;
+import edu.nu.forensic.reader.ReadJsonToDB;
 import edu.nu.forensic.reducer.Reducer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,20 +26,18 @@ public class Main {
 //    public static void main(String[] args) {
 //        SpringApplication.run(Main.class,args);
 //    }
+    //this is json test section
     public static void main(String[] args) {
-        String file = "C:\\Data\\ta1-marple-1-e5-bgt-2.bin.1";
-        try {
-            AvroReader avroReader = new AvroReader();
-            avroReader.readTraceWithoutIndex(new File(file));
-//          avroReader.readTrace(new File(request.getTrace()));
-        } catch (IOException | SchemaNotInitializedException e) {
-            e.printStackTrace();
-        }
+        String file = "C:\\Data\\47g.out";
+//        try {
+//            ReadJsonToDB readJsonToDB = new ReadJsonToDB();
+//            readJsonToDB.readEvent(new File(file));
+////          avroReader.readTrace(new File(request.getTrace()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         Reducer reducer = new Reducer();
-        Set<String> fileList = reducer.getFileList();
-        List<Event> events = new ArrayList<>();
-        //Here you should put some event in events, after this, you can call reduce function;
-        events = reducer.reduce(events, fileList);
+        reducer.JsonReduce(new File(file));
         //Here is the reduction result
     }
 }

@@ -12,7 +12,7 @@ import java.util.UUID;
 public class Subject {
     @Id
     @Type(type = "uuid-char")
-    private UUID uuid;
+    private String uuid;
 
     private String type;
 
@@ -21,7 +21,7 @@ public class Subject {
     @ManyToOne
     private Subject parentSubject;
 
-    private UUID parentSubjectUUID;
+    private String parentSubjectUUID;
 
     @ManyToOne
     private Principal localPrincipal;
@@ -36,7 +36,7 @@ public class Subject {
     public Subject() {
     }
 
-    public Subject(UUID uuid, String type, int cid, Subject parentSubject, Principal localPrincipal, Long startTimestampNanos, String cmdLine, String privilegeLevel) {
+    public Subject(String uuid, String type, int cid, Subject parentSubject, Principal localPrincipal, Long startTimestampNanos, String cmdLine, String privilegeLevel) {
         this.uuid = uuid;
         this.type = type;
         this.cid = cid;
@@ -47,7 +47,7 @@ public class Subject {
         this.privilegeLevel = privilegeLevel;
     }
 
-    public Subject(UUID uuid, int cid, UUID parentSubjectUUID, Long startTimestampNanos, String cmdLine){
+    public Subject(String uuid, int cid, String parentSubjectUUID, Long startTimestampNanos, String cmdLine){
         this.uuid = uuid;
         this.cid = cid;
         this.parentSubjectUUID = parentSubjectUUID;
@@ -55,15 +55,17 @@ public class Subject {
         this.cmdLine = cmdLine;
     }
 
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
-    public UUID getParentSubjectUUID() { return parentSubjectUUID; }
+    public void setParentSubjectUUID(String uuid){ this.parentSubjectUUID = uuid; }
+
+    public String getParentSubjectUUID() { return parentSubjectUUID; }
 
     public String getType() {
         return type;

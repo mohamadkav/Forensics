@@ -9,10 +9,13 @@ import java.util.*;
 public class PostGreSqlApi {
 
     private static Connection c = null;
-    private static List<UUID> StoreSubjectLists = new LinkedList<>();
+    private static List<String> StoreSubjectLists = new LinkedList<>();
     private static Statement stmt = null;
     private static int CountInTable = 0;
     private static int NumInTable = 0;
+    private static PreparedStatement pstSubj = null;
+    private static PreparedStatement pstEvent = null;
+    private static Boolean createSubj = false;
 
     public PostGreSqlApi() {
         Connection c = null;
@@ -20,8 +23,6 @@ public class PostGreSqlApi {
             Class.forName("org.postgresql.Driver");
             c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/testdb", "postgres", "123456");
             stmt = c.createStatement();
-            CreateSubjectTable();
-            CreateFileTable(NumInTable);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
@@ -37,6 +38,16 @@ public class PostGreSqlApi {
             Class.forName("org.postgresql.Driver");
             c = DriverManager.getConnection(url, user, passwd);
             stmt = c.createStatement();
+            if(!createSubj){
+                CreateSubjectTable();
+                CreateFileTable(NumInTable);
+                createSubj = true;
+            }
+            String sqlSubj = "insert into \"SubjectInfo\" (UUID, PID, NAME, PARENTUUID, TIMESTAMP) values (?,?,?,?,?)";
+            pstSubj = c.prepareStatement(sqlSubj);
+            String sqlEvent = "insert into \"file_" +NumInTable+ "\" (UUID, FILENAME, EVENTTYPE, TIMESTAMP, SUBJECTUUID) values (?,?,?,?,?)";
+            pstEvent = c.prepareStatement(sqlEvent);
+            c.setAutoCommit(false);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
@@ -54,8 +65,13 @@ public class PostGreSqlApi {
                 try{
                     if(!StoreSubjectLists.contains(subject.getUuid())) {
                         StoreSubjectLists.add(subject.getUuid());
+//                        pstSubj.setString(1, subject.getUuid().toString());
+//                        pstSubj.setString(2, String.valueOf(subject.getCid()));
+//                        pstSubj.setString(3, subject.getCmdLine());
+//                        pstSubj.setString(4, parentSubjectUUID);
+//                        pstSubj.setString(5, String.valueOf(subject.getStartTimestampNanos()));
                         String sql = "INSERT INTO \"SubjectInfo\" (UUID,PID,NAME,PARENTUUID,TIMESTAMP) VALUES ('" +
-                                subject.getUuid().toString() + "' , '" +
+                                subject.getUuid() + "' , '" +
                                 subject.getCid() + "' , '" +
                                 subject.getCmdLine() + "' , '" +
                                 parentSubjectUUID+ "' , '" +
@@ -81,9 +97,16 @@ public class PostGreSqlApi {
                     if(CountInTable>10000000){
                         NumInTable++;
                         CreateFileTable(NumInTable);
+                        String sqlEvent = "insert into \"file_" +NumInTable+ "\" (UUID, FILENAME, EVENTTYPE, TIMESTAMP, SUBJECTUUID) values (?,?,?,?,?)";
+                        pstEvent = c.prepareStatement(sqlEvent);
                     }
+//                    pstEvent.setString(1, event.getId().toString());
+//                    pstEvent.setString(2, event.getPredicateObjectPath().toString());
+//                    pstEvent.setString(3, event.getType());
+//                    pstEvent.setString(4, String.valueOf(event.getTimestampNanos()));
+//                    pstEvent.setString(5, event.getSubjectUUID().toString());
                     String sql = "INSERT INTO \"file_" +NumInTable+ "\" (UUID,FILENAME,EVENTTYPE,TIMESTAMP,SUBJECTUUID) VALUES ('" +
-                                event.getId().toString() + "' , '+" +
+                                event.getId() + "' , '+" +
                                 event.getPredicateObjectPath() + "' , '" +
                                 event.getType() + "' , '" +
                                 event.getTimestampNanos() +"' , '" +
@@ -94,7 +117,7 @@ public class PostGreSqlApi {
                     e.getMessage();
                 }
             }
-//            c.commit();
+            c.commit();
         } catch (Exception e) {
             e.printStackTrace();
             e.getMessage();
@@ -126,7 +149,7 @@ public class PostGreSqlApi {
                     "\" (UUID   VARCHAR     NOT NULL," +
                     " FILENAME       VARCHAR    NOT NULL, " +
                     " EVENTTYPE      VARCHAR   NOT NULL, "+
-                    " TIMESTAMP       VARCHAR PRIMARY KEY  NOT NULL, " +
+                    " TIMESTAMP       VARCHAR NOT NULL, " +
                     " SUBJECTUUID  VARCHAR NOT NULL)";
             stmt.executeUpdate(sqlfile);
         } catch (Exception e) {
@@ -179,7 +202,7 @@ public class PostGreSqlApi {
 
     public synchronized Map<String, Map<String,Integer>> getProcessToFileFrequences(){
         try{
-            int threshold = 0;
+            int threshold = 3;
             List<String> filetables = FindTables();
             Map<String, Map<String, Integer>> result = new HashMap<>();
             List<String> NotReadOnlyFiles = new LinkedList<>();
@@ -193,6 +216,7 @@ public class PostGreSqlApi {
                     String filename = fileResult.getString("FILENAME");
                     String eventtype = fileResult.getString("EVENTTYPE");
                     String SubjectUUID = fileResult.getString("SUBJECTUUID");
+                    System.out.println(filename);
                     int count = fileResult.getInt("count");
                     if(SubjectUUID!=lastSubjectUUID){
                         if(lastSubjectUUID!=null){

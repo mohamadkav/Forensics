@@ -1,20 +1,75 @@
 package edu.nu.forensic.reader;
 
+import com.google.gson.Gson;
+import edu.nu.forensic.JsonFormat.ETWEvent;
 import edu.nu.forensic.db.DBApi.PostGreSqlApi;
 import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.db.entity.Subject;
+import org.parboiled.common.FileUtils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ReadJsonToDB {
 
-    private PostGreSqlApi postGreSqlApi = new PostGreSqlApi("jdbc:postgresql://localhost:5432/testdb", "postgres", "123456");
 
-    public void ReadProcessToDB(List<Subject> subjects){
-        postGreSqlApi.storeSubject(subjects);
+// UUID format: cid
+
+    public void readEvent(File source){
+        PostGreSqlApi postGreSqlApi = new PostGreSqlApi("jdbc:postgresql://localhost:5432/testdb", "postgres", "123456");
+        try{
+            int i = 0;
+            String line = null;
+            List<Event> eventList = new ArrayList<>();
+            List<Subject> subjectList = new ArrayList<>();
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(source));
+            Gson gson = new Gson();
+            while((line = bufferedReader.readLine())!=null){
+                if(i%10000==0) System.out.println(i);
+                try {
+                    ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);
+                    if (line.contains("ProcessStart") || line.contains("ProcessDCStart")) {
+                        Subject subject = new Subject();
+                        subject.setCmdLine(etwEvent.arguments.ImageFileName);
+                        subject.setCid(etwEvent.processID);
+                        subject.setUuid(String.valueOf(etwEvent.processID));
+                        subject.setStartTimestampNanos(etwEvent.TimeStamp);
+                        subject.setParentSubjectUUID(String.valueOf(etwEvent.arguments.ParentId));
+                        subjectList.add(subject);
+                    } else if (line.contains("FileIoRead") || line.contains("FileIoWrite")) {
+                        Event event = new Event();
+                        event.setPredicateObjectPath(etwEvent.arguments.FileName);
+                        event.setId(etwEvent.arguments.FileKey);
+                        event.setType(etwEvent.EventName);
+                        event.setSubjectUUID(String.valueOf(etwEvent.processID));
+                        event.setTimestampNanos(etwEvent.TimeStamp);
+                        eventList.add(event);
+                    }
+                    if (subjectList.size() >= 1000) {
+                        postGreSqlApi.storeSubject(subjectList);
+                        subjectList = new ArrayList<>();
+                        System.out.println(1111111);
+                    }
+                    if (eventList.size() >= 10000) {
+                        postGreSqlApi.storeEvent(eventList);
+                        eventList = new ArrayList<>();
+                        System.out.println(2222222);
+                    }
+                    i++;
+                }catch (Exception e){
+                    e.printStackTrace();
+                    System.out.println(line);
+                }
+            }
+            postGreSqlApi.storeSubject(subjectList);
+            postGreSqlApi.storeEvent(eventList);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
-    public void ReadFileToDB(List<Event> eventList){
-        postGreSqlApi.storeEvent(eventList);
-    }
 }

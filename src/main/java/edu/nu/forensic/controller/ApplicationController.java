@@ -29,33 +29,33 @@ public class ApplicationController {
     Reducer reducer;
 
 
-//    @RequestMapping(method = RequestMethod.POST, value = "/read")
-//    public String read(@RequestBody ReadTraceRequest request){
-//        System.out.println(request.getTrace());
-//        if(request.getTrace()!=null && new File(request.getTrace()).exists())
-//            try {
-//                avroReader.readTraceWithoutIndex(new File(request.getTrace()));
-////                avroReader.readTrace(new File(request.getTrace()));
-//            }catch (IOException|SchemaNotInitializedException e){
-//                e.printStackTrace();
-//                return "ERROR";
-//            }
-//        else
-//            kafkaReader.readTrace();
-//        return "OK";
-//    }
-//
-//    @RequestMapping(method = RequestMethod.GET, value = "/reduce")
-//    public String reduce(@RequestBody ReadTraceRequest request){
-//        if(request.getTrace()!=null && new File(request.getTrace()).exists()){
-//            try{
-//                reducer.reduce(new File(request.getTrace()));
-//            }catch (Exception e){
-//                e.printStackTrace();
-//                return "ERROR";
-//            }
-//        }
-//        else return "File Not Existed";
-//        return "OK";
-//    }
+    @RequestMapping(method = RequestMethod.POST, value = "/read")
+    public String read(@RequestBody ReadTraceRequest request){
+        System.out.println(request.getTrace());
+        if(request.getTrace()!=null && new File(request.getTrace()).exists())
+            try {
+                avroReader.readTraceWithoutIndex(new File(request.getTrace()));
+//                avroReader.readTrace(new File(request.getTrace()));
+            }catch (IOException|SchemaNotInitializedException e){
+                e.printStackTrace();
+                return "ERROR";
+            }
+        else
+            kafkaReader.readTrace();
+        return "OK";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/reduce")
+    public String reduce(@RequestBody ReadTraceRequest request){
+        if(request.getTrace()!=null && new File(request.getTrace()).exists()){
+            try{
+                reducer.reduce(new File(request.getTrace()));
+            }catch (Exception e){
+                e.printStackTrace();
+                return "ERROR";
+            }
+        }
+        else return "File Not Existed";
+        return "OK";
+    }
 }

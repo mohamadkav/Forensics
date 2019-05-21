@@ -41,12 +41,12 @@ public class AvroReader {
         List<String> registryUUIDs = new LinkedList<>();
         List<edu.nu.forensic.db.entity.Subject> subjectList= new ArrayList<>();
         List<edu.nu.forensic.db.entity.Event> eventList= new ArrayList<>();
-        Map<UUID,UUID> ThreadIDToProcessID = new HashMap<>();
-        Map<UUID,UUID> UnitToDependency = new HashMap<>();
+        Map<String,String> ThreadIDToProcessID = new HashMap<>();
+        Map<String,String> UnitToDependency = new HashMap<>();
 
         //init db
 //        Neo4jApi neo4jApi = new Neo4jApi("C:\\Data\\neo4j-community-3.5.3\\data\\databases\\graph.db");
-        PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
+        PostGreSqlApi postGreSqlApi = new PostGreSqlApi("jdbc:postgresql://localhost:5432/testdb", "postgres", "123456");
 
         while(scanner.hasNextInt()){
             final int length  = scanner.nextInt();
@@ -88,14 +88,14 @@ public class AvroReader {
 //                    System.err.println(CDMdatum.toString());
                 if(CDMdatum.getDatum() instanceof Subject) {
                     if (((Subject) CDMdatum.getDatum()).getType().toString().contains("THREAD")) {
-                        UUID threadID = UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getUuid().bytes());
-                        UUID processID =  UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getParentSubject().bytes());
+                        String threadID = ((Subject) CDMdatum.getDatum()).getUuid().toString();
+                        String processID =  ((Subject) CDMdatum.getDatum()).getParentSubject().toString();
                         if(processID!=null) ThreadIDToProcessID.put(threadID,processID);
                     } else {
 //                        System.out.println(CDMdatum.getDatum().toString());
 
-                        UUID processID = UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getUuid().bytes());
-                        UUID parentID = ((Subject) CDMdatum.getDatum()).getParentSubject() != null ? UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getParentSubject().bytes()) : null;
+                        String processID = ((Subject) CDMdatum.getDatum()).getUuid().toString();
+                        String parentID = ((Subject) CDMdatum.getDatum()).getParentSubject().toString() != null ? ((Subject) CDMdatum.getDatum()).getParentSubject().toString() : null;
 
                         //thread
                         while(ThreadIDToProcessID.containsKey(processID)) processID = ThreadIDToProcessID.get(processID);
@@ -126,7 +126,7 @@ public class AvroReader {
                 else if(CDMdatum.getDatum() instanceof Event){
                     if(((Event) CDMdatum.getDatum()).toString().contains("FileIoWrite")||((Event) CDMdatum.getDatum()).toString().contains("FileIoRead")) {
                         if(!((Event) CDMdatum.getDatum()).toString().contains("UNKNOWN")) {
-                            UUID processID = UUID.nameUUIDFromBytes(((Event) CDMdatum.getDatum()).getSubject().bytes());
+                            String processID = ((Event) CDMdatum.getDatum()).getSubject().toString();
 
                             //thread
                             while(ThreadIDToProcessID.containsKey(processID)) processID = ThreadIDToProcessID.get(processID);
@@ -136,7 +136,7 @@ public class AvroReader {
                             }
 
                             edu.nu.forensic.db.entity.Event event = new edu.nu.forensic.db.entity.Event(
-                                    UUID.nameUUIDFromBytes(((Event) CDMdatum.getDatum()).getUuid().bytes())
+                                    ((Event) CDMdatum.getDatum()).getUuid().toString()
                                     , ((Event) CDMdatum.getDatum()).getNames().toString()
                                     , ((Event) CDMdatum.getDatum()).getThreadId()
                                     , processID
@@ -152,8 +152,8 @@ public class AvroReader {
                     }
                 }
                 else if(CDMdatum.getDatum() instanceof UnitDependency){
-                    UUID unit = UUID.nameUUIDFromBytes(((UnitDependency)CDMdatum.getDatum()).getUnit().bytes());
-                    UUID dependentUnit = UUID.nameUUIDFromBytes(((UnitDependency)CDMdatum.getDatum()).getDependentUnit().bytes());
+                    String unit = ((UnitDependency)CDMdatum.getDatum()).getUnit().toString();
+                    String dependentUnit = ((UnitDependency)CDMdatum.getDatum()).getDependentUnit().toString();
                     UnitToDependency.put(dependentUnit,unit);
                 }
             }catch (Exception e){
@@ -178,12 +178,12 @@ public class AvroReader {
         List<String> registryUUIDs = new LinkedList<>();
         List<edu.nu.forensic.db.entity.Subject> subjectList= new ArrayList<>();
         List<edu.nu.forensic.db.entity.Event> eventList= new ArrayList<>();
-        Map<UUID,UUID> ThreadIDToProcessID = new HashMap<>();
-        Map<UUID,UUID> UnitToDependency = new HashMap<>();
+        Map<String,String> ThreadIDToProcessID = new HashMap<>();
+        Map<String,String> UnitToDependency = new HashMap<>();
 
         //init db
 //        Neo4jApi neo4jApi = new Neo4jApi("C:\\Data\\neo4j-community-3.5.3\\data\\databases\\graph.db");
-        PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
+        PostGreSqlApi postGreSqlApi = new PostGreSqlApi("jdbc:postgresql://localhost:5432/testdb", "postgres", "123456");
         DatumReader<TCCDMDatum> reader = new SpecificDatumReader<>(TCCDMDatum.class);
 
         DataFileReader<TCCDMDatum> dataFileReader = new DataFileReader<>(source, reader);
@@ -226,15 +226,15 @@ public class AvroReader {
 //                    System.err.println(CDMdatum.toString());
                 if(CDMdatum.getDatum() instanceof Subject) {
                     if (((Subject) CDMdatum.getDatum()).getType().toString().contains("THREAD")) {
-                        UUID threadID = UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getUuid().bytes());
-                        UUID processID =  UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getParentSubject().bytes());
+                        String threadID = ((Subject) CDMdatum.getDatum()).getUuid().toString();
+                        String processID =  ((Subject) CDMdatum.getDatum()).getParentSubject().toString();
                         if(processID!=null) ThreadIDToProcessID.put(threadID,processID);
                     } else {
 //                        System.out.println(CDMdatum.getDatum().toString());
 
-                        UUID processID = UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getUuid().bytes());
-                        UUID parentID = ((Subject) CDMdatum.getDatum()).getParentSubject() != null ?
-                                UUID.nameUUIDFromBytes(((Subject) CDMdatum.getDatum()).getParentSubject().bytes()) : null;
+                        String processID = ((Subject) CDMdatum.getDatum()).getUuid().toString();
+                        String parentID = ((Subject) CDMdatum.getDatum()).getParentSubject() != null ?
+                                ((Subject) CDMdatum.getDatum()).getParentSubject().toString() : null;
 
                         //thread
                         while(ThreadIDToProcessID.containsKey(processID)) processID = ThreadIDToProcessID.get(processID);
@@ -268,7 +268,7 @@ public class AvroReader {
                     if (((Event) CDMdatum.getDatum()).getType().toString().contains("EVENT_WRITE")
                             || ((Event) CDMdatum.getDatum()).getType().toString().contains("EVENT_READ")) {
                         if (!((Event) CDMdatum.getDatum()).toString().contains("UNKNOWN")) {
-                            UUID processID = UUID.nameUUIDFromBytes(((Event) CDMdatum.getDatum()).getSubject().bytes());
+                            String processID = ((Event) CDMdatum.getDatum()).getSubject().toString();
 
                             //thread
                             while (ThreadIDToProcessID.containsKey(processID))
@@ -279,7 +279,7 @@ public class AvroReader {
                             }
 
                             edu.nu.forensic.db.entity.Event event = new edu.nu.forensic.db.entity.Event(
-                                    UUID.nameUUIDFromBytes(((Event) CDMdatum.getDatum()).getUuid().bytes())
+                                    ((Event) CDMdatum.getDatum()).getUuid().toString()
                                     , ((Event) CDMdatum.getDatum()).getType().toString()
                                     , ((Event) CDMdatum.getDatum()).getThreadId()
                                     , processID
@@ -295,8 +295,8 @@ public class AvroReader {
                             System.out.println(22222);
                         }
                     } else if (CDMdatum.getDatum() instanceof UnitDependency) {
-                        UUID unit = UUID.nameUUIDFromBytes(((UnitDependency) CDMdatum.getDatum()).getUnit().bytes());
-                        UUID dependentUnit = UUID.nameUUIDFromBytes(((UnitDependency) CDMdatum.getDatum()).getDependentUnit().bytes());
+                        String unit = ((UnitDependency) CDMdatum.getDatum()).getUnit().toString();
+                        String dependentUnit = ((UnitDependency) CDMdatum.getDatum()).getDependentUnit().toString();
                         UnitToDependency.put(dependentUnit, unit);
                     }
                 }

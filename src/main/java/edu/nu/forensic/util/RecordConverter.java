@@ -40,7 +40,7 @@ public class RecordConverter {
             parentSubject=subjectRepository.findById(UUID.nameUUIDFromBytes(bbnSubject.getParentSubject().bytes())).orElse(null);
         if(bbnSubject.getLocalPrincipal()!=null)
             localPrincipal=principalRepository.findById(UUID.nameUUIDFromBytes(bbnSubject.getLocalPrincipal().bytes())).orElse(null);
-        Subject subject=new Subject(UUID.nameUUIDFromBytes(bbnSubject.getUuid().bytes()),bbnSubject.getType().name(),
+        Subject subject=new Subject(bbnSubject.getUuid().toString(),bbnSubject.getType().name(),
                 bbnSubject.getCid(),parentSubject,localPrincipal,bbnSubject.getStartTimestampNanos(),
                 bbnSubject.getCmdLine()==null?null:bbnSubject.getCmdLine().toString(),bbnSubject.getPrivilegeLevel()==null?null:bbnSubject.getPrivilegeLevel().name());
         subjectList.add(subject);
@@ -103,7 +103,7 @@ public class RecordConverter {
             eventNames.deleteCharAt(eventNames.length() - 1);
         else
             eventNames=null;
-        Event event=new Event(UUID.nameUUIDFromBytes(bbnEvent.getUuid().bytes()),bbnEvent.getSequence(),bbnEvent.getType()==null?null:bbnEvent.getType().name(),
+        Event event=new Event(bbnEvent.getUuid().toString(),bbnEvent.getSequence(),bbnEvent.getType()==null?null:bbnEvent.getType().name(),
                 bbnEvent.getThreadId(),subject,predicateObject,bbnEvent.getPredicateObjectPath()!=null?bbnEvent.getPredicateObjectPath().toString():null,
                 predicateObject2,bbnEvent.getPredicateObject2Path()!=null?bbnEvent.getPredicateObject2Path().toString():null,bbnEvent.getTimestampNanos(),
                 eventNames!=null?eventNames.toString():null,bbnEvent.getLocation(),bbnEvent.getSize(),bbnEvent.getProgramPoint()!=null?bbnEvent.getProgramPoint().toString():null);

@@ -1,12 +1,17 @@
 package edu.nu.forensic.reducer;
 
+import com.bbn.tc.schema.avro.cdm20.TCCDMDatum;
+import com.google.gson.Gson;
+import edu.nu.forensic.JsonFormat.ETWEvent;
 import edu.nu.forensic.db.DBApi.PostGreSqlApi;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.*;
 
 import edu.nu.forensic.db.entity.Event;
+import org.apache.avro.file.DataFileReader;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.specific.SpecificDatumReader;
 import org.springframework.stereotype.Component;
 
 import static edu.nu.forensic.reducer.FPGrowth.findFrequentItemsetWithSuffix;
@@ -19,10 +24,7 @@ public class Reducer {
     private HashSet<Integer> test = new HashSet<>();
 
     public Set<String> getFileList() {
-        String url = "jdbc:postgresql://localhost:5432/testdb";
-        String user = "postgres";
-        String passwd = "123456";
-        PostGreSqlApi postGreSqlApi = new PostGreSqlApi(url, user, passwd);
+        PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
         //Extract all file reads and writes
         Map<String, Map<String, Integer>> processIdToFileFrequences = postGreSqlApi.getProcessToFileFrequences();
         //Building FP tree
@@ -93,48 +95,83 @@ public class Reducer {
             return null;
         }
     }
+
+    public void JsonReduce(File source){
+        try{
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(source));
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("temp.txt"));
+            Set<String> filelists = getFileList();
+            List<String> judgeprocessID = new ArrayList<>();
+            String line = null;
+            Gson gson = new Gson();
+            while((line = bufferedReader.readLine())!=null){
+                ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);
+                if(line.contains("FileIoRead")){
+                    if(filelists.contains(etwEvent.arguments.FileName)){
+                        if(!judgeprocessID.contains(String.valueOf(etwEvent.processID))){
+                            judgeprocessID.add(String.valueOf(etwEvent.processID));
+                            line.replace(etwEvent.arguments.FileName, "Init Process");
+                            bufferedWriter.append(line+"\r\n");
+                        }
+                    }
+                    else bufferedWriter.append(line+"\r\n");
+                }
+                else bufferedWriter.append(line+"\r\n");
+            }
+            bufferedReader.close();
+            bufferedWriter.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void reduce(File source){
+        Set<String> filelists = getFileList();
+
+        try{
+            int i=0;
+            List<String> judgeprocessID = new ArrayList<>();
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("temp.txt"));
+            DatumReader<TCCDMDatum> reader = new SpecificDatumReader<>(TCCDMDatum.class);
+
+            DataFileReader<TCCDMDatum> dataFileReader = new DataFileReader<>(source, reader);
+            TCCDMDatum CDMdatum = null;
+            while (dataFileReader.hasNext()) {
+                CDMdatum = dataFileReader.next();
+
+                if(CDMdatum==null)
+                    break;
+//                bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
+                try {
+                    if (i % 10000 == 0) System.out.println(i);
+                    i++;
+                    if (CDMdatum.getDatum() instanceof Event) {
+                        if (((Event) CDMdatum.getDatum()).getType().toString().contains("EVENT_READ")) {
+                            if (filelists.contains(((Event) CDMdatum.getDatum()).getPredicateObjectPath().toString())){
+                                if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubject().toString())) {
+                                    judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubject().toString());
+                                    String temp = CDMdatum.getDatum().toString();
+                                    temp = temp.replace(((Event) CDMdatum.getDatum()).getPredicateObjectPath().toString(), "Initial process");
+                                    bufferedWriter.append(temp + "\r\n");
+                                }
+                            } else bufferedWriter.append(CDMdatum.getDatum().toString() + "\r\n");
+                        }
+                        else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
+                    }
+                    else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
+                } catch (Exception e) {
+                    System.err.println("Darn! We have an unknown bug over: ");
+//                System.err.println(CDMdatum);
+                    e.printStackTrace();
+                }
+            }
+            bufferedWriter.flush();
+            bufferedWriter.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }
 
-//        try{
-//            int i=0;
-//            List<String> judgeprocessID = new ArrayList<>();
-//            List<String> writeFiles = new LinkedList<>();
-//            BufferedWriter  bufferedWriter = new BufferedWriter(new FileWriter("temp.txt"));
-//            DatumReader<TCCDMDatum> reader = new SpecificDatumReader<>(TCCDMDatum.class);
-//
-//            DataFileReader<TCCDMDatum> dataFileReader = new DataFileReader<>(source, reader);
-//            TCCDMDatum CDMdatum = null;
-//            while (dataFileReader.hasNext()) {
-//                CDMdatum = dataFileReader.next();
-//
-//                if(CDMdatum==null)
-//                    break;
-////                bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
-//                try {
-//                    if (i % 10000 == 0) System.out.println(i);
-//                    i++;
-//                    if (CDMdatum.getDatum() instanceof Event) {
-//                        if (((Event) CDMdatum.getDatum()).getType().toString().contains("EVENT_READ")) {
-//                            if (filelists.contains(((Event) CDMdatum.getDatum()).getPredicateObjectPath().toString())){
-//                                if(!judgeprocessID.contains(((Event) CDMdatum.getDatum()).getSubject().toString())) {
-//                                    judgeprocessID.add(((Event) CDMdatum.getDatum()).getSubject().toString());
-//                                    String temp = CDMdatum.getDatum().toString();
-//                                    temp = temp.replace(((Event) CDMdatum.getDatum()).getPredicateObjectPath().toString(), "Initial process");
-//                                    bufferedWriter.append(temp + "\r\n");
-//                                }
-//                            } else bufferedWriter.append(CDMdatum.getDatum().toString() + "\r\n");
-//                        }
-//                        else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
-//                    }
-//                    else bufferedWriter.append(CDMdatum.getDatum().toString()+"\r\n");
-//                } catch (Exception e) {
-//                    System.err.println("Darn! We have an unknown bug over: ");
-////                System.err.println(CDMdatum);
-//                    e.printStackTrace();
-//                }
-//            }
-//            bufferedWriter.flush();
-//            bufferedWriter.close();
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
+
