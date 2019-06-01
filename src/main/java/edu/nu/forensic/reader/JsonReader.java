@@ -59,7 +59,7 @@ public class JsonReader {
                             parent = subjectRepository.findById(pidToUUID.get(parentPid)).get();
                         tidToUUID.put(tid, uuid);
                         Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, "SUBJECT_THREAD",
-                                tid, parent, null, timeStamp,
+                                tid, parent==null?null:parent.getUuid(), null, timeStamp,
                                 null, null);
                         subjectRepository.save(subject);
                         break;
@@ -75,7 +75,7 @@ public class JsonReader {
                             parent = subjectRepository.findById(pidToUUID.get(parentPid)).get();
                         pidToUUID.put(pid, uuid);
                         Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, "SUBJECT_PROCESS",
-                                pid, parent, null, timeStamp,
+                                pid, parent==null?null:parent.getUuid(), null, timeStamp,
                                 jsonObject.get("arguments").getAsJsonObject().get("CommandLine").getAsString(), null);
                         subjectRepository.save(subject);
                         break;
@@ -85,9 +85,8 @@ public class JsonReader {
                         int tid = jsonObject.get("threadID").getAsInt();
                         long timeStamp = jsonObject.get("TimeStamp").getAsLong();
                         UUID uuid = UUID.randomUUID();
-                        Event event = new Event(uuid, null, eventName.equals("FileIoRead") ? "EVENT_READ" : "EVENT_WRITE", tid, subjectRepository.findById(tidToUUID.get(tid)).get(),
-                                null, jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString(), null, null, timeStamp, eventName.equals("FileIoRead") ? "FileIoRead" : "FileIoWrite",
-                                null, null, null);
+                        Event event = new Event(uuid, eventName.equals("FileIoRead") ? "EVENT_READ" : "EVENT_WRITE", tid, tidToUUID.get(tid),
+                                jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString(), timeStamp, eventName.equals("FileIoRead") ? "FileIoRead" : "FileIoWrite");
                         toBeSavedEvents.add(event);
                         if(toBeSavedEvents.size()>1000) {
                             System.out.println("Saving...");

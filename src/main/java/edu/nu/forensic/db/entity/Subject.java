@@ -18,31 +18,31 @@ public class Subject {
 
     private int cid;
 
-    @ManyToOne
-    private Subject parentSubject;
+ //   @ManyToOne
+    private UUID parentSubjectUUID;
 
-    @ManyToOne
-    private Principal localPrincipal;
+//    @ManyToOne
+//    private Principal localPrincipal;
 
     private Long startTimestampNanos;
 
     @Column(length = 2048)
     private String cmdLine;
 
-    private String privilegeLevel;
+ //   private String privilegeLevel;
 
     public Subject() {
     }
 
-    public Subject(UUID uuid, String type, int cid, Subject parentSubject, Principal localPrincipal, Long startTimestampNanos, String cmdLine, String privilegeLevel) {
+    public Subject(UUID uuid, String type, int cid, UUID parentSubject, Principal localPrincipal, Long startTimestampNanos, String cmdLine, String privilegeLevel) {
         this.uuid = uuid;
         this.type = type;
         this.cid = cid;
-        this.parentSubject = parentSubject;
-        this.localPrincipal = localPrincipal;
+        this.parentSubjectUUID = parentSubject;
+       // this.localPrincipal = localPrincipal;
         this.startTimestampNanos = startTimestampNanos;
         this.cmdLine = cmdLine;
-        this.privilegeLevel = privilegeLevel;
+     //   this.privilegeLevel = privilegeLevel;
     }
 
     public UUID getUuid() {
@@ -69,21 +69,21 @@ public class Subject {
         this.cid = cid;
     }
 
-    public Subject getParentSubject() {
-        return parentSubject;
+    public UUID getParentSubject() {
+        return parentSubjectUUID;
     }
 
-    public void setParentSubject(Subject parentSubject) {
-        this.parentSubject = parentSubject;
+    public void setParentSubject(UUID parentSubject) {
+        this.parentSubjectUUID = parentSubject;
     }
-
-    public Principal getLocalPrincipal() {
-        return localPrincipal;
-    }
-
-    public void setLocalPrincipal(Principal localPrincipal) {
-        this.localPrincipal = localPrincipal;
-    }
+//
+//    public Principal getLocalPrincipal() {
+//        return localPrincipal;
+//    }
+//
+//    public void setLocalPrincipal(Principal localPrincipal) {
+//        this.localPrincipal = localPrincipal;
+//    }
 
     public Long getStartTimestampNanos() {
         return startTimestampNanos;
@@ -101,11 +101,12 @@ public class Subject {
         this.cmdLine = cmdLine;
     }
 
-    public String getPrivilegeLevel() {
-        return privilegeLevel;
-    }
+//    public String getPrivilegeLevel() {
+//        return privilegeLevel;
+//    }
+//
+//    public void setPrivilegeLevel(String privilegeLevel) {
+//        this.privilegeLevel = privilegeLevel;
+//    }
 
-    public void setPrivilegeLevel(String privilegeLevel) {
-        this.privilegeLevel = privilegeLevel;
-    }
 }
