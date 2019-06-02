@@ -20,10 +20,13 @@ public class AvroReader {
     @Autowired
     private RecordConverter recordConverter;
 
+    private int eventCounter;
+
 
     public void readTrace(File source) throws IOException, SchemaNotInitializedException {
         AvroGenericDeserializer avroGenericDeserializer=new AvroGenericDeserializer("schema/TCCDMDatum.avsc","schema/TCCDMDatum.avsc",
                 true,source);
+        eventCounter = 0;
         while(true){
             GenericContainer data= (GenericContainer)avroGenericDeserializer.deserializeNextRecordFromFile();
             if(data==null)
@@ -32,26 +35,35 @@ public class AvroReader {
             try {
                 if (CDMdatum.getDatum() instanceof Subject)
                     recordConverter.saveAndConvertBBNSubjectToSubject((Subject) CDMdatum.getDatum());
-                else if (CDMdatum.getDatum() instanceof Principal)
-                    recordConverter.saveAndConvertBBNPrincipalToPrincipal((Principal) CDMdatum.getDatum());
-                else if (CDMdatum.getDatum() instanceof FileObject)
-                    recordConverter.saveAndConvertBBNFileObjectToFileObject((FileObject) CDMdatum.getDatum());
-                else if (CDMdatum.getDatum() instanceof RegistryKeyObject)
-                    recordConverter.saveAndConvertBBNRegistryKeyObjectToRegistryKeyObject((RegistryKeyObject) CDMdatum.getDatum());
-                else if (CDMdatum.getDatum() instanceof NetFlowObject)
-                    recordConverter.saveAndConvertBBNNetFlowObjectToNetFlowObject((NetFlowObject) CDMdatum.getDatum());
-                else if (CDMdatum.getDatum() instanceof Event)
-                    recordConverter.saveAndConvertBBNEventToEvent((Event) CDMdatum.getDatum());
-                else if (CDMdatum.getDatum() instanceof UnitDependency)
-                    recordConverter.saveAndConvertBBNUnitDependencyToUnitDependency((UnitDependency) CDMdatum.getDatum());
-                else
-                    System.err.println(CDMdatum.toString());
+            //    else if (CDMdatum.getDatum() instanceof Principal)
+            //        recordConverter.saveAndConvertBBNPrincipalToPrincipal((Principal) CDMdatum.getDatum());
+            //    else if (CDMdatum.getDatum() instanceof FileObject)
+            //        recordConverter.saveAndConvertBBNFileObjectToFileObject((FileObject) CDMdatum.getDatum());
+            //    else if (CDMdatum.getDatum() instanceof RegistryKeyObject)
+            //        recordConverter.saveAndConvertBBNRegistryKeyObjectToRegistryKeyObject((RegistryKeyObject) CDMdatum.getDatum());
+            //    else if (CDMdatum.getDatum() instanceof NetFlowObject)
+            //        recordConverter.saveAndConvertBBNNetFlowObjectToNetFlowObject((NetFlowObject) CDMdatum.getDatum());
+                else if (CDMdatum.getDatum() instanceof Event) {
+                    Event e=(Event) CDMdatum.getDatum();
+                    eventCounter += 1;
+                    if (eventCounter % 1000000 == 0)
+                        System.out.println(eventCounter);
+                    if(e.getNames()!=null && (e.getNames().get(0).toString().contains("FileIoRead") || e.getNames().get(0).toString().contains("FileIoWrite")))
+                        if(!e.getPredicateObjectPath().toString().equals("UNKNOWN_FILE")) {
+                            recordConverter.saveAndConvertBBNEventToEvent(e);
+                        }
+                }
+            //    else if (CDMdatum.getDatum() instanceof UnitDependency)
+            //        recordConverter.saveAndConvertBBNUnitDependencyToUnitDependency((UnitDependency) CDMdatum.getDatum());
+            //    else
+            //        System.err.println(CDMdatum.toString());
             }catch (Exception e){
                 System.err.println("Darn! We have an unknown bug over: ");
                 System.err.println(CDMdatum);
                 e.printStackTrace();
             }
         }
+        System.out.println(eventCounter);
         avroGenericDeserializer.close();
     }
 }

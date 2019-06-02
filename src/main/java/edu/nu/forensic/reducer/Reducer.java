@@ -25,20 +25,24 @@ public class Reducer {
     private Set<IoEvent> ioEventSet = new HashSet<>();
     private List<IoEvent> toBeSavedIoEvents = new ArrayList<>();
     private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt = new HashMap<>();
-    //private HashSet<Integer> test=new HashSet<>();
+    // CPR optimization
+    private HashMap<String, HashSet<IoEvent>> eventsStartFromKey = new HashMap();
+    private HashMap<String, HashSet<IoEvent>> eventsEndAtKey = new HashMap();
 
-    private boolean forward_check(IoEvent e_p, IoEvent e, String v) {
-        for (IoEvent ioEvent : ioEventSet) {
-            if (!(ioEvent.getEndTimestampNanos() <= e_p.getStartTimestampNanos() || e.getStartTimestampNanos() <= ioEvent.getStartTimestampNanos()))
+    private boolean forward_check(IoEvent e_p, IoEvent e_l, String v) {
+        for (IoEvent ioEvent : eventsStartFromKey.get(v)) {
+            // time window of this event has overlapped the start time interval of e_p and e_l
+            if (!(ioEvent.getEndTimestampNanos() <= e_p.getStartTimestampNanos() || e_l.getStartTimestampNanos() <= ioEvent.getStartTimestampNanos()))
                 return false;
         }
         //System.out.println("get forward");
         return true;
     }
 
-    private boolean backward_check(IoEvent e_p, IoEvent e, String u) {
-        for (IoEvent ioEvent : ioEventSet) {
-            if (!(ioEvent.getEndTimestampNanos() <= e_p.getEndTimestampNanos() || e.getEndTimestampNanos() <= ioEvent.getStartTimestampNanos()))
+    private boolean backward_check(IoEvent e_p, IoEvent e_l, String u) {
+        for (IoEvent ioEvent : eventsEndAtKey.get(u)) {
+            // time window of this event has overlapped the end time interval of e_p and e_l
+            if (!(ioEvent.getEndTimestampNanos() <= e_p.getEndTimestampNanos() || e_l.getEndTimestampNanos() <= ioEvent.getStartTimestampNanos()))
                 return false;
         }
         //System.out.println("get backward");
@@ -49,15 +53,19 @@ public class Reducer {
         Set<Event> eventSet = eventRepository.findByNamesEqualsOrNamesEqualsOrderByTimestampNanosAsc("FileIoRead","FileIoWrite");
         System.out.println("Size of eventSet: "+eventSet.size());
 
+        // these three cols are used to decide whether two adjacent events are the same.
         String lastNames = "";
         String lastPredicateObjectPath = "";
-        int lastThreadId = -1;
+        String lastThreadId = "";
+        // this is a merged ioEvent of one or more events.
         IoEvent toBeSavedIoEvent = null;
+        // this is a flag where true indicates invalid toBeSavedIoEvent
         boolean dirty = true;
 
+        // merge all io events into ioEvents by timestamp.
         for (Event event : eventSet) {
             // if current event has same type, object_path, thread_id as the last event, we are still in same time window.
-            if (event.getNames().compareTo(lastNames) == 0 && event.getPredicateObjectPath().compareTo(lastPredicateObjectPath) == 0 && event.getThreadId() == lastThreadId) {
+            if (event.getNames().compareTo(lastNames) == 0 && event.getPredicateObjectPath().compareTo(lastPredicateObjectPath) == 0 && event.getThreadId().toString().compareTo(lastThreadId) == 0) {
                 // update the ioEvent's time window.
                 toBeSavedIoEvent.setEndTimestampNanos(event.getTimestampNanos());
             }
@@ -75,18 +83,18 @@ public class Reducer {
                 toBeSavedIoEvent = new IoEvent(event.getId(), event.getSequence(), event.getType(), event.getThreadId(), event.getSubject(), event.getPredicateObject(), event.getPredicateObjectPath(), event.getPredicateObject2(), event.getPredicateObject2Path(), event.getTimestampNanos(), event.getTimestampNanos(), event.getNames(), event.getLocation(), event.getSize(), event.getProgramPoint());
                 lastNames = event.getNames();
                 lastPredicateObjectPath = event.getPredicateObjectPath();
-                lastThreadId = event.getThreadId();
+                lastThreadId = event.getThreadId().toString();
             }
             if(toBeSavedIoEvents.size() >= 1000) {
-                System.out.println("Saving 1000 ioEvents...");
-                ioEventRepository.saveAll(toBeSavedIoEvents);
+                //System.out.println("Saving 1000 ioEvents...");
+                //ioEventRepository.saveAll(toBeSavedIoEvents);
                 toBeSavedIoEvents = new ArrayList<>();
             }
         }
         toBeSavedIoEvents.add(toBeSavedIoEvent);
         ioEventSet.add(toBeSavedIoEvent);
-        System.out.println("Saving the rest ioEvents...");
-        ioEventRepository.saveAll(toBeSavedIoEvents);
+        //System.out.println("Saving the rest ioEvents...");
+        //ioEventRepository.saveAll(toBeSavedIoEvents);
 
         // debug
         /*int counter = 0;
@@ -96,6 +104,35 @@ public class Reducer {
         }*/
 
         // CPR algorithm
+        // step 0. CPR optimization
+        for (IoEvent ioEvent: ioEventSet) {
+            if (!eventsStartFromKey.containsKey(ioEvent.getPredicateObjectPath())) {
+                HashSet<IoEvent> ioEventSubset = new HashSet<>();
+                eventsStartFromKey.put(ioEvent.getPredicateObjectPath(), ioEventSubset);
+            }
+            if (!eventsEndAtKey.containsKey(ioEvent.getPredicateObjectPath())) {
+                HashSet<IoEvent> ioEventSubset = new HashSet<>();
+                eventsEndAtKey.put(ioEvent.getPredicateObjectPath(), ioEventSubset);
+            }
+            if (!eventsStartFromKey.containsKey(ioEvent.getThreadId().toString())) {
+                HashSet<IoEvent> ioEventSubset = new HashSet<>();
+                eventsStartFromKey.put(ioEvent.getThreadId().toString(), ioEventSubset);
+            }
+            if (!eventsEndAtKey.containsKey(ioEvent.getThreadId().toString())) {
+                HashSet<IoEvent> ioEventSubset = new HashSet<>();
+                eventsEndAtKey.put(ioEvent.getThreadId().toString(), ioEventSubset);
+            }
+        }
+        for (IoEvent ioEvent: ioEventSet) {
+            if (ioEvent.getNames().compareTo("FileIoRead") == 0) {
+                eventsStartFromKey.get(ioEvent.getPredicateObjectPath()).add(ioEvent);
+                eventsEndAtKey.get(ioEvent.getThreadId().toString()).add(ioEvent);
+            }
+            else if (ioEvent.getNames().compareTo("FileIoWrite") == 0) {
+                eventsStartFromKey.get(ioEvent.getThreadId().toString()).add(ioEvent);
+                eventsEndAtKey.get(ioEvent.getPredicateObjectPath()).add(ioEvent);
+            }
+        }
         // step 1. find all possible edges.
         for (IoEvent ioEvent : ioEventSet) {
             if (fileToProcessesWhichHaveAccessedIt.containsKey(ioEvent.getPredicateObjectPath())) {
@@ -110,7 +147,7 @@ public class Reducer {
                 fileToProcessesWhichHaveAccessedIt.put(ioEvent.getPredicateObjectPath(), threadSet);
             }
         }
-        // step 2. generate stacks for all possible edges.
+        // step 2. prepare stacks for all possible edges.
         HashMap<String, HashMap<String, Stack<IoEvent>>> stackMaps = new HashMap<>();
         fileToProcessesWhichHaveAccessedIt.forEach((key, value) -> {
             value.forEach((threadId) -> {
@@ -139,12 +176,12 @@ public class Reducer {
             });
         });
         // step 3. merge aggregable events.
-        // debug
-        int counter = 0;
+        //int counter = 0;
         Set<IoEvent> toBeRemovedEventSet = new HashSet<>();
         for (IoEvent ioEvent : ioEventSet) {
-            counter += 1;
-            System.out.println(counter);
+            // debug
+            //counter += 1;
+            //System.out.println(counter);
             String u;
             String v;
             if (ioEvent.getNames().compareTo("FileIoRead") == 0) {
