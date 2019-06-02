@@ -18,7 +18,7 @@ public class IoEvent {
     private Integer threadId;
 
   //  @ManyToOne
-  private UUID subjectUUID;
+    private UUID subjectUUID;
 
 //    @ManyToOne
 //    private Object predicateObject;

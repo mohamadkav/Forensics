@@ -21,9 +21,12 @@ public class AvroStandAloneReader {
     private static Connection c;
     private static Statement stmt = null;
 
+    private static int eventCounter;
+
     public static void main(String[] args) throws Exception{
         Scanner input=new Scanner(System.in);
-        initDB("jdbc:postgresql://localhost:5432/forensics", "postgres", "1234");
+        initDB("jdbc:postgresql://localhost:5432/forensic", "postgres", "12345");
+        eventCounter = 0;
         while(true){
             System.err.println("Ready");
             String raw=input.nextLine();
@@ -55,6 +58,7 @@ public class AvroStandAloneReader {
                 }
                 if(CDMdatum.getDatum() instanceof com.bbn.tc.schema.avro.cdm19.Event){
                     com.bbn.tc.schema.avro.cdm19.Event bbnEvent=(com.bbn.tc.schema.avro.cdm19.Event) CDMdatum.getDatum();
+
                     StringBuilder eventNames= new StringBuilder();
                     if(bbnEvent.getNames()!=null) {
                         for (CharSequence cs : bbnEvent.getNames())
@@ -65,11 +69,14 @@ public class AvroStandAloneReader {
                     else
                         eventNames=null;
                     if(bbnEvent.getType().toString().equals("EVENT_OTHER")){
-                        if(eventNames==null||!(eventNames.toString().equals("FileIoRead")||eventNames.equals("FileIoWrite")))
+                        if(eventNames==null||!(eventNames.toString().equals("FileIoRead")||eventNames.toString().equals("FileIoWrite")))
+                            continue;
+                        else if (bbnEvent.getPredicateObjectPath().toString().compareTo(("UNKNOWN_FILE")) == 0)
                             continue;
                     }
                     else if(!(bbnEvent.getType().equals("EVENT_READ")||bbnEvent.equals("EVENT_WRITE")))
                         continue;
+
                     Event event=new Event(UUID.nameUUIDFromBytes(bbnEvent.getUuid().bytes()),bbnEvent.getType()==null?null:bbnEvent.getType().name(),
                             bbnEvent.getThreadId(),bbnEvent.getSubject()==null?null:UUID.nameUUIDFromBytes(bbnEvent.getSubject().bytes()),bbnEvent.getPredicateObjectPath()!=null?bbnEvent.getPredicateObjectPath().toString():null,
                             bbnEvent.getTimestampNanos(),eventNames!=null?eventNames.toString():null);

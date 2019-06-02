@@ -64,7 +64,7 @@ public class Reducer {
         // merge all io events into ioEvents by timestamp.
         for (Event event : eventSet) {
             // if current event has same type, object_path, thread_id as the last event, we are still in same time window.
-            if (event.getNames().compareTo(lastNames) == 0 && event.getPredicateObjectPath().compareTo(lastPredicateObjectPath) == 0 && event.getThreadId().toString().compareTo(lastThreadId) == 0) {
+            if (event.getNames().equals(lastNames) && event.getPredicateObjectPath().equals(lastPredicateObjectPath)  && event.getThreadId().toString().equals(lastThreadId) ) {
                 // update the ioEvent's time window.
                 toBeSavedIoEvent.setEndTimestampNanos(event.getTimestampNanos());
             }
@@ -123,11 +123,11 @@ public class Reducer {
             }
         }
         for (IoEvent ioEvent: ioEventSet) {
-            if (ioEvent.getNames().compareTo("FileIoRead") == 0) {
+            if (ioEvent.getNames().equals("FileIoRead") ) {
                 eventsStartFromKey.get(ioEvent.getPredicateObjectPath()).add(ioEvent);
                 eventsEndAtKey.get(ioEvent.getThreadId().toString()).add(ioEvent);
             }
-            else if (ioEvent.getNames().compareTo("FileIoWrite") == 0) {
+            else if (ioEvent.getNames().equals("FileIoWrite") ) {
                 eventsStartFromKey.get(ioEvent.getThreadId().toString()).add(ioEvent);
                 eventsEndAtKey.get(ioEvent.getPredicateObjectPath()).add(ioEvent);
             }
@@ -183,7 +183,7 @@ public class Reducer {
             //System.out.println(counter);
             String u;
             String v;
-            if (ioEvent.getNames().compareTo("FileIoRead") == 0) {
+            if (ioEvent.getNames().equals("FileIoRead") ) {
                 // fetch stack(file, thread)
                 u = ioEvent.getPredicateObjectPath();
                 v = ioEvent.getThreadId().toString();
