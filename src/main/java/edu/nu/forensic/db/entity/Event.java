@@ -11,55 +11,48 @@ public class Event {
     @Id
     private UUID id;
 
-    private Long sequence;
+  //  private Long sequence;
 
     private String type;
 
     private Integer threadId;
 
-    @ManyToOne
-    private Subject subject;
+//    @ManyToOne
+    private UUID subjectUUID;
 
-    @ManyToOne
-    private Object predicateObject;
+//    @ManyToOne
+//    private Object predicateObject;
 
     @Column(length = 2048)
     private String predicateObjectPath;
 
-    @ManyToOne
-    private Object predicateObject2;
-
-    @Column(length = 2048)
-    private String predicateObject2Path;
+//    @ManyToOne
+//    private Object predicateObject2;
+//
+//    @Column(length = 2048)
+//    private String predicateObject2Path;
 
     private long timestampNanos;
 
     private String names;
 
-    private Long location;
-
-    private Long size;
-
-    private String programPoint;
+//    private Long location;
+//
+//    private Long size;
+//
+//    private String programPoint;
 
     public Event() {
     }
 
-    public Event(UUID id, Long sequence, String type, Integer threadId, Subject subject, Object predicateObject, String predicateObjectPath, Object predicateObject2, String predicateObject2Path, long timestampNanos, String names, Long location, Long size, String programPoint) {
+    public Event(UUID id, String type, Integer threadId, UUID subject, String predicateObjectPath, long timestampNanos, String names) {
         this.id = id;
-        this.sequence = sequence;
         this.type = type;
         this.threadId = threadId;
-        this.subject = subject;
-        this.predicateObject = predicateObject;
+        this.subjectUUID = subject;
         this.predicateObjectPath = predicateObjectPath;
-        this.predicateObject2 = predicateObject2;
-        this.predicateObject2Path = predicateObject2Path;
         this.timestampNanos = timestampNanos;
         this.names = names;
-        this.location = location;
-        this.size = size;
-        this.programPoint = programPoint;
     }
 
     public UUID getId() {
@@ -68,14 +61,6 @@ public class Event {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public Long getSequence() {
-        return sequence;
-    }
-
-    public void setSequence(Long sequence) {
-        this.sequence = sequence;
     }
 
     public String getType() {
@@ -94,20 +79,12 @@ public class Event {
         this.threadId = threadId;
     }
 
-    public Subject getSubject() {
-        return subject;
+    public UUID getSubjectUUID() {
+        return subjectUUID;
     }
 
-    public void setSubject(Subject subject) {
-        this.subject = subject;
-    }
-
-    public Object getPredicateObject() {
-        return predicateObject;
-    }
-
-    public void setPredicateObject(Object predicateObject) {
-        this.predicateObject = predicateObject;
+    public void setSubjectUUID(UUID subjectUUID) {
+        this.subjectUUID = subjectUUID;
     }
 
     public String getPredicateObjectPath() {
@@ -116,22 +93,6 @@ public class Event {
 
     public void setPredicateObjectPath(String predicateObjectPath) {
         this.predicateObjectPath = predicateObjectPath;
-    }
-
-    public Object getPredicateObject2() {
-        return predicateObject2;
-    }
-
-    public void setPredicateObject2(Object predicateObject2) {
-        this.predicateObject2 = predicateObject2;
-    }
-
-    public String getPredicateObject2Path() {
-        return predicateObject2Path;
-    }
-
-    public void setPredicateObject2Path(String predicateObject2Path) {
-        this.predicateObject2Path = predicateObject2Path;
     }
 
     public long getTimestampNanos() {
@@ -148,29 +109,5 @@ public class Event {
 
     public void setNames(String names) {
         this.names = names;
-    }
-
-    public Long getLocation() {
-        return location;
-    }
-
-    public void setLocation(Long location) {
-        this.location = location;
-    }
-
-    public Long getSize() {
-        return size;
-    }
-
-    public void setSize(Long size) {
-        this.size = size;
-    }
-
-    public String getProgramPoint() {
-        return programPoint;
-    }
-
-    public void setProgramPoint(String programPoint) {
-        this.programPoint = programPoint;
     }
 }

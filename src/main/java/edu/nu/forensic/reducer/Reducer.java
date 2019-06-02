@@ -1,7 +1,6 @@
 package edu.nu.forensic.reducer;
 
 
-import com.sun.javafx.iio.ios.IosDescriptor;
 import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.db.entity.IoEvent;
 import edu.nu.forensic.db.entity.Object;
@@ -80,7 +79,7 @@ public class Reducer {
                     ioEventSet.add(toBeSavedIoEvent);
                 }
                 // create a new ioEvent
-                toBeSavedIoEvent = new IoEvent(event.getId(), event.getSequence(), event.getType(), event.getThreadId(), event.getSubject(), event.getPredicateObject(), event.getPredicateObjectPath(), event.getPredicateObject2(), event.getPredicateObject2Path(), event.getTimestampNanos(), event.getTimestampNanos(), event.getNames(), event.getLocation(), event.getSize(), event.getProgramPoint());
+                toBeSavedIoEvent = new IoEvent(event.getId(), event.getType(), event.getThreadId(), event.getSubjectUUID(), event.getPredicateObjectPath(),event.getTimestampNanos(), event.getTimestampNanos(), event.getNames());
                 lastNames = event.getNames();
                 lastPredicateObjectPath = event.getPredicateObjectPath();
                 lastThreadId = event.getThreadId().toString();
