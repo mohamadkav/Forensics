@@ -49,7 +49,8 @@ public class Reducer {
     }
 
     public void reduce(){
-        Set<Event> eventSet = eventRepository.findByNamesEqualsOrNamesEqualsOrderByTimestampNanosAsc("FileIoRead","FileIoWrite");
+        System.out.println("Fetching events from database...");
+        Set<Event> eventSet = eventRepository.OrderByTimestampNanosAsc();
         System.out.println("Size of eventSet: "+eventSet.size());
 
         // these three cols are used to decide whether two adjacent events are the same.
@@ -217,5 +218,6 @@ public class Reducer {
         }
         System.out.println("After remove we have");
         System.out.println(ioEventSet.size());
+        //ioEventRepository.saveAll(ioEventSet);
     }
 }

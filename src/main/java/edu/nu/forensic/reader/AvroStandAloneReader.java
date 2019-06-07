@@ -21,15 +21,19 @@ public class AvroStandAloneReader {
     private static Connection c;
     private static Statement stmt = null;
 
-    private static int eventCounter;
+    private static int fileCounter;
+    private static int fileNum;
 
     public static void main(String[] args) throws Exception{
         Scanner input=new Scanner(System.in);
-        initDB("jdbc:postgresql://localhost:5432/forensic", "postgres", "12345");
-        eventCounter = 0;
-        while(true){
+        initDB("jdbc:postgresql://localhost:5432/forensic3", "postgres", "12345");
+        fileCounter = 0;
+        fileNum = 1;
+        while(fileCounter < fileNum){
             System.err.println("Ready");
-            String raw=input.nextLine();
+            //String raw=input.nextLine();
+            String raw = "D:\\NU\\QuarterThree\\" + fileCounter + ".bin";
+            fileCounter += 1;
             List<Event> eventList=new ArrayList<>();
             List<Subject> subjectList=new ArrayList<>();
             if(raw.equals("stop"))
