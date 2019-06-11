@@ -26,9 +26,9 @@ public class AvroStandAloneReader {
 
     public static void main(String[] args) throws Exception{
         Scanner input=new Scanner(System.in);
-        initDB("jdbc:postgresql://localhost:5432/forensic3", "postgres", "12345");
+        initDB("jdbc:postgresql://localhost:5432/forensic", "postgres", "12345");
         fileCounter = 0;
-        fileNum = 1;
+        fileNum = 10;
         while(fileCounter < fileNum){
             System.err.println("Ready");
             //String raw=input.nextLine();
@@ -55,7 +55,7 @@ public class AvroStandAloneReader {
                             bbnSubject.getCid(),bbnSubject.getParentSubject()==null?null:UUID.nameUUIDFromBytes(bbnSubject.getParentSubject().bytes()),null,bbnSubject.getStartTimestampNanos(),
                             bbnSubject.getCmdLine()==null?null:bbnSubject.getCmdLine().toString(),bbnSubject.getPrivilegeLevel()==null?null:bbnSubject.getPrivilegeLevel().name());
                     subjectList.add(subject);
-                    if(subjectList.size()>1000) {
+                    if(subjectList.size()>=1000) {
                         storeSubject(subjectList);
                         subjectList=new ArrayList<>();
                     }
@@ -85,7 +85,7 @@ public class AvroStandAloneReader {
                             bbnEvent.getThreadId(),bbnEvent.getSubject()==null?null:UUID.nameUUIDFromBytes(bbnEvent.getSubject().bytes()),bbnEvent.getPredicateObjectPath()!=null?bbnEvent.getPredicateObjectPath().toString():null,
                             bbnEvent.getTimestampNanos(),eventNames!=null?eventNames.toString():null);
                     eventList.add(event);
-                    if(eventList.size()>10000) {
+                    if(eventList.size()>=10000) {
                         storeEvent(eventList);
                         eventList=new ArrayList<>();
                     }
