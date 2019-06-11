@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 @Component
@@ -50,58 +51,67 @@ public class Reducer {
 
     public void reduce(){
         System.out.println("Fetching events from database...");
-        Set<Event> eventSet = eventRepository.OrderByTimestampNanosAsc();
-        System.out.println("Size of eventSet: "+eventSet.size());
+        Event firstEvent = eventRepository.findTop1ByOrderByTimestampNanosAsc();
+        Event lastEvent = eventRepository.findTop1ByOrderByTimestampNanosDesc();
+        System.out.println("Begin at: "+ firstEvent.getTimestampNanos());
+        System.out.println("End at: "+ lastEvent.getTimestampNanos());
+        long timeSpan = lastEvent.getTimestampNanos() - firstEvent.getTimestampNanos();
+        int chunkNum = 100;
+        long chunkSpan = timeSpan / chunkNum;
 
+        for (int i = 0; i < 100; i++) {
+            Set<Event> eventSubSet = eventRepository.findMyEvents(firstEvent.getTimestampNanos() + i * chunkSpan, firstEvent.getTimestampNanos() + (i + 1) * chunkSpan);
+            System.out.println("id = " + i +  ", eventSubSet size = " + eventSubSet.size());
+        }
+
+        /*
         // these three cols are used to decide whether two adjacent events are the same.
         String lastNames = "";
         String lastPredicateObjectPath = "";
         String lastThreadId = "";
         // this is a merged ioEvent of one or more events.
         IoEvent toBeSavedIoEvent = null;
-        // this is a flag where true indicates invalid toBeSavedIoEvent
-        boolean dirty = true;
+        // this is a flag where true indicates that there is no time swindow before current one.
+        boolean noWindow = true;
 
-        // merge all io events into ioEvents by timestamp.
-        for (Event event : eventSet) {
-            // if current event has same type, object_path, thread_id as the last event, we are still in same time window.
-            if (event.getNames().equals(lastNames) && event.getPredicateObjectPath().equals(lastPredicateObjectPath)  && event.getThreadId().toString().equals(lastThreadId) ) {
-                // update the ioEvent's time window.
-                toBeSavedIoEvent.setEndTimestampNanos(event.getTimestampNanos());
-            }
-            // o.w., we hit another time window.
-            else {
-                if (dirty) {
-                    dirty = false;
+        for (int i = 0; i < 100; i++){
+            Set<Event> eventSubSet = eventRepository.findMyEvents(firstEvent.getTimestampNanos()+i*chunkSpan, firstEvent.getTimestampNanos() + (i+1)*chunkSpan);
+            System.out.println("id = " + i +  ", eventSubSet size = " + eventSubSet.size());
+
+            // merge all io events into ioEvents by timestamp.
+            for (Event event : eventSubSet) {
+                // if current event has same type, object_path, thread_id as the last event, we are still in same time window.
+                if (event.getNames().equals(lastNames) && event.getPredicateObjectPath().equals(lastPredicateObjectPath)  && event.getThreadId().toString().equals(lastThreadId) ) {
+                    // update the ioEvent's time window.
+                    toBeSavedIoEvent.setEndTimestampNanos(event.getTimestampNanos());
                 }
+                // o.w., we hit another time window.
                 else {
-                    // save the ioEvent into buffer toBeSavedIoEvents.
-                    toBeSavedIoEvents.add(toBeSavedIoEvent);
-                    ioEventSet.add(toBeSavedIoEvent);
+                    if (noWindow) {
+                        noWindow = false;
+                    }
+                    else {
+                        //toBeSavedIoEvents.add(toBeSavedIoEvent);
+                        ioEventSet.add(toBeSavedIoEvent);
+                    }
+                    // create a new ioEvent
+                    toBeSavedIoEvent = new IoEvent(event.getId(), event.getType(), event.getThreadId(), event.getSubjectUUID(), event.getPredicateObjectPath(),event.getTimestampNanos(), event.getTimestampNanos(), event.getNames());
+                    lastNames = event.getNames();
+                    lastPredicateObjectPath = event.getPredicateObjectPath();
+                    lastThreadId = event.getThreadId().toString();
                 }
-                // create a new ioEvent
-                toBeSavedIoEvent = new IoEvent(event.getId(), event.getType(), event.getThreadId(), event.getSubjectUUID(), event.getPredicateObjectPath(),event.getTimestampNanos(), event.getTimestampNanos(), event.getNames());
-                lastNames = event.getNames();
-                lastPredicateObjectPath = event.getPredicateObjectPath();
-                lastThreadId = event.getThreadId().toString();
-            }
-            if(toBeSavedIoEvents.size() >= 1000) {
-                //System.out.println("Saving 1000 ioEvents...");
-                //ioEventRepository.saveAll(toBeSavedIoEvents);
-                toBeSavedIoEvents = new ArrayList<>();
+                //if(toBeSavedIoEvents.size() >= 1000) {
+                    //System.out.println("Saving 1000 ioEvents...");
+                    //ioEventRepository.saveAll(toBeSavedIoEvents);
+                    //toBeSavedIoEvents = new ArrayList<>();
+                //}
             }
         }
-        toBeSavedIoEvents.add(toBeSavedIoEvent);
+        //toBeSavedIoEvents.add(toBeSavedIoEvent);
         ioEventSet.add(toBeSavedIoEvent);
         //System.out.println("Saving the rest ioEvents...");
         //ioEventRepository.saveAll(toBeSavedIoEvents);
 
-        // debug
-        /*int counter = 0;
-        for (IoEvent ioEvent : ioEventSet) {
-            counter += 1;
-            System.out.println(counter+": "+ioEvent.getStartTimestampNanos()+", "+ioEvent.getEndTimestampNanos());
-        }*/
 
         // CPR algorithm
         // step 0. CPR optimization
@@ -219,5 +229,7 @@ public class Reducer {
         System.out.println("After remove we have");
         System.out.println(ioEventSet.size());
         //ioEventRepository.saveAll(ioEventSet);
+
+         */
     }
 }
