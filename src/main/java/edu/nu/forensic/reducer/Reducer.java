@@ -37,7 +37,7 @@ public class Reducer {
     private HashMap<String, HashSet<IoEvent>> eventsEndAtKey = new HashMap();
 
     private boolean forward_check(IoEvent e_p, IoEvent e_l, String v) {
-        System.out.println("eventsStartFromKey.get(v).size() = "+ eventsStartFromKey.get(v).size());
+        //System.out.println("eventsStartFromKey.get(v).size() = "+ eventsStartFromKey.get(v).size());
         for (IoEvent ioEvent : eventsStartFromKey.get(v)) {
             // time window of this event has overlapped the start time interval of e_p and e_l
             if (!(ioEvent.getEndTimestampNanos() <= e_p.getStartTimestampNanos() || e_l.getStartTimestampNanos() <= ioEvent.getStartTimestampNanos()))
@@ -48,7 +48,7 @@ public class Reducer {
     }
 
     private boolean backward_check(IoEvent e_p, IoEvent e_l, String u) {
-        System.out.println("eventsEndAtKey.get(u).size() = "+ eventsEndAtKey.get(u).size());
+       // System.out.println("eventsEndAtKey.get(u).size() = "+ eventsEndAtKey.get(u).size());
         for (IoEvent ioEvent : eventsEndAtKey.get(u)) {
             // time window of this event has overlapped the end time interval of e_p and e_l
             if (!(ioEvent.getEndTimestampNanos() <= e_p.getEndTimestampNanos() || e_l.getEndTimestampNanos() <= ioEvent.getStartTimestampNanos()))

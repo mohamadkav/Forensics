@@ -3,6 +3,7 @@ package edu.nu.forensic.controller;
 
 import com.bbn.tc.schema.SchemaNotInitializedException;
 import edu.nu.forensic.dto.ReadTraceRequest;
+import edu.nu.forensic.evaluator.Evaluator;
 import edu.nu.forensic.reader.AvroReader;
 import edu.nu.forensic.reader.JsonReader;
 import edu.nu.forensic.reader.KafkaReader;
@@ -30,6 +31,9 @@ public class ApplicationController {
     Reducer reducer;
 
     @Autowired
+    Evaluator evaluator;
+
+    @Autowired
     JsonReader jsonReader;
 
 
@@ -55,6 +59,12 @@ public class ApplicationController {
     @RequestMapping(method = RequestMethod.GET, value = "/reduce")
     public String reduce(){
         reducer.reduce();
+        return "OK";
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/evaluate")
+    public String evaluate(){
+        evaluator.evaluate();
         return "OK";
     }
 }
