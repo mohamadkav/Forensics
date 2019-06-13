@@ -26,13 +26,15 @@ public class AvroStandAloneReader {
 
     public static void main(String[] args) throws Exception{
         Scanner input=new Scanner(System.in);
-        initDB("jdbc:postgresql://localhost:5432/forensic", "postgres", "12345");
+        initDB("jdbc:postgresql://localhost:5432/forensic", "postgres", "postgres");
         fileCounter = 0;
         fileNum = 10;
         while(fileCounter < fileNum){
-            System.err.println("Ready");
+            System.err.println(fileCounter);
             //String raw=input.nextLine();
-            String raw = "D:\\NU\\QuarterThree\\" + fileCounter + ".bin";
+            String raw = "D:\\E4_data\\" + "ta1-marple-e4-A.bin";
+            if(fileCounter!=0)
+                raw+="."+fileCounter;
             fileCounter += 1;
             List<Event> eventList=new ArrayList<>();
             List<Subject> subjectList=new ArrayList<>();
@@ -78,7 +80,7 @@ public class AvroStandAloneReader {
                         else if (bbnEvent.getPredicateObjectPath().toString().compareTo(("UNKNOWN_FILE")) == 0)
                             continue;
                     }
-                    else if(!(bbnEvent.getType().equals("EVENT_READ")||bbnEvent.equals("EVENT_WRITE")))
+                    else if(!(bbnEvent.getType().toString().equals("EVENT_READ")||bbnEvent.getType().toString().equals("EVENT_WRITE")))
                         continue;
 
                     Event event=new Event(UUID.nameUUIDFromBytes(bbnEvent.getUuid().bytes()),bbnEvent.getType()==null?null:bbnEvent.getType().name(),

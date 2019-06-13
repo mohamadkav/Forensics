@@ -250,7 +250,7 @@ public class Reducer {
         System.out.println(ioEventAfterCPRSet.size());
         ioEventAfterCPRRepository.deleteAll();
         ioEventAfterCPRRepository.saveAll(ioEventAfterCPRSet);
-
+        System.out.println("DONE");
 
     }
 }
