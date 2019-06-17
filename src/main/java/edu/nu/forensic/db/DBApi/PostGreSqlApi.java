@@ -18,6 +18,7 @@ public class PostGreSqlApi {
     private static Boolean createSubj = false;
     private static PreparedStatement pstTempFile = null;
 
+    //if you want to use Node Merge with other algo, please use this constructor
     public PostGreSqlApi(String machineNum) {
         Connection c = null;
         this.NumInTable = machineNum;
@@ -43,6 +44,7 @@ public class PostGreSqlApi {
         }
     }
 
+    // this constructor will create subject and file table, if you use this program with other algo, please use another one.
     public PostGreSqlApi(String url, String user, String passwd, String machineNum){
         Connection c = null;
         this.NumInTable = machineNum;

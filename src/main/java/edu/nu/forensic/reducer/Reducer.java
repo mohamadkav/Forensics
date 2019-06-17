@@ -20,8 +20,8 @@ import org.springframework.stereotype.Component;
 public class Reducer {
 
     //    private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt=new HashMap<>();
-    private HashSet<Integer> test = new HashSet<>();
 
+    //I remove FP tree because I think it is slow.
     public Set<String> getFileList(String machineNum) {
         PostGreSqlApi postGreSqlApi = new PostGreSqlApi(machineNum);
         //Extract all file reads and writes
@@ -73,34 +73,31 @@ public class Reducer {
         return filelists;
     }
 
+    //reduce event, input: filelists and event, output: true means this event should be reduced
+    //judgeProcessId should be inited as a empty list, you can get fileslists from the function "getFileList"
+    //bufferedWriter is used to write the data that are reduced by node merge
+    //if you come across some bugs, please confirm these: 1. the event.Names stores the file name;
+    //2. event.Type stores the event type
 
-    //reduce event, input: filelists and events, output: events should be remained
-    public List<Event> reduce(List<Event> events, Set<String> fileslists){
+    public boolean reduce(Event event, Set<String> fileslists, List<String> judgeProcessId, BufferedWriter bufferedWriter){
         try {
-            List<String> judgeProcessId = new ArrayList<>();
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("temp.txt"));
-            List<Event> result = new ArrayList<>();
-            for (Event event : events) {
-                try{
-                    if(event.getType().contains("EVENT_READ")){
-                        if(fileslists.contains(event.getNames())){
-                            if(!judgeProcessId.contains(event.getSubjectUUID())){
-                                judgeProcessId.add(event.getSubjectUUID());
-                                event.setNames("Init Process");
-                                result.add(event);
-                            }
-                        }
-                        else result.add(event);
+            try{
+                if(event.getType().contains("FileIoRead")) {
+                    if (fileslists.contains(event.getNames())) {
+                        if (!judgeProcessId.contains(event.getSubjectUUID())) {
+                            judgeProcessId.add(event.getSubjectUUID());
+                            event.setNames("Init Process");
+                            return true;
+                        } else bufferedWriter.append(event.getNames()+"\r\n");
                     }
-                    else result.add(event);
+                }
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-            }
-            return result;
+            return false;
         }catch (Exception e){
             e.printStackTrace();
-            return null;
+            return false;
         }
     }
 
@@ -177,17 +174,11 @@ public class Reducer {
                 try {
                     if (line.contains("FileIoRead")) {
                         ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);
-                        String target = etwEvent.arguments.FileName;
-                        if (filelists.contains(target)) {
-                            target = target.replaceAll("\\\\", "\\\\\\\\");
-                            if (!judgeprocessID.contains(String.valueOf(etwEvent.processID))) {
-                                judgeprocessID.add(String.valueOf(etwEvent.processID));
-                                String newLine = line.replace(target, replacement);
-                                // output
-                            }
-                            else{
-                                bufferedWriter.append(line + "\r\n");
-                            }
+                        Event event = new Event();
+                        event.setNames(etwEvent.arguments.FileName);
+                        event.setType(etwEvent.EventName);
+                        if(!reduce(event, filelists, judgeprocessID, bufferedWriter)){
+                            //store the data
                         }
 //                        else bufferedWriter.append(line + "\r\n");
                     }
