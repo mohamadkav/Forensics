@@ -22,8 +22,8 @@ public class Reducer {
     //    private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt=new HashMap<>();
     private HashSet<Integer> test = new HashSet<>();
 
-    public Set<String> getFileList() {
-        PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
+    public Set<String> getFileList(String machineNum) {
+        PostGreSqlApi postGreSqlApi = new PostGreSqlApi(machineNum);
         //Extract all file reads and writes
         Map<String, Map<String, Integer>> processIdToFileFrequences = postGreSqlApi.getProcessToFileFrequences();
         //Building FP tree
@@ -73,22 +73,8 @@ public class Reducer {
         return filelists;
     }
 
-    public Set<String> getFileList(String machineNum) {
-        PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
 
-        Map<String, Map<String, Integer>> processIdToFileFrequences = postGreSqlApi.getProcessToFileFrequences(machineNum);
-        Set<String> filelists = new HashSet<>();
-
-        for(String it:processIdToFileFrequences.keySet()){
-            for(String its:processIdToFileFrequences.get(it).keySet()){
-                filelists.add(its);
-            }
-        }
-        System.out.println(filelists.size());
-        return filelists;
-    }
-
-    //reduce event
+    //reduce event, input: filelists and events, output: events should be remained
     public List<Event> reduce(List<Event> events, Set<String> fileslists){
         try {
             List<String> judgeProcessId = new ArrayList<>();
@@ -98,8 +84,8 @@ public class Reducer {
                 try{
                     if(event.getType().contains("EVENT_READ")){
                         if(fileslists.contains(event.getNames())){
-                            if(!judgeProcessId.contains(event.getSubjectUUID().toString())){
-                                judgeProcessId.add(event.getSubjectUUID().toString());
+                            if(!judgeProcessId.contains(event.getSubjectUUID())){
+                                judgeProcessId.add(event.getSubjectUUID());
                                 event.setNames("Init Process");
                                 result.add(event);
                             }
@@ -118,79 +104,31 @@ public class Reducer {
         }
     }
 
-    public void JsonReduce(File source){
-        try{
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(source));
-//            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("temp.out"));
-            Set<String> filelists = getFileList();
-            List<String> judgeprocessID = new ArrayList<>();
-            String line = null;
-            String replacement = "Init Process";
-            Gson gson = new Gson();
-            int i = 0;
-            int j = 0;
-            Map<String, Integer> k = new HashMap<>();
-            while((line = bufferedReader.readLine())!=null) {
-                try {
-                    ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);
-                    if(!k.keySet().contains(etwEvent.EventName)){
-                        k.put(etwEvent.EventName, 1);
-                        System.out.println(line);
-                    }
-                    else {
-                        Integer temp = k.get(etwEvent.EventName);
-                        ++temp;
-                        k.put(etwEvent.EventName,temp);
-                    }
-                    if (line.contains("FileIoWrite")) {
-                        String target = etwEvent.arguments.FileName;
-                        if (filelists.contains(target)) {
-                            i++;
-                            target = target.replaceAll("\\\\", "\\\\\\\\");
-                            if (!judgeprocessID.contains(String.valueOf(etwEvent.processID))) {
-                                j++;
-                                judgeprocessID.add(String.valueOf(etwEvent.processID));
-                                String newLine = line.replace(target, replacement);
-//                                bufferedWriter.append(newLine + "\r\n");
-                            }
-                        }
-//                        else bufferedWriter.append(line + "\r\n");
-                    }
-//                    else bufferedWriter.append(line + "\r\n");
-                    }catch (Exception e){
-                    System.out.println(line);
-                    e.printStackTrace();
-                }
-            }
-            bufferedReader.close();
-//            bufferedWriter.close();
-            for(String it:k.keySet()){
-                System.out.println(it+" "+k.get(it));
-            }
-            System.out.println(i+" "+j);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-    }
-
-
-    //Json file
-    public void JsonReduce(File source, String machineNum){
-        try{
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(source));
-//            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("temp.out"));
-            Set<String> filelists = getFileList(machineNum);
-            List<String> judgeprocessID = new ArrayList<>();
-            String line;
-            String replacement = "Init Process";
-            Gson gson = new Gson();
-            int i = 0;
-            int j = 0;
+//    public void JsonReduce(File source){
+//        try{
+//            BufferedReader bufferedReader = new BufferedReader(new FileReader(source));
+////            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("temp.out"));
+//            Set<String> filelists = getFileList();
+//            List<String> judgeprocessID = new ArrayList<>();
+//            String line = null;
+//            String replacement = "Init Process";
+//            Gson gson = new Gson();
+//            int i = 0;
+//            int j = 0;
+//            Map<String, Integer> k = new HashMap<>();
 //            while((line = bufferedReader.readLine())!=null) {
 //                try {
-//                    if (line.contains("FileIoRead")) {
-//                        ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);
+//                    ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);
+//                    if(!k.keySet().contains(etwEvent.EventName)){
+//                        k.put(etwEvent.EventName, 1);
+//                        System.out.println(line);
+//                    }
+//                    else {
+//                        Integer temp = k.get(etwEvent.EventName);
+//                        ++temp;
+//                        k.put(etwEvent.EventName,temp);
+//                    }
+//                    if (line.contains("FileIoWrite")) {
 //                        String target = etwEvent.arguments.FileName;
 //                        if (filelists.contains(target)) {
 //                            i++;
@@ -205,16 +143,66 @@ public class Reducer {
 ////                        else bufferedWriter.append(line + "\r\n");
 //                    }
 ////                    else bufferedWriter.append(line + "\r\n");
-//                }catch (Exception e){
+//                    }catch (Exception e){
 //                    System.out.println(line);
 //                    e.printStackTrace();
 //                }
 //            }
 //            bufferedReader.close();
 ////            bufferedWriter.close();
+//            for(String it:k.keySet()){
+//                System.out.println(it+" "+k.get(it));
+//            }
+//            System.out.println(i+" "+j);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//
+//    }
+
+
+    //Json file
+    public void JsonReduce(File source, String machineNum){
+        try{
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(source));
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("reduce.out"));
+            Set<String> filelists = getFileList(machineNum);
+            List<String> judgeprocessID = new ArrayList<>();
+            String line;
+            String replacement = "Init Process";
+            Gson gson = new Gson();
+            int i = 0;
+            int j = 0;
+            while((line = bufferedReader.readLine())!=null) {
+                try {
+                    if (line.contains("FileIoRead")) {
+                        ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);
+                        String target = etwEvent.arguments.FileName;
+                        if (filelists.contains(target)) {
+                            target = target.replaceAll("\\\\", "\\\\\\\\");
+                            if (!judgeprocessID.contains(String.valueOf(etwEvent.processID))) {
+                                judgeprocessID.add(String.valueOf(etwEvent.processID));
+                                String newLine = line.replace(target, replacement);
+                                // output
+                            }
+                            else{
+                                bufferedWriter.append(line + "\r\n");
+                            }
+                        }
+//                        else bufferedWriter.append(line + "\r\n");
+                    }
+//                    else bufferedWriter.append(line + "\r\n");
+                }catch (Exception e){
+                    System.out.println(line);
+                    e.printStackTrace();
+                }
+            }
+            bufferedReader.close();
+            bufferedWriter.close();
             System.out.println(filelists.size());
-            PostGreSqlApi postGreSqlApi = new PostGreSqlApi();
+            PostGreSqlApi postGreSqlApi = new PostGreSqlApi(machineNum);
             postGreSqlApi.storeTempFileName(filelists);
+            postGreSqlApi.closeConnection();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -278,8 +266,8 @@ public class Reducer {
 //    }
 
     //CDM 20
-    public void reduce(File source){
-        Set<String> filelists = getFileList();
+    public void CDMreduce(File source, String machineNum){
+        Set<String> filelists = getFileList(machineNum);
 
         try{
             int i=0;

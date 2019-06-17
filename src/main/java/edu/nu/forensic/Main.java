@@ -24,14 +24,14 @@ public class Main {
     //this is json test section
     public static void main(String[] args) throws IOException{
         String file = "C:\\Data\\2019-05-10-15-20-50.out";
-        System.out.println(file+" "+args[0]);
-        try {
-            ReadJsonToDB readJsonToDB = new ReadJsonToDB();
-            readJsonToDB.readEvent(new File(file), args[0]);
-//          avroReader.readTrace(new File(request.getTrace()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        System.out.println(file+" "+args[0]);
+//        try {
+//            ReadJsonToDB readJsonToDB = new ReadJsonToDB();
+//            readJsonToDB.readEvent(new File(file), args[0]);
+////          avroReader.readTrace(new File(request.getTrace()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         Reducer reducer = new Reducer();
         reducer.JsonReduce(new File(file), args[0]);
 

@@ -27,8 +27,8 @@ public class ReadJsonToDB {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(source));
             Gson gson = new Gson();
             while((line = bufferedReader.readLine())!=null){
-                i++;
-                if(i<=68131452) continue;
+//                i++;
+//                if(i<=68131452) continue;
                 try {
                     if (line.contains("ProcessStart") || line.contains("ProcessDCStart")) {
                         ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);

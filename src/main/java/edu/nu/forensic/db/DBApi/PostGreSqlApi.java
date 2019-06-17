@@ -18,8 +18,29 @@ public class PostGreSqlApi {
     private static Boolean createSubj = false;
     private static PreparedStatement pstTempFile = null;
 
-    public PostGreSqlApi() {
-
+    public PostGreSqlApi(String machineNum) {
+        Connection c = null;
+        this.NumInTable = machineNum;
+        try {
+            Class.forName("org.postgresql.Driver");
+            c = DriverManager.getConnection("jdbc:postgresql://localhost:5432/testdb", "postgres", "123456");
+            c.setAutoCommit(false);
+            stmt = c.createStatement();
+            String sql = "insert into TempFile_" +NumInTable + " (FILENAME) values (?)";
+            pstTempFile = c.prepareStatement(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println(e.getClass().getName()+": "+e.getMessage());
+            System.exit(0);
+        }
+        System.out.println("Open database successfully");
+        this.c = c;
+        try{
+            this.c.commit();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.exit(0);
+        }
     }
 
     public PostGreSqlApi(String url, String user, String passwd, String machineNum){
@@ -123,7 +144,6 @@ public class PostGreSqlApi {
         try {
             String sqlfile = "CREATE TABLE IF NOT EXISTS TempFile_"+NumInTable+ " (FILENAME  VARCHAR NOT NULL)";
             stmt.execute(sqlfile);
-
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
