@@ -114,7 +114,6 @@ public class PostGreSqlApi {
     }
 
     public static synchronized void storeTempFileName(Set<String> fileList){
-
         try {
             for (String it : fileList) {
                 System.out.println(it);

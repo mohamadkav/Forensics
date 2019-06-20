@@ -162,7 +162,7 @@ public class Reducer {
     public void JsonReduce(File source, String machineNum){
         try{
             BufferedReader bufferedReader = new BufferedReader(new FileReader(source));
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("reduce.out"));
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\Data\\reduce.out"));
             Set<String> filelists = getFileList(machineNum);
             List<String> judgeprocessID = new ArrayList<>();
             String line;
