@@ -32,9 +32,9 @@ public class IoEvent {
 //    @Column(length = 2048)
 //    private String predicateObject2Path;
 
-    private long startTimestampNanos;
+    private Long startTimestampNanos;
 
-    private long endTimestampNanos;
+    private Long endTimestampNanos;
 
     private String names;
 
@@ -102,7 +102,7 @@ public class IoEvent {
         return startTimestampNanos;
     }
 
-    public void setStartTimestampNanos(long startTimestampNanos) {
+    public void setStartTimestampNanos(Long startTimestampNanos) {
         this.startTimestampNanos = startTimestampNanos;
     }
 
@@ -110,7 +110,7 @@ public class IoEvent {
         return endTimestampNanos;
     }
 
-    public void setEndTimestampNanos(long endTimestampNanos) {
+    public void setEndTimestampNanos(Long endTimestampNanos) {
         this.endTimestampNanos = endTimestampNanos;
     }
 

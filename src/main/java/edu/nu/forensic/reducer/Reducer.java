@@ -28,6 +28,10 @@ public class Reducer {
     @Autowired
     IoEventAfterCPRRepository ioEventAfterCPRRepository;
 
+    @Autowired
+    NodeMergeReducer nodeMergeReducer;
+
+
     private Set<IoEvent> ioEventSet = new HashSet<>();
     private Set<IoEventAfterCPR> ioEventAfterCPRSet = new HashSet<>();
     private List<IoEvent> toBeSavedIoEvents = new ArrayList<>();
@@ -113,7 +117,7 @@ public class Reducer {
                     //toBeSavedIoEvents = new ArrayList<>();
                 //}
             }
-            System.out.println("ioEventSet.size() = " + ioEventSet.size());
+          //  System.out.println("ioEventSet.size() = " + ioEventSet.size());
         }
         //toBeSavedIoEvents.add(toBeSavedIoEvent);
         ioEventSet.add(toBeSavedIoEvent);
@@ -238,7 +242,7 @@ public class Reducer {
         System.out.println("Before remove we have:");
         System.out.println(ioEventSet.size());
         ioEventRepository.deleteAll();
-        ioEventRepository.saveAll(ioEventSet);
+      //  ioEventRepository.saveAll(ioEventSet);
         for (IoEvent toBeRemovedEvent : toBeRemovedEventSet) {
             ioEventSet.remove(toBeRemovedEvent);
         }
