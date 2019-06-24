@@ -73,6 +73,13 @@ public class Reducer {
         return filelists;
     }
 
+    public Set<String> getFileListOnlyGetTempFile(String machineNum) {
+        PostGreSqlApi postGreSqlApi = new PostGreSqlApi(machineNum);
+        Set<String> result = postGreSqlApi.getTempFileNameReturnSet();
+        postGreSqlApi.dropTempFileTable();
+        return result;
+    }
+
     //reduce event, input: filelists and event, output: true means this event should be reduced
     //judgeProcessId should be inited as a empty list, you can get fileslists from the function "getFileList"
     //bufferedWriter is used to write the data that are reduced by node merge
@@ -94,6 +101,33 @@ public class Reducer {
                 }catch (Exception e){
                     e.printStackTrace();
                 }
+            return false;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean reduceOnlyGetTempFile(Event event, Set<String> fileslists, List<String> judgeProcessId, BufferedWriter bufferedWriter){
+        try {
+            try{
+                if(event.getType().contains("FileIoRead")) {
+                    if (!fileslists.contains(event.getNames())) {
+                        if (!judgeProcessId.contains(event.getSubjectUUID())) {
+                            judgeProcessId.add(event.getSubjectUUID());
+                            event.setNames("Init Process");
+                            return true;
+                        } else bufferedWriter.append(event.getNames()+"\r\n");
+                    }
+                }
+                else if(event.getType().contains("FileIoWrite")){
+                    if (!fileslists.contains(event.getNames())) {
+                        fileslists.add(event.getNames());
+                    }
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             return false;
         }catch (Exception e){
             e.printStackTrace();
@@ -163,7 +197,9 @@ public class Reducer {
         try{
             BufferedReader bufferedReader = new BufferedReader(new FileReader(source));
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("C:\\Data\\reduce.out"));
-            Set<String> filelists = getFileList(machineNum);
+
+            //this is the new function
+            Set<String> filelists = getFileListOnlyGetTempFile(machineNum);
             List<String> judgeprocessID = new ArrayList<>();
             String line;
             String replacement = "Init Process";
@@ -172,17 +208,17 @@ public class Reducer {
             int j = 0;
             while((line = bufferedReader.readLine())!=null) {
                 try {
-                    if (line.contains("FileIoRead")) {
+                    if (line.contains("FileIoRead")||line.contains("FileIoWrite")) {
                         ETWEvent etwEvent = gson.fromJson(line, ETWEvent.class);
                         Event event = new Event();
                         event.setNames(etwEvent.arguments.FileName);
                         event.setType(etwEvent.EventName);
-                        if(!reduce(event, filelists, judgeprocessID, bufferedWriter)){
+                        if(!reduceOnlyGetTempFile(event, filelists, judgeprocessID, bufferedWriter)){
                             //store the data
                         }
-//                        else bufferedWriter.append(line + "\r\n");
+                        else bufferedWriter.append(line + "\r\n");
                     }
-//                    else bufferedWriter.append(line + "\r\n");
+                    else bufferedWriter.append(line + "\r\n");
                 }catch (Exception e){
                     System.out.println(line);
                     e.printStackTrace();
@@ -192,6 +228,7 @@ public class Reducer {
             bufferedWriter.close();
             System.out.println(filelists.size());
             PostGreSqlApi postGreSqlApi = new PostGreSqlApi(machineNum);
+            postGreSqlApi.createTempFileName();
             postGreSqlApi.storeTempFileName(filelists);
             postGreSqlApi.closeConnection();
         }catch (Exception e){

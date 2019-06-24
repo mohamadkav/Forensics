@@ -141,6 +141,27 @@ public class PostGreSqlApi {
         return result;
     }
 
+    public static synchronized Set<String> getTempFileNameReturnSet(){
+        Set<String> result = new HashSet<>();
+        try{
+            String sqlfile = "select count(*) from pg_class where relname = 'TempFile"+NumInTable+"';";
+            ResultSet resultSet = stmt.executeQuery(sqlfile);
+            if(resultSet.getFetchSize()!=0){
+                sqlfile = "SELECT FILENAME FROM TempFile_"+NumInTable+";";
+                resultSet = stmt.executeQuery(sqlfile);
+                while(resultSet.next()){
+                    result.add(resultSet.getString(1));
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            System.exit(0);
+        }
+        System.out.println("tempsize"+result.size());
+        return result;
+    }
+
     public static synchronized void createTempFileName(){
         try {
             String sqlfile = "CREATE TABLE IF NOT EXISTS TempFile_"+NumInTable+ " (FILENAME  VARCHAR NOT NULL)";
@@ -263,6 +284,15 @@ public class PostGreSqlApi {
             c.close();
         }catch (Exception e){
             System.err.println("error when shutting down");
+        }
+    }
+
+    public synchronized void dropTempFileTable(){
+        try{
+            String sql = "DROP TABLE IF EXISTS TempFile_"+NumInTable;
+            stmt.execute(sql);
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
