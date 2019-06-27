@@ -11,6 +11,7 @@ import edu.nu.forensic.db.repository.SubjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -24,10 +25,14 @@ public class JsonReader {
     @Autowired
     private EventRepository eventRepository;
 
+    @Autowired
+    private EntityManager entityManager;
+
     private Map <Integer, UUID> tidToUUID=new HashMap<>();
     private Map <Integer, UUID> pidToUUID=new HashMap<>();
 
     private List<Event> toBeSavedEvents=new ArrayList<>();
+    private List<Subject> toBeSavedSubjects=new ArrayList<>();
     public void readTrace(File source) throws IOException {
         Scanner input = new Scanner(source);
         long startTime = System.currentTimeMillis();
@@ -54,14 +59,20 @@ public class JsonReader {
                         int parentPid = jsonObject.get("processID").getAsInt();
                         long timeStamp = jsonObject.get("TimeStamp").getAsLong();
                         UUID uuid = UUID.randomUUID();
-                        Subject parent = null;
-                        if (pidToUUID.containsKey(parentPid))
-                            parent = subjectRepository.findById(pidToUUID.get(parentPid)).get();
+//                        Subject parent = null;
+//                        if (pidToUUID.containsKey(parentPid))
+//                            parent = subjectRepository.findById(pidToUUID.get(parentPid)).get();
                         tidToUUID.put(tid, uuid);
                         Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, "SUBJECT_THREAD",
-                                tid, parent==null?null:parent.getUuid(), null, timeStamp,
+                                tid, !pidToUUID.containsKey(parentPid)?null:pidToUUID.get(parentPid), null, timeStamp,
                                 null, null);
-                        subjectRepository.save(subject);
+                        toBeSavedSubjects.add(subject);
+                        if(toBeSavedSubjects.size()>1000) {
+                            System.out.println("Saving Subjects...");
+                            subjectRepository.saveAll(toBeSavedSubjects);
+                            entityManager.clear();
+                            toBeSavedSubjects=new ArrayList<>();
+                        }
                         break;
                     }
                     case "ProcessStart":
@@ -70,14 +81,20 @@ public class JsonReader {
                         int parentPid = jsonObject.get("processID").getAsInt();
                         long timeStamp = jsonObject.get("TimeStamp").getAsLong();
                         UUID uuid = UUID.randomUUID();
-                        Subject parent = null;
-                        if (pidToUUID.containsKey(parentPid))
-                            parent = subjectRepository.findById(pidToUUID.get(parentPid)).get();
+//                        Subject parent = null;
+//                        if (pidToUUID.containsKey(parentPid))
+//                            parent = subjectRepository.findById(pidToUUID.get(parentPid)).get();
                         pidToUUID.put(pid, uuid);
                         Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, "SUBJECT_PROCESS",
-                                pid, parent==null?null:parent.getUuid(), null, timeStamp,
+                                pid, !pidToUUID.containsKey(parentPid)?null:pidToUUID.get(parentPid), null, timeStamp,
                                 jsonObject.get("arguments").getAsJsonObject().get("CommandLine").getAsString(), null);
-                        subjectRepository.save(subject);
+                        toBeSavedSubjects.add(subject);
+                        if(toBeSavedSubjects.size()>1000) {
+                            System.out.println("Saving Subjects...");
+                            subjectRepository.saveAll(toBeSavedSubjects);
+                            entityManager.clear();
+                            toBeSavedSubjects=new ArrayList<>();
+                        }
                         break;
                     }
                     case "FileIoRead":
@@ -91,6 +108,7 @@ public class JsonReader {
                         if(toBeSavedEvents.size()>1000) {
                             System.out.println("Saving...");
                             eventRepository.saveAll(toBeSavedEvents);
+                            entityManager.clear();
                             toBeSavedEvents=new ArrayList<>();
                         }
                         break;

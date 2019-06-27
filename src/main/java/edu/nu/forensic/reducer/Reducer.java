@@ -248,7 +248,8 @@ public class Reducer {
         }
         for (IoEvent ioEvent: ioEventSet) {
             IoEventAfterCPR ioEventAfterCPR = new IoEventAfterCPR(ioEvent.getId(), ioEvent.getType(), ioEvent.getThreadId(), ioEvent.getSubjectUUID(), ioEvent.getPredicateObjectPath(),ioEvent.getStartTimestampNanos(), ioEvent.getEndTimestampNanos(), ioEvent.getNames());
-            ioEventAfterCPRSet.add(ioEventAfterCPR);
+            if(!nodeMergeReducer.reduce(ioEventAfterCPR))
+                ioEventAfterCPRSet.add(ioEventAfterCPR);
         }
         System.out.println("After remove we have");
         System.out.println(ioEventAfterCPRSet.size());
