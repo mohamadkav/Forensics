@@ -21,25 +21,20 @@ public class AvroStandAloneReader {
     private static Connection c;
     private static Statement stmt = null;
 
-    private static int fileCounter;
-    private static int fileNum;
-
     public static void main(String[] args) throws Exception{
-        Scanner input=new Scanner(System.in);
         initDB("jdbc:postgresql://localhost:5432/forensic", "postgres", "postgres");
-        fileCounter = 0;
-        fileNum = 10;
+        int fileCounter = 0;
+        int fileNum = 10;
         while(fileCounter < fileNum){
             System.err.println(fileCounter);
             //String raw=input.nextLine();
             String raw = "D:\\E4_data\\" + "ta1-marple-e4-A.bin";
-            if(fileCounter!=0)
-                raw+="."+fileCounter;
+            if(fileCounter !=0)
+                raw+="."+ fileCounter;
             fileCounter += 1;
             List<Event> eventList=new ArrayList<>();
             List<Subject> subjectList=new ArrayList<>();
-            if(raw.equals("stop"))
-                break;
+
             AvroGenericDeserializer avroGenericDeserializer=new AvroGenericDeserializer("schema/TCCDMDatum.avsc","schema/TCCDMDatum.avsc",
                     true,new File(raw));
             while(true) {
