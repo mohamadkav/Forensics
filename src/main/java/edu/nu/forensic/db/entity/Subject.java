@@ -29,6 +29,10 @@ public class Subject {
     @Column(length = 2048)
     private String cmdLine;
 
+    private String Usersid;
+
+    private String visibleWindowInfo;
+
  //   private String privilegeLevel;
 
     public Subject() {
@@ -43,6 +47,20 @@ public class Subject {
         this.startTimestampNanos = startTimestampNanos;
         this.cmdLine = cmdLine;
      //   this.privilegeLevel = privilegeLevel;
+    }
+
+    public Subject(UUID uuid, String type, int cid, UUID parentSubject, Principal localPrincipal, Long startTimestampNanos, String cmdLine,
+                   String privilegeLevel, String Usersid, String visibleWindowInfo) {
+        this.uuid = uuid;
+        this.type = type;
+        this.cid = cid;
+        this.parentSubjectUUID = parentSubject;
+        // this.localPrincipal = localPrincipal;
+        this.startTimestampNanos = startTimestampNanos;
+        this.cmdLine = cmdLine;
+        this.Usersid = Usersid;
+        this.visibleWindowInfo = visibleWindowInfo;
+        //   this.privilegeLevel = privilegeLevel;
     }
 
     public UUID getUuid() {
@@ -76,6 +94,11 @@ public class Subject {
     public void setParentSubject(UUID parentSubject) {
         this.parentSubjectUUID = parentSubject;
     }
+
+    public void setUsersid(String sid){this.Usersid = sid;}
+
+    public String getUsersid(){return this.Usersid;}
+
 //
 //    public Principal getLocalPrincipal() {
 //        return localPrincipal;
@@ -100,6 +123,10 @@ public class Subject {
     public void setCmdLine(String cmdLine) {
         this.cmdLine = cmdLine;
     }
+
+    public void setVisibleWindowInfo(String visibleWindowInfo){this.visibleWindowInfo = visibleWindowInfo;}
+
+    public String getVisibleWindowInfo(){return this.visibleWindowInfo;}
 
 //    public String getPrivilegeLevel() {
 //        return privilegeLevel;

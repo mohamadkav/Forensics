@@ -37,7 +37,9 @@ dependencies {
     compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13'
   //  compile fileTree(dir: "/home/mohammad/Desktop/avro/dist/java", includes: ['*.jar'])
     compile files("lib/tc-schema-1.0-SNAPSHOT.jar")
-  //  compile files("lib/tc-avro-1.0-SNAPSHOT-jar-with-dependencies.jar")
+// https://mvnrepository.com/artifact/com.datastax.cassandra/cassandra-driver-core
+    compile group: 'com.datastax.cassandra', name: 'cassandra-driver-core', version: '3.7.1'
+    //  compile files("lib/tc-avro-1.0-SNAPSHOT-jar-with-dependencies.jar")
   //  compile files("lib/kafkaclients-1.0-SNAPSHOT-jar-with-dependencies.jar")
     compile group: 'org.apache.kafka', name: 'kafka-clients', version: '2.1.0'
     testCompile("junit:junit")

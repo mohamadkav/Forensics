@@ -46,7 +46,8 @@ public class IoEventAfterCPR {
     public IoEventAfterCPR() {
     }
 
-    public IoEventAfterCPR(UUID id, String type, Integer threadId, UUID subjectUUID, String predicateObjectPath, long startTimestampNanos, long endTimestampNanos, String names) {
+    public IoEventAfterCPR(UUID id, String type, Integer threadId, UUID subjectUUID, String predicateObjectPath,
+                           long startTimestampNanos, long endTimestampNanos, String names) {
         this.id = id;
         this.type = type;
         this.threadId = threadId;
@@ -93,13 +94,9 @@ public class IoEventAfterCPR {
         return predicateObjectPath;
     }
 
-    public void setPredicateObjectPath(String predicateObjectPath) {
-        this.predicateObjectPath = predicateObjectPath;
-    }
+    public void setPredicateObjectPath(String predicateObjectPath) { this.predicateObjectPath = predicateObjectPath; }
 
-    public long getStartTimestampNanos() {
-        return startTimestampNanos;
-    }
+    public long getStartTimestampNanos() { return startTimestampNanos; }
 
     public void setStartTimestampNanos(long startTimestampNanos) {
         this.startTimestampNanos = startTimestampNanos;

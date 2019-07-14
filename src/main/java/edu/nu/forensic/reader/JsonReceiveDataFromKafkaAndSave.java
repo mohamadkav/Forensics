@@ -169,7 +169,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                             int pid = jsonObject.get("arguments").getAsJsonObject().get("ProcessId").getAsInt();
                             int parentPid = jsonObject.get("processID").getAsInt();
                             long timeStamp = jsonObject.get("TimeStamp").getAsLong();
-                            UUID uuid = UUID.randomUUID();
+                            UUID uuid = UUID.randomUUID();  //maybe we can change this uuid as machine number+pid+timestamp
 //                        Subject parent = null;
 //                        if (pidToUUID.containsKey(parentPid))
 //                            parent = subjectRepository.findById(pidToUUID.get(parentPid)).get();
