@@ -43,6 +43,7 @@ class JsonReceiverThread extends Thread implements Runnable{
     private int threadId;
     private CPRStandAloneReducer reducer=new CPRStandAloneReducer();
     public JsonReceiverThread(int threadId){
+
         this.threadId=threadId;
     //    initDB("jdbc:postgresql://localhost:5432/forensic", "postgres", "1234"); TODO: Init scylla/cassandra
         Properties props = new Properties();
