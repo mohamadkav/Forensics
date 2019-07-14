@@ -2,8 +2,7 @@ package edu.nu.forensic.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import edu.nu.forensic.db.CassandraApi.connectionToCassandra;
-import edu.nu.forensic.db.entity.Event;
+import edu.nu.forensic.db.cassandra.connectionToCassandra;
 import edu.nu.forensic.db.entity.IoEventAfterCPR;
 import edu.nu.forensic.db.entity.NetFlowObject;
 import edu.nu.forensic.db.entity.Subject;

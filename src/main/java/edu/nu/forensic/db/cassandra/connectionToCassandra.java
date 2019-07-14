@@ -1,4 +1,4 @@
-package edu.nu.forensic.db.CassandraApi;
+package edu.nu.forensic.db.cassandra;
 
 import com.datastax.driver.core.*;
 import edu.nu.forensic.db.entity.IoEventAfterCPR;

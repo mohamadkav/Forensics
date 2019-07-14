@@ -5,7 +5,7 @@ import edu.nu.forensic.db.entity.*;
 import edu.nu.forensic.db.entity.Object;
 import edu.nu.forensic.db.repository.EventRepository;
 import edu.nu.forensic.db.repository.IoEventAfterCPRRepository;
-import edu.nu.forensic.db.repository.IoEventRepository;
+//import edu.nu.forensic.db.repository.IoEventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +22,8 @@ public class Reducer {
     @Autowired
     EventRepository eventRepository;
 
-    @Autowired
-    IoEventRepository ioEventRepository;
+//    @Autowired
+//    IoEventRepository ioEventRepository;
 
     @Autowired
     IoEventAfterCPRRepository ioEventAfterCPRRepository;
@@ -37,8 +37,8 @@ public class Reducer {
     private List<IoEvent> toBeSavedIoEvents = new ArrayList<>();
     private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt = new HashMap<>();
     // CPR optimization
-    private HashMap<String, HashSet<IoEvent>> eventsStartFromKey = new HashMap();
-    private HashMap<String, HashSet<IoEvent>> eventsEndAtKey = new HashMap();
+    private HashMap<String, HashSet<IoEvent>> eventsStartFromKey = new HashMap<>();
+    private HashMap<String, HashSet<IoEvent>> eventsEndAtKey = new HashMap<>();
 
     private boolean forward_check(IoEvent e_p, IoEvent e_l, String v) {
         //System.out.println("eventsStartFromKey.get(v).size() = "+ eventsStartFromKey.get(v).size());
@@ -241,7 +241,7 @@ public class Reducer {
         }
         System.out.println("Before remove we have:");
         System.out.println(ioEventSet.size());
-        ioEventRepository.deleteAll();
+      //  ioEventRepository.deleteAll();
       //  ioEventRepository.saveAll(ioEventSet);
         for (IoEvent toBeRemovedEvent : toBeRemovedEventSet) {
             ioEventSet.remove(toBeRemovedEvent);

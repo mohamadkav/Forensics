@@ -35,7 +35,7 @@ public class ReadableJsonEncoder extends JsonEncoder {
     private static JsonGenerator jG;
 
     public ReadableJsonEncoder(Schema sc, OutputStream out, boolean pretty) throws IOException {
-        super(sc, getJsonGenerator(out, pretty));
+        super(sc, out);
     }
 
     @Override

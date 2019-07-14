@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.db.entity.Subject;
+import edu.nu.forensic.reducer.CPRStandAloneReducer;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -40,9 +41,10 @@ class JsonReceiverThread extends Thread implements Runnable{
     private Consumer<String, String> consumer;
     private long consumed=0;
     private int threadId;
+    private CPRStandAloneReducer reducer=new CPRStandAloneReducer();
     public JsonReceiverThread(int threadId){
         this.threadId=threadId;
-        initDB("jdbc:postgresql://localhost:5432/forensic", "postgres", "1234");
+    //    initDB("jdbc:postgresql://localhost:5432/forensic", "postgres", "1234"); TODO: Init scylla/cassandra
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "MARPLE");
@@ -57,80 +59,80 @@ class JsonReceiverThread extends Thread implements Runnable{
         consumer.subscribe(Collections.singletonList("MARPLE"+threadId));
         System.err.println("Consumer subscribed to topic MARPLE"+threadId);
     }
-
-    private void initDB(String url, String user, String passwd){
-        Connection connection = null;
-        try {
-            Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection(url, user, passwd);
-            stmt = connection.createStatement();
-            connection.setAutoCommit(false);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println(e.getClass().getName()+": "+e.getMessage());
-            System.exit(0);
-        }
-        System.out.println("Opened database successfully");
-        c = connection;
-    }
-
-    private void storeSubject(List<Subject> subjectList) {
-        try {
-            for (Subject subject : subjectList) {
-                String sql=null;
-                try{
-                    String parentSubjectUUID = null;
-                    if(subject.getParentSubject()!=null)
-                        parentSubjectUUID = subject.getParentSubject().toString();
-                    if(subject.getCmdLine()==null)
-                        subject.setCmdLine("undefined");
-                    if(parentSubjectUUID!=null)
-                        sql= "INSERT INTO \"subject\" (UUID,CID,cmd_line,parent_subjectuuid,start_timestamp_nanos,type) VALUES ('" +
-                                subject.getUuid() + "' , " +
-                                subject.getCid() + " , '" +
-                                subject.getCmdLine() + "' , '" +
-                                parentSubjectUUID+ "' , " +
-                                subject.getStartTimestampNanos() + "," +
-                                "'"+subject.getType()+"');";
-                    else
-                        sql= "INSERT INTO \"subject\" (UUID,CID,cmd_line,start_timestamp_nanos,type) VALUES ('" +
-                                subject.getUuid() + "' , " +
-                                subject.getCid() + " , '" +
-                                subject.getCmdLine() + "' ," +
-                                subject.getStartTimestampNanos() + "," +
-                                "'"+subject.getType()+"');";
-                    stmt.execute(sql);
-                }catch (Exception e){
-                    System.out.printf(sql);
-                    e.printStackTrace();
-                }
-            }
-            c.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    private void storeEvent(List<Event> eventList) {
-        try {
-            for (Event event : eventList) {
-                try{
-                    String sql = "INSERT INTO \"event\" (id,thread_id,names,predicate_object_path,timestamp_nanos,type,subjectuuid) VALUES ('" +
-                            event.getId() + "' , " +
-                            event.getThreadId() + " , '" +
-                            event.getNames() + "' , '" +
-                            event.getPredicateObjectPath()+ "' , " +
-                            event.getTimestampNanos() + "," +
-                            "'"+event.getType()+"','"+event.getSubjectUUID()+"');";
-                    stmt.execute(sql);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-            c.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//
+//    private void initDB(String url, String user, String passwd){
+//        Connection connection = null;
+//        try {
+//            Class.forName("org.postgresql.Driver");
+//            connection = DriverManager.getConnection(url, user, passwd);
+//            stmt = connection.createStatement();
+//            connection.setAutoCommit(false);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.err.println(e.getClass().getName()+": "+e.getMessage());
+//            System.exit(0);
+//        }
+//        System.out.println("Opened database successfully");
+//        c = connection;
+//    }
+//
+//    private void storeSubject(List<Subject> subjectList) {
+//        try {
+//            for (Subject subject : subjectList) {
+//                String sql=null;
+//                try{
+//                    String parentSubjectUUID = null;
+//                    if(subject.getParentSubject()!=null)
+//                        parentSubjectUUID = subject.getParentSubject().toString();
+//                    if(subject.getCmdLine()==null)
+//                        subject.setCmdLine("undefined");
+//                    if(parentSubjectUUID!=null)
+//                        sql= "INSERT INTO \"subject\" (UUID,CID,cmd_line,parent_subjectuuid,start_timestamp_nanos,type) VALUES ('" +
+//                                subject.getUuid() + "' , " +
+//                                subject.getCid() + " , '" +
+//                                subject.getCmdLine() + "' , '" +
+//                                parentSubjectUUID+ "' , " +
+//                                subject.getStartTimestampNanos() + "," +
+//                                "'"+subject.getType()+"');";
+//                    else
+//                        sql= "INSERT INTO \"subject\" (UUID,CID,cmd_line,start_timestamp_nanos,type) VALUES ('" +
+//                                subject.getUuid() + "' , " +
+//                                subject.getCid() + " , '" +
+//                                subject.getCmdLine() + "' ," +
+//                                subject.getStartTimestampNanos() + "," +
+//                                "'"+subject.getType()+"');";
+//                    stmt.execute(sql);
+//                }catch (Exception e){
+//                    System.out.printf(sql);
+//                    e.printStackTrace();
+//                }
+//            }
+//            c.commit();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//    private void storeEvent(List<Event> eventList) {
+//        try {
+//            for (Event event : eventList) {
+//                try{
+//                    String sql = "INSERT INTO \"event\" (id,thread_id,names,predicate_object_path,timestamp_nanos,type,subjectuuid) VALUES ('" +
+//                            event.getId() + "' , " +
+//                            event.getThreadId() + " , '" +
+//                            event.getNames() + "' , '" +
+//                            event.getPredicateObjectPath()+ "' , " +
+//                            event.getTimestampNanos() + "," +
+//                            "'"+event.getType()+"','"+event.getSubjectUUID()+"');";
+//                    stmt.execute(sql);
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//            }
+//            c.commit();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
     public void run(){
         while (true) {
             ConsumerRecords<String, String> consumerRecords = consumer.poll(5000);
@@ -159,7 +161,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                                     null, null);
                             subjectList.add(subject);
                             if(subjectList.size()>1000) {
-                                storeSubject(subjectList);
+                              //  storeSubject(subjectLis); TODO: DB storage
                                 subjectList=new ArrayList<>();
                             }
                             break;
@@ -179,9 +181,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                                     jsonObject.get("arguments").getAsJsonObject().get("CommandLine").getAsString(), null);
                             subjectList.add(subject);
                             if(subjectList.size()>1000) {
-                                System.out.println("Saving Subjects...");
-                                System.err.println("Saving... "+threadId);
-                                storeSubject(subjectList);;
+                                //  storeSubject(subjectLis); TODO: DB storage
                                 subjectList=new ArrayList<>();
                             }
                             break;
@@ -193,10 +193,10 @@ class JsonReceiverThread extends Thread implements Runnable{
                             UUID uuid = UUID.randomUUID();
                             Event event = new Event(uuid, eventName.equals("FileIoRead") ? "EVENT_READ" : "EVENT_WRITE", tid, tidToUUID.get(tid),
                                     jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString(), timeStamp, eventName.equals("FileIoRead") ? "FileIoRead" : "FileIoWrite");
-                            eventList.add(event);
+                            if(!reducer.canBeRemoved(event))
+                                eventList.add(event);
                             if(eventList.size()>1000) {
-                                storeEvent(eventList);
-                                System.err.println("Saving... "+threadId);
+                               // storeEvent(eventList); TODO: DB storage
                                 eventList=new ArrayList<>();
                             }
                             break;
