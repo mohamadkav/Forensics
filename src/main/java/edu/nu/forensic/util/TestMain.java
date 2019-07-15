@@ -16,8 +16,8 @@ import java.util.*;
 public class TestMain {
 
     public static void main(String[] args) throws IOException {
-        String file = "E:\\download\\2019-05-19-19-25-47.out";
-        String machineNum = "0";
+        String file = "C:\\Data\\2019-05-19-19-25-47\\2019-05-19-19-25-47.out";
+        String machineNum = "1";
         String IPaddress = "10.214.148.122";
         String line = null;
         Set<Subject> subjectList = new HashSet<>();
@@ -59,7 +59,7 @@ public class TestMain {
                     UUID uuid = UUID.randomUUID();
                     IoEventAfterCPR ioEventAfterCPR = new IoEventAfterCPR(uuid, eventName, tid,
                             pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
-                            jsonObject.get("arugements").getAsJsonObject().get("FileName").getAsString(), timeStamp, timeStamp, "names");
+                            jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString(), timeStamp, timeStamp, "names");
                     eventList.add(ioEventAfterCPR);
                     if(eventList.size()>1000) {
                         connectionToCassandra.insertEventData(eventList);
@@ -86,7 +86,7 @@ public class TestMain {
                     }
                 }
                 else if(eventName.contains("VisibleWindowInfo")) {
-                    int pid = jsonObject.get("arguments").getAsJsonObject().get("ProcessId").getAsInt();
+                    int pid = jsonObject.get("processID").getAsInt();
                     if(!visibleWindowPid.contains(pid)) visibleWindowPid.add(pid);
                 }
                 else if(!eventName.contains("Thread")&&!eventNames.contains(eventName)) {

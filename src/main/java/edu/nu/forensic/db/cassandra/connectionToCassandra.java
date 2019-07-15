@@ -42,13 +42,14 @@ public class connectionToCassandra {
     }
 
     public void insertSubjectData(Set<Subject> subjectList) {
+        try{
         String sql = "CREATE TABLE IF NOT EXISTS test.subject"+machineNumber+" (" +
                 "uuid varchar PRIMARY KEY," +
                 "name varchar," +
                 "timestamp varchar NOT NULL," +
                 "parentuuid varchar," +
-                "Usersid," +
-                "visibleWindow)";
+                "Usersid varchar," +
+                "visibleWindow varchar)";
         getSession().execute(sql);
         String insertDB = "insert into test.subject"+machineNumber+"(uuid ,name,timestamp,parentuuid,Usersid,visibleWindow) " +
                 "values(?,?,?,?,?,?)";
@@ -56,7 +57,7 @@ public class connectionToCassandra {
 
         BatchStatement batchStatement = new BatchStatement();
 
-        try{
+
             int i = 0;
             for(Subject subject:subjectList) {
                 BoundStatement boundSta = new BoundStatement(psta);
@@ -79,6 +80,7 @@ public class connectionToCassandra {
     }
 
     public void insertEventData(Set<IoEventAfterCPR> eventList) {
+        try {
         //store event
         String sqlEvent = "CREATE TABLE IF NOT EXISTS test.event"+machineNumber+" (" +
                 "uuid varchar PRIMARY KEY," +
@@ -102,7 +104,7 @@ public class connectionToCassandra {
                 "dport varchar," +
                 "saddress varchar," +
                 "sport varchar," +
-                "name)";
+                "name varchar)";
         getSession().execute(sqlObject);
         String insertDBObject = "insert into test.object"+machineNumber+"(uuid,mark,daddress,dport,saddress,sport,name) " +
                 "values(?,?,?,?,?,?)";
@@ -110,7 +112,7 @@ public class connectionToCassandra {
 
         BatchStatement batchStatementObject = new BatchStatement();
 
-        try {
+
             int i = 0;
             for(IoEventAfterCPR event: eventList){
                 BoundStatement boundStaEvent = new BoundStatement(pstaEvent);
@@ -138,48 +140,47 @@ public class connectionToCassandra {
     }
 
     public void insertNetworkEvent(Set<NetFlowObject> networkList){
+        try {
         //store event
-        String sqlEvent = "CREATE TABLE IF NOT EXISTS test.event"+machineNumber+" (" +
+            String sqlEvent = "CREATE TABLE IF NOT EXISTS test.event"+machineNumber+" (" +
                 "uuid varchar PRIMARY KEY," +
                 "subjectuuid varchar," +
-                "objectuuid varchar NOT NULL," +
+                "objectuuid varchar," +
                 "eventName varchar," +
                 "tid varchar," +
-                "timestamp varchar)";
-        getSession().execute(sqlEvent);
-        String insertDBEvent = "insert into test.event"+machineNumber+"" +
+                "timestamp varchar);";
+            getSession().execute(sqlEvent);
+            String insertDBEvent = "insert into test.event"+machineNumber+"" +
                 "(uuid,subjectuuid,objectuuid,eventName,tid,timestamp) " +
                 "values(?,?,?,?,?,?)";
-        PreparedStatement pstaEvent = getSession().prepare(insertDBEvent);
-        BatchStatement batchStatementEvent = new BatchStatement();
+            PreparedStatement pstaEvent = getSession().prepare(insertDBEvent);
+            BatchStatement batchStatementEvent = new BatchStatement();
 
-        //store entities
-        String sqlObject = "CREATE TABLE IF NOT EXISTS test.object"+machineNumber+" (" +
+            //store entities
+            String sqlObject = "CREATE TABLE IF NOT EXISTS test.object"+machineNumber+" (" +
                 "uuid varchar PRIMARY KEY," +
                 "mark varchar," +
                 "daddress varchar," +
                 "dport varchar," +
                 "saddress varchar," +
                 "sport varchar," +
-                "name)";
-        getSession().execute(sqlObject);
-        String insertDBObject = "insert into test.object"+machineNumber+"(uuid,mark,daddress,dport,saddress,sport,name) " +
-                "values(?,?,?,?,?,?)";
-        PreparedStatement pstaObject = getSession().prepare(insertDBObject);
+                "name varchar)";
+            getSession().execute(sqlObject);
+            String insertDBObject = "insert into test.object"+machineNumber+"(uuid,mark,daddress,dport,saddress,sport,name) " +
+                "values(?,?,?,?,?,?,?)";
+            PreparedStatement pstaObject = getSession().prepare(insertDBObject);
 
-        BatchStatement batchStatementObject = new BatchStatement();
+            BatchStatement batchStatementObject = new BatchStatement();
 
-        try {
             int i = 0;
             for(NetFlowObject netFlowObject: networkList){
                 BoundStatement boundStaEvent = new BoundStatement(pstaEvent);
                 boundStaEvent.bind(UUID.randomUUID().toString(), netFlowObject.getSubjectUUID().toString(), netFlowObject.getId().toString(),
                         netFlowObject.getType(), String.valueOf(netFlowObject.getThreadId()), String.valueOf(netFlowObject.getStartTimestampNanos()));
                 batchStatementEvent.add(boundStaEvent);
-
                 BoundStatement boundStaObject = new BoundStatement(pstaObject);
-                boundStaObject.bind(netFlowObject.getId().toString(),"Y",netFlowObject.getRemoteAddress(), netFlowObject.getRemotePort(),
-                        netFlowObject.getLocalAddress(), netFlowObject.getLocalPort(), null);
+                boundStaObject.bind(netFlowObject.getId().toString(),"Y",netFlowObject.getRemoteAddress(), String.valueOf(netFlowObject.getRemotePort()),
+                        netFlowObject.getLocalAddress(), String.valueOf(netFlowObject.getLocalPort()), "network");
                 ++i;
                 if(i%50==0) {
                     System.out.println(i);
@@ -191,7 +192,7 @@ public class connectionToCassandra {
             }
             System.out.println("successful insertion！");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
+
             e.printStackTrace();
             System.exit(1);
         }
