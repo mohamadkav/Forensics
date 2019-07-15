@@ -26,8 +26,9 @@ public class TestMain {
         return result;
     }
     public static void main(String[] args) throws IOException {
+        long start = System.currentTimeMillis();
         String file = "E:\\download\\2019-05-19-19-25-47.out";
-        String machineNum = "1";
+        String machineNum = "2";
         String IPaddress = "10.214.148.122";
         String line = null;
         Set<Subject> subjectList = new HashSet<>();
@@ -38,12 +39,13 @@ public class TestMain {
         Set<String> eventNames = new HashSet<>();
         connectionToCassandra connectionToCassandra = new connectionToCassandra(IPaddress, machineNum);
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(file)));
-        int j = 0;
         while((line = bufferedReader.readLine())!=null){
-            j++;
-            if(j==10000) break;
             try {
                 JsonObject jsonObject = new JsonParser().parse(line).getAsJsonObject();
+                if(line.contains("CallStack")){
+                    //To do: handle Keylogger and ScreenGrab
+                    continue;
+                }
                 String eventName = jsonObject.get("EventName").getAsString();
                 if(eventName.contains("ProcessStart")||eventName.contains("ProcessDCStart")){
                     int pid = jsonObject.get("arguments").getAsJsonObject().get("ProcessId").getAsInt();
@@ -58,14 +60,14 @@ public class TestMain {
                             jsonObject.get("arguments").getAsJsonObject().get("UserSID").getAsString(),
                             visibleWindowPid.contains(pid)?"visibleWindow":"NoWindow");
                     subjectList.add(subject);
-                    if(subjectList.size()>1000) {
+                    if(subjectList.size()>10000) {
                         System.out.println("Saving Subjects...");
                         connectionToCassandra.insertSubjectData(subjectList);
                         subjectList=new HashSet<>();
                     }
                 }
                 else if(eventName.contains("ProcessEnd")){
-
+                    //To do: handle this event
                 }
                 else if(eventName.contains("FileIo")){
                     int tid = jsonObject.get("threadID").getAsInt();
@@ -75,14 +77,14 @@ public class TestMain {
                             pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
                             jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString(), timeStamp, timeStamp, "names");
                     eventList.add(ioEventAfterCPR);
-                    if(eventList.size()>1000) {
+                    if(eventList.size()>10000) {
                         System.out.println("Saving file... ");
                         connectionToCassandra.insertEventData(eventList);
                         eventList=new HashSet<>();
                     }
                 }
                 else if(eventName.contains("Image")){
-
+                    //To do: handle ImageDCStart and ImageLoad
                 }
                 else if(eventName.contains("TcpIp")||eventName.contains("UdpIp")){
                     int tid = jsonObject.get("threadID").getAsInt();
@@ -97,7 +99,7 @@ public class TestMain {
                             pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
                             timeStamp, eventName, tid);
                     netList.add(netFlowObject);
-                    if(netList.size()>1000) {
+                    if(netList.size()>10000) {
                         System.out.println("Saving network... ");
                         connectionToCassandra.insertNetworkEvent(netList);
                         netList=new HashSet<>();
@@ -121,6 +123,7 @@ public class TestMain {
         for(String eventname:eventNames){
             System.out.println(eventname);
         }
+        System.out.println(System.currentTimeMillis()-start);
         System.exit(0);
     }
 }

@@ -93,7 +93,8 @@ public class connectionToCassandra {
             for(Subject subject:subjectList) {
                 BoundStatement boundSta = new BoundStatement(psta);
                 boundSta.bind(subject.getUuid().toString(), subject.getCmdLine(), String.valueOf(subject.getStartTimestampNanos()),
-                        subject.getParentSubject().toString(), subject.getUsersid(), subject.getVisibleWindowInfo());
+                        subject.getParentSubject()==null?null:subject.getParentSubject().toString(),
+                        subject.getUsersid(), subject.getVisibleWindowInfo());
                 batchStatement.add(boundSta);
                 ++i;
                 if(i%50==0) {
@@ -122,7 +123,8 @@ public class connectionToCassandra {
                 batchStatementEvent.add(boundStaEvent);
 
                 BoundStatement boundStaObject = new BoundStatement(pstaObject);
-                boundStaObject.bind(event.getId().toString(),"N",null, null, null, null, event.getPredicateObjectPath());
+                boundStaObject.bind(event.getId().toString(),"N","1", "2", "3", "4", event.getPredicateObjectPath());
+                batchStatementObject.add(boundStaObject);
                 ++i;
                 if(i%50==0) {
                     getSession().execute(batchStatementEvent);
@@ -152,9 +154,11 @@ public class connectionToCassandra {
                 boundStaEvent.bind(UUID.randomUUID().toString(), netFlowObject.getSubjectUUID().toString(), netFlowObject.getId().toString(),
                         netFlowObject.getType(), String.valueOf(netFlowObject.getThreadId()), String.valueOf(netFlowObject.getStartTimestampNanos()));
                 batchStatementEvent.add(boundStaEvent);
+
                 BoundStatement boundStaObject = new BoundStatement(pstaObject);
                 boundStaObject.bind(netFlowObject.getId().toString(),"Y",netFlowObject.getRemoteAddress(), String.valueOf(netFlowObject.getRemotePort()),
                         netFlowObject.getLocalAddress(), String.valueOf(netFlowObject.getLocalPort()), "network");
+                batchStatementObject.add(boundStaObject);
                 ++i;
                 if(i%50==0) {
                     getSession().execute(batchStatementEvent);
