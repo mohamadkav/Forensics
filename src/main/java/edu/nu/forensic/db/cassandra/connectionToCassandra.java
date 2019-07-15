@@ -30,34 +30,65 @@ public class connectionToCassandra {
 
     private String machineNumber;
 
+    private PreparedStatement psta;
+    private PreparedStatement pstaObject;
+    private PreparedStatement pstaEvent;
+
     public connectionToCassandra(String nodeIP, String machineNum) {
         cluster = Cluster.builder().addContactPoint(nodeIP).build();
-        Metadata metadata = cluster.getMetadata();
-        System.out.printf("Connected to cluster: %s\n", metadata.getClusterName());
-        for (Host host : metadata.getAllHosts()) {
-            System.out.printf("Datatacenter: %s; Host: %s; Rack: %s\n", host.getDatacenter(), host.getAddress(), host.getRack());
-        }
         setSession(cluster.connect());
         this.machineNumber = machineNum;
+        createSubjectTable();
+        createEventAndObjectTable();
     }
 
-    public void insertSubjectData(Set<Subject> subjectList) {
-        try{
+    private void createSubjectTable(){
         String sql = "CREATE TABLE IF NOT EXISTS test.subject"+machineNumber+" (" +
                 "uuid varchar PRIMARY KEY," +
                 "name varchar," +
-                "timestamp varchar NOT NULL," +
+                "timestamp varchar," +
                 "parentuuid varchar," +
                 "Usersid varchar," +
                 "visibleWindow varchar)";
         getSession().execute(sql);
         String insertDB = "insert into test.subject"+machineNumber+"(uuid ,name,timestamp,parentuuid,Usersid,visibleWindow) " +
                 "values(?,?,?,?,?,?)";
-        PreparedStatement psta = getSession().prepare(insertDB);
+        this.psta = getSession().prepare(insertDB);
+    }
 
-        BatchStatement batchStatement = new BatchStatement();
+    private void createEventAndObjectTable(){
+        String sqlEvent = "CREATE TABLE IF NOT EXISTS test.event"+machineNumber+" (" +
+                "uuid varchar PRIMARY KEY," +
+                "subjectuuid varchar," +
+                "objectuuid varchar," +
+                "eventName varchar," +
+                "tid varchar," +
+                "timestamp varchar)";
+        getSession().execute(sqlEvent);
+        String insertDBEvent = "insert into test.event"+machineNumber+"" +
+                "(uuid,subjectuuid,objectuuid,eventName,tid,timestamp) " +
+                "values(?,?,?,?,?,?)";
+        this.pstaEvent = getSession().prepare(insertDBEvent);
 
 
+        //store entities
+        String sqlObject = "CREATE TABLE IF NOT EXISTS test.object"+machineNumber+" (" +
+                "uuid varchar PRIMARY KEY," +
+                "mark varchar," +
+                "daddress varchar," +
+                "dport varchar," +
+                "saddress varchar," +
+                "sport varchar," +
+                "name varchar)";
+        getSession().execute(sqlObject);
+        String insertDBObject = "insert into test.object"+machineNumber+"(uuid,mark,daddress,dport,saddress,sport,name) " +
+                "values(?,?,?,?,?,?,?)";
+        this.pstaObject = getSession().prepare(insertDBObject);
+    }
+
+    public void insertSubjectData(Set<Subject> subjectList) {
+        try{
+            BatchStatement batchStatement = new BatchStatement();
             int i = 0;
             for(Subject subject:subjectList) {
                 BoundStatement boundSta = new BoundStatement(psta);
@@ -66,7 +97,6 @@ public class connectionToCassandra {
                 batchStatement.add(boundSta);
                 ++i;
                 if(i%50==0) {
-                    System.out.println(i);
                     getSession().execute(batchStatement);
                     batchStatement = new BatchStatement();
                 }
@@ -82,37 +112,8 @@ public class connectionToCassandra {
     public void insertEventData(Set<IoEventAfterCPR> eventList) {
         try {
         //store event
-        String sqlEvent = "CREATE TABLE IF NOT EXISTS test.event"+machineNumber+" (" +
-                "uuid varchar PRIMARY KEY," +
-                "subjectuuid varchar," +
-                "objectuuid varchar NOT NULL," +
-                "eventName varchar," +
-                "tid varchar," +
-                "timestamp varchar)";
-        getSession().execute(sqlEvent);
-        String insertDBEvent = "insert into test.event"+machineNumber+"" +
-                "(uuid,subjectuuid,objectuuid,eventName,tid,timestamp) " +
-                "values(?,?,?,?,?,?)";
-        PreparedStatement pstaEvent = getSession().prepare(insertDBEvent);
-        BatchStatement batchStatementEvent = new BatchStatement();
-
-        //store entities
-        String sqlObject = "CREATE TABLE IF NOT EXISTS test.object"+machineNumber+" (" +
-                "uuid varchar PRIMARY KEY," +
-                "mark varchar," +
-                "daddress varchar," +
-                "dport varchar," +
-                "saddress varchar," +
-                "sport varchar," +
-                "name varchar)";
-        getSession().execute(sqlObject);
-        String insertDBObject = "insert into test.object"+machineNumber+"(uuid,mark,daddress,dport,saddress,sport,name) " +
-                "values(?,?,?,?,?,?)";
-        PreparedStatement pstaObject = getSession().prepare(insertDBObject);
-
-        BatchStatement batchStatementObject = new BatchStatement();
-
-
+            BatchStatement batchStatementEvent = new BatchStatement();
+            BatchStatement batchStatementObject = new BatchStatement();
             int i = 0;
             for(IoEventAfterCPR event: eventList){
                 BoundStatement boundStaEvent = new BoundStatement(pstaEvent);
@@ -124,7 +125,6 @@ public class connectionToCassandra {
                 boundStaObject.bind(event.getId().toString(),"N",null, null, null, null, event.getPredicateObjectPath());
                 ++i;
                 if(i%50==0) {
-                    System.out.println(i);
                     getSession().execute(batchStatementEvent);
                     getSession().execute(batchStatementObject);
                     batchStatementObject = new BatchStatement();
@@ -133,7 +133,6 @@ public class connectionToCassandra {
             }
             System.out.println("successful insertion！");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             System.exit(1);
         }
@@ -141,35 +140,10 @@ public class connectionToCassandra {
 
     public void insertNetworkEvent(Set<NetFlowObject> networkList){
         try {
-        //store event
-            String sqlEvent = "CREATE TABLE IF NOT EXISTS test.event"+machineNumber+" (" +
-                "uuid varchar PRIMARY KEY," +
-                "subjectuuid varchar," +
-                "objectuuid varchar," +
-                "eventName varchar," +
-                "tid varchar," +
-                "timestamp varchar);";
-            getSession().execute(sqlEvent);
-            String insertDBEvent = "insert into test.event"+machineNumber+"" +
-                "(uuid,subjectuuid,objectuuid,eventName,tid,timestamp) " +
-                "values(?,?,?,?,?,?)";
-            PreparedStatement pstaEvent = getSession().prepare(insertDBEvent);
+            //store event
             BatchStatement batchStatementEvent = new BatchStatement();
 
             //store entities
-            String sqlObject = "CREATE TABLE IF NOT EXISTS test.object"+machineNumber+" (" +
-                "uuid varchar PRIMARY KEY," +
-                "mark varchar," +
-                "daddress varchar," +
-                "dport varchar," +
-                "saddress varchar," +
-                "sport varchar," +
-                "name varchar)";
-            getSession().execute(sqlObject);
-            String insertDBObject = "insert into test.object"+machineNumber+"(uuid,mark,daddress,dport,saddress,sport,name) " +
-                "values(?,?,?,?,?,?,?)";
-            PreparedStatement pstaObject = getSession().prepare(insertDBObject);
-
             BatchStatement batchStatementObject = new BatchStatement();
 
             int i = 0;
@@ -183,7 +157,6 @@ public class connectionToCassandra {
                         netFlowObject.getLocalAddress(), String.valueOf(netFlowObject.getLocalPort()), "network");
                 ++i;
                 if(i%50==0) {
-                    System.out.println(i);
                     getSession().execute(batchStatementEvent);
                     getSession().execute(batchStatementObject);
                     batchStatementObject = new BatchStatement();

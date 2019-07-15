@@ -14,9 +14,19 @@ import java.io.IOException;
 import java.util.*;
 
 public class TestMain {
-
+    private static String transferIntIPToStringIP(Integer IP){
+        String IP1 = String.valueOf(IP&0xff);
+        IP = IP>>8;
+        String IP2 = String.valueOf(IP&0xff);
+        IP = IP>>8;
+        String IP3 = String.valueOf(IP&0xff);
+        IP = IP>>8;
+        String IP4 = String.valueOf(IP&0xff);
+        String result = IP1+"."+IP2+"."+IP3+"."+IP4;
+        return result;
+    }
     public static void main(String[] args) throws IOException {
-        String file = "C:\\Data\\2019-05-19-19-25-47\\2019-05-19-19-25-47.out";
+        String file = "E:\\download\\2019-05-19-19-25-47.out";
         String machineNum = "1";
         String IPaddress = "10.214.148.122";
         String line = null;
@@ -39,7 +49,8 @@ public class TestMain {
                     int pid = jsonObject.get("arguments").getAsJsonObject().get("ProcessId").getAsInt();
                     int parentPid = jsonObject.get("processID").getAsInt();
                     long timeStamp = jsonObject.get("TimeStamp").getAsLong();
-                    UUID uuid = UUID.fromString(machineNum+pid+timeStamp);
+//                    UUID uuid = UUID.fromString(machineNum+"-"+pid+"-"+timeStamp+"-"+pid+"-"+machineNum);
+                    UUID uuid = UUID.randomUUID();
                     pidToUUID.put(pid, uuid);
                     Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, "SUBJECT_PROCESS",
                             pid, !pidToUUID.containsKey(parentPid)?null:pidToUUID.get(parentPid), null, timeStamp,
@@ -53,6 +64,9 @@ public class TestMain {
                         subjectList=new HashSet<>();
                     }
                 }
+                else if(eventName.contains("ProcessEnd")){
+
+                }
                 else if(eventName.contains("FileIo")){
                     int tid = jsonObject.get("threadID").getAsInt();
                     long timeStamp = jsonObject.get("TimeStamp").getAsLong();
@@ -62,10 +76,13 @@ public class TestMain {
                             jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString(), timeStamp, timeStamp, "names");
                     eventList.add(ioEventAfterCPR);
                     if(eventList.size()>1000) {
+                        System.out.println("Saving file... ");
                         connectionToCassandra.insertEventData(eventList);
-                        System.err.println("Saving file... ");
                         eventList=new HashSet<>();
                     }
+                }
+                else if(eventName.contains("Image")){
+
                 }
                 else if(eventName.contains("TcpIp")||eventName.contains("UdpIp")){
                     int tid = jsonObject.get("threadID").getAsInt();
@@ -75,13 +92,14 @@ public class TestMain {
                     Integer remoteAddress = jsonObject.get("arguments").getAsJsonObject().get("daddr").getAsInt();
                     Integer localPort = jsonObject.get("arguments").getAsJsonObject().get("sport").getAsInt();
                     Integer remotePort = jsonObject.get("arguments").getAsJsonObject().get("dport").getAsInt();
-                    NetFlowObject netFlowObject = new NetFlowObject(uuid, String.valueOf(localAddress), localPort, String.valueOf(remoteAddress), remotePort,
+                    NetFlowObject netFlowObject = new NetFlowObject(
+                            uuid, transferIntIPToStringIP(localAddress), localPort, transferIntIPToStringIP(remoteAddress), remotePort,
                             pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
                             timeStamp, eventName, tid);
                     netList.add(netFlowObject);
                     if(netList.size()>1000) {
+                        System.out.println("Saving network... ");
                         connectionToCassandra.insertNetworkEvent(netList);
-                        System.err.println("Saving file... ");
                         netList=new HashSet<>();
                     }
                 }
@@ -90,7 +108,6 @@ public class TestMain {
                     if(!visibleWindowPid.contains(pid)) visibleWindowPid.add(pid);
                 }
                 else if(!eventName.contains("Thread")&&!eventNames.contains(eventName)) {
-                    System.out.println(eventName);
                     eventNames.add(eventName);
                 }
             }catch (Exception e){
@@ -98,5 +115,12 @@ public class TestMain {
                 e.printStackTrace();
             }
         }
+        connectionToCassandra.insertEventData(eventList);
+        connectionToCassandra.insertSubjectData(subjectList);
+        connectionToCassandra.insertNetworkEvent(netList);
+        for(String eventname:eventNames){
+            System.out.println(eventname);
+        }
+        System.exit(0);
     }
 }
