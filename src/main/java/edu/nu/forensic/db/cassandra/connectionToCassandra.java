@@ -92,6 +92,8 @@ public class connectionToCassandra {
             int i = 0;
             for(Subject subject:subjectList) {
                 BoundStatement boundSta = new BoundStatement(psta);
+                // you can see BatchStatement as a stl, boundSta is the class that can only be stored into batchStatement;
+                // boundSta.bind means add data according to psta's format;
                 boundSta.bind(subject.getUuid().toString(), subject.getCmdLine(), String.valueOf(subject.getStartTimestampNanos()),
                         subject.getParentSubject()==null?null:subject.getParentSubject().toString(),
                         subject.getUsersid(), subject.getVisibleWindowInfo());

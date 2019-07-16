@@ -83,6 +83,7 @@ public class TestMain {
                         eventList=new HashSet<>();
                     }
                 }
+                // FileIoRename & FileIoDelete
                 else if(eventName.contains("Image")){
                     //To do: handle ImageDCStart and ImageLoad
                 }
