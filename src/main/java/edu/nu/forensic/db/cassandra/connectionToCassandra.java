@@ -46,10 +46,10 @@ public class connectionToCassandra {
     private void createSubjectTable(){
         String sql = "CREATE TABLE IF NOT EXISTS test.subject"+machineNumber+" (" +
                 "uuid uuid PRIMARY KEY," +
-                "name varchar," +
+                "name ascii," +
                 "timestamp bigint," +
                 "parentuuid uuid," +
-                "Usersid varchar," +
+                "Usersid ascii," +
                 "visibleWindow boolean)";
         getSession().execute(sql);
         String insertDB = "insert into test.subject"+machineNumber+"(uuid ,name,timestamp,parentuuid,Usersid,visibleWindow) " +
@@ -62,7 +62,7 @@ public class connectionToCassandra {
                 "timestamp bigint PRIMARY KEY," +
                 "subjectuuid uuid," +
                 "objectuuid uuid," +
-                "eventName varchar," +
+                "eventName ascii," +
                 "tid int)";
         getSession().execute(sqlEvent);
         String insertDBEvent = "insert into test.event"+machineNumber+"" +
@@ -84,15 +84,14 @@ public class connectionToCassandra {
         String sqlNetwork = "CREATE TABLE IF NOT EXISTS test.network"+machineNumber+" (" +
                 "timestamp bigint PRIMARY KEY,"+
                 "subjectuuid uuid,"+
-                "eventName varchar,"+
+                "eventName ascii,"+
                 "tid int,"+
-                "daddress varchar," +
+                "daddress ascii," +
                 "dport int," +
-                "saddress varchar," +
                 "sport int)";
         getSession().execute(sqlNetwork);
-        String insertDBNetwork = "insert into test.network"+machineNumber+"(timestamp,subjectuuid,eventName,tid,daddress,dport,saddress,sport) " +
-                "values(?,?,?,?,?,?,?,?)";
+        String insertDBNetwork = "insert into test.network"+machineNumber+"(timestamp,subjectuuid,eventName,tid,daddress,dport,sport) " +
+                "values(?,?,?,?,?,?,?)";
         this.pstaNetwork = getSession().prepare(insertDBNetwork);
     }
 
@@ -167,8 +166,7 @@ public class connectionToCassandra {
             for(NetFlowObject netFlowObject: networkList){
                 BoundStatement boundStaEvent = new BoundStatement(pstaNetwork);
                 boundStaEvent.bind(netFlowObject.getStartTimestampNanos(), netFlowObject.getSubjectUUID(), netFlowObject.getType(),
-                        netFlowObject.getThreadId(), netFlowObject.getRemoteAddress(), netFlowObject.getRemotePort(),
-                        netFlowObject.getLocalAddress(), netFlowObject.getLocalPort());
+                        netFlowObject.getThreadId(), netFlowObject.getRemoteAddress(), netFlowObject.getRemotePort(), netFlowObject.getLocalPort());
                 batchStatementEvent.add(boundStaEvent);
 
                 ++i;
