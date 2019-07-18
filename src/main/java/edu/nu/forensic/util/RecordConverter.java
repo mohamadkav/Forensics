@@ -94,7 +94,7 @@ public class RecordConverter {
             eventNames=null;
         Event event=new Event(UUID.nameUUIDFromBytes(bbnEvent.getUuid().bytes()),bbnEvent.getType()==null?null:bbnEvent.getType().name(),
                 bbnEvent.getThreadId(),subject==null?null:subject.getUuid(),bbnEvent.getPredicateObjectPath()!=null?bbnEvent.getPredicateObjectPath().toString():null,
-                bbnEvent.getTimestampNanos(),eventNames!=null?eventNames.toString():null);
+                bbnEvent.getTimestampNanos(),eventNames!=null?eventNames.toString():null,false);
 //        Event event=new Event(UUID.nameUUIDFromBytes(bbnEvent.getUuid().bytes()),bbnEvent.getSequence(),bbnEvent.getType()==null?null:bbnEvent.getType().name(),
 //                bbnEvent.getThreadId(),subject,predicateObject,bbnEvent.getPredicateObjectPath()!=null?bbnEvent.getPredicateObjectPath().toString():null,
 //                predicateObject2,bbnEvent.getPredicateObject2Path()!=null?bbnEvent.getPredicateObject2Path().toString():null,bbnEvent.getTimestampNanos(),

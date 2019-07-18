@@ -1,6 +1,7 @@
 package edu.nu.forensic.db.cassandra;
 
 import com.datastax.driver.core.*;
+import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.db.entity.IoEventAfterCPR;
 import edu.nu.forensic.db.entity.NetFlowObject;
 import edu.nu.forensic.db.entity.Subject;
@@ -95,7 +96,7 @@ public class connectionToCassandra {
         this.pstaNetwork = getSession().prepare(insertDBNetwork);
     }
 
-    public void insertSubjectData(Set<Subject> subjectList) {
+    public void insertSubjectData(List<Subject> subjectList) {
         try{
             BatchStatement batchStatement = new BatchStatement();
             int i = 0;
@@ -122,22 +123,22 @@ public class connectionToCassandra {
         }
     }
 
-    public void insertEventData(Set<IoEventAfterCPR> eventList) {
+    public void insertEventData(List<Event> eventList) {
         try {
         //store event
             BatchStatement batchStatementEvent = new BatchStatement();
             BatchStatement batchStatementObject = new BatchStatement();
 
             int i = 0;
-            for(IoEventAfterCPR event: eventList){
+            for(Event event: eventList){
                 BoundStatement boundStaEvent = new BoundStatement(pstaEvent);
-                boundStaEvent.bind(event.getStartTimestampNanos(), event.getSubjectUUID(), event.getId(), event.getType(), event.getThreadId());
+                boundStaEvent.bind(event.getTimestampNanos(), event.getSubjectUUID(), event.getId(), event.getType(), event.getThreadId());
                 batchStatementEvent.add(boundStaEvent);
 
                 ++i;
-                if(event.getNeedToWrite()){
+                if(event.getNeedWritingToObjectTable()){
                     BoundStatement boundStaObject = new BoundStatement(pstaObject);
-                    boundStaObject.bind(event.getStartTimestampNanos(), event.getId(), event.getPredicateObjectPath());
+                    boundStaObject.bind(event.getTimestampNanos(), event.getId(), event.getPredicateObjectPath());
                     batchStatementObject.add(boundStaObject);
                 }
                 if(i%50==0) {
@@ -157,7 +158,7 @@ public class connectionToCassandra {
         }
     }
 
-    public void insertNetworkEvent(Set<NetFlowObject> networkList){
+    public void insertNetworkEvent(List<NetFlowObject> networkList){
         try {
             //store event
             BatchStatement batchStatementEvent = new BatchStatement();

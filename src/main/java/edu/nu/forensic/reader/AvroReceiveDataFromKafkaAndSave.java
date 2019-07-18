@@ -169,7 +169,7 @@ class ReceiverThread extends Thread implements Runnable{
 
                     Event event=new Event(UUID.nameUUIDFromBytes(bbnEvent.getUuid().bytes()),bbnEvent.getType()==null?null:bbnEvent.getType().name(),
                             bbnEvent.getThreadId(),bbnEvent.getSubject()==null?null:UUID.nameUUIDFromBytes(bbnEvent.getSubject().bytes()),bbnEvent.getPredicateObjectPath()!=null?bbnEvent.getPredicateObjectPath().toString():null,
-                            bbnEvent.getTimestampNanos(),eventNames!=null?eventNames.toString():null);
+                            bbnEvent.getTimestampNanos(),eventNames!=null?eventNames.toString():null,false);
                     eventList.add(event);
                     if(eventList.size()>=10000) {
                         storeEvent(eventList);

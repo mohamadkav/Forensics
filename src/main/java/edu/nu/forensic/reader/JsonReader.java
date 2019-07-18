@@ -103,7 +103,7 @@ public class JsonReader {
                         long timeStamp = jsonObject.get("TimeStamp").getAsLong();
                         UUID uuid = UUID.randomUUID();
                         Event event = new Event(uuid, eventName.equals("FileIoRead") ? "EVENT_READ" : "EVENT_WRITE", tid, tidToUUID.get(tid),
-                                jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString(), timeStamp, eventName.equals("FileIoRead") ? "FileIoRead" : "FileIoWrite");
+                                jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString(), timeStamp, eventName.equals("FileIoRead") ? "FileIoRead" : "FileIoWrite",false);
                         toBeSavedEvents.add(event);
                         if(toBeSavedEvents.size()>1000) {
                             System.out.println("Saving...");

@@ -15,7 +15,7 @@ public class CPRStandAloneReducer {
     private HashMap<String, HashMap<String, Stack<Event>>> stackMaps = new HashMap<>();
 
     public boolean canBeRemoved(Event event){
-        if(!event.getType().equals("EVENT_READ")&& !event.getType().equals("EVENT_WRITE"))
+        if(!event.getType().equals("FileIoRead")&& !event.getType().equals("FileIoWrite"))
             return false;
         if(lastSavedEvent==null) {
             lastSavedEvent = event;
@@ -34,6 +34,31 @@ public class CPRStandAloneReducer {
         }
 
     }
+
+    public void notifyFileDelete(String filename){
+        eventsStartFromKey.remove(filename);
+        eventsEndAtKey.remove(filename);
+        fileToProcessesWhichHaveAccessedIt.remove(filename);
+        stackMaps.remove(filename);
+    }
+    public void notifyFileRename(String oldFileName, String newFileName){
+        if(eventsEndAtKey.containsKey(oldFileName)){
+            eventsEndAtKey.put(newFileName,eventsEndAtKey.get(oldFileName));
+            eventsEndAtKey.remove(oldFileName);
+        }
+        if(eventsStartFromKey.containsKey(oldFileName)){
+            eventsStartFromKey.put(newFileName,eventsStartFromKey.get(oldFileName));
+            eventsStartFromKey.remove(oldFileName);
+        }
+        if(fileToProcessesWhichHaveAccessedIt.containsKey(oldFileName)){
+            fileToProcessesWhichHaveAccessedIt.put(newFileName,fileToProcessesWhichHaveAccessedIt.get(oldFileName));
+            fileToProcessesWhichHaveAccessedIt.remove(oldFileName);
+        }
+        if(stackMaps.containsKey(oldFileName)){
+            stackMaps.put(newFileName,stackMaps.get(oldFileName));
+            stackMaps.remove(oldFileName);
+        }
+    }
     private boolean doStep0(Event event){
         if (!eventsStartFromKey.containsKey(event.getPredicateObjectPath())) {
             HashSet<Event> ioEventSubset = new HashSet<>();
@@ -51,11 +76,11 @@ public class CPRStandAloneReducer {
             HashSet<Event> ioEventSubset = new HashSet<>();
             eventsEndAtKey.put(event.getThreadId().toString(), ioEventSubset);
         }
-        if (event.getType().equals("EVENT_READ") ) {
+        if (event.getType().equals("FileIoRead") ) {
             eventsStartFromKey.get(event.getPredicateObjectPath()).add(event);
             eventsEndAtKey.get(event.getThreadId().toString()).add(event);
         }
-        else if (event.getNames().equals("EVENT_WRITE") ) {
+        else if (event.getNames().equals("FileIoWrite") ) {
             eventsStartFromKey.get(event.getThreadId().toString()).add(event);
             eventsEndAtKey.get(event.getPredicateObjectPath()).add(event);
         }
@@ -101,7 +126,7 @@ public class CPRStandAloneReducer {
     private boolean doStep2(Event event) {
         String u;
         String v;
-        if (event.getType().equals("EVENT_READ") ) {
+        if (event.getType().equals("FileIoRead") ) {
             // fetch stack(file, thread)
             u = event.getPredicateObjectPath();
             v = event.getThreadId().toString();
