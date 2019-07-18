@@ -34,7 +34,8 @@ public class TestMain {
         Set<Subject> subjectList = new HashSet<>();
         Map<Integer, UUID> pidToUUID = new HashMap<>();
         Set<Integer> visibleWindowPid = new HashSet<>();
-        Set<IoEventAfterCPR> eventList = new HashSet<>();
+        Set<IoEventAfterCPR> eventList = new HashSet<>();  //we will store event through this set
+        Map<String, UUID> FileNameToUUID = new HashMap<>();
         Set<NetFlowObject> netList = new HashSet<>();
         Set<String> eventNames = new HashSet<>();
         connectionToCassandra connectionToCassandra = new connectionToCassandra(IPaddress, machineNum);
@@ -53,12 +54,13 @@ public class TestMain {
                     long timeStamp = jsonObject.get("TimeStamp").getAsLong();
 //                    UUID uuid = UUID.fromString(machineNum+"-"+pid+"-"+timeStamp+"-"+pid+"-"+machineNum);
                     UUID uuid = UUID.randomUUID();
-                    pidToUUID.put(pid, uuid);
+                    if(pidToUUID.containsKey(pid)) uuid = pidToUUID.get(pid);
+                    else pidToUUID.put(pid, uuid);
                     Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, "SUBJECT_PROCESS",
                             pid, !pidToUUID.containsKey(parentPid)?null:pidToUUID.get(parentPid), null, timeStamp,
                             jsonObject.get("arguments").getAsJsonObject().get("CommandLine").getAsString(), null,
                             jsonObject.get("arguments").getAsJsonObject().get("UserSID").getAsString(),
-                            visibleWindowPid.contains(pid)?"visibleWindow":"NoWindow");
+                            visibleWindowPid.contains(pid)?true:false);
                     subjectList.add(subject);
                     if(subjectList.size()>10000) {
                         System.out.println("Saving Subjects...");
@@ -69,13 +71,63 @@ public class TestMain {
                 else if(eventName.contains("ProcessEnd")){
                     //To do: handle this event
                 }
+                else if(eventName.contains("FileIoRename")||eventName.contains("FileIoDelete")){
+                    int tid = jsonObject.get("threadID").getAsInt();
+                    long timeStamp = jsonObject.get("TimeStamp").getAsLong();
+                    String filename = jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString();
+                    UUID uuid = UUID.randomUUID();
+                    //k = true means the map includes this key-value;
+                    IoEventAfterCPR ioEventAfterCPR;
+                    if(FileNameToUUID.containsKey(filename)){
+                        uuid = FileNameToUUID.get(filename);
+                        FileNameToUUID.remove(filename);
+                        ioEventAfterCPR = new IoEventAfterCPR(uuid, eventName, tid,
+                                pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
+                                filename, timeStamp, timeStamp, "names", false);
+                    }
+                    else{
+                        ioEventAfterCPR = new IoEventAfterCPR(uuid, eventName, tid,
+                                pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
+                                filename, timeStamp, timeStamp, "names", true);
+                    }
+
+                    //if the event name is fileIoRename, we should put new file name to object table, but I think it is not necessary to store event table;
+                    if(eventName.contains("FileIoRename")){
+                        String newFileName = jsonObject.get("arguments").getAsJsonObject().get("NewFileName").getAsString();
+                        FileNameToUUID.put(newFileName, uuid);
+                        IoEventAfterCPR newioEventAfterCPR = new IoEventAfterCPR(uuid, eventName, tid,
+                                pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
+                                newFileName, timeStamp, timeStamp, "names", true);
+                        eventList.add(newioEventAfterCPR);
+                    }
+                    //if the event name is fileIoDelete, we should store it in event table;
+                    else eventList.add(ioEventAfterCPR);
+
+                    if(eventList.size()>10000) {
+                        System.out.println("Saving file... ");
+                        connectionToCassandra.insertEventData(eventList);
+                        eventList=new HashSet<>();
+                    }
+                }
                 else if(eventName.contains("FileIo")){
                     int tid = jsonObject.get("threadID").getAsInt();
                     long timeStamp = jsonObject.get("TimeStamp").getAsLong();
+                    String filename = jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString();
                     UUID uuid = UUID.randomUUID();
-                    IoEventAfterCPR ioEventAfterCPR = new IoEventAfterCPR(uuid, eventName, tid,
-                            pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
-                            jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString(), timeStamp, timeStamp, "names");
+                    boolean k = false;
+                    IoEventAfterCPR ioEventAfterCPR;
+                    if(FileNameToUUID.containsKey(filename)) {
+                        uuid = FileNameToUUID.get(filename);
+                        ioEventAfterCPR = new IoEventAfterCPR(uuid, eventName, tid,
+                                pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
+                                filename, timeStamp, timeStamp, "names", false);
+                    }
+                    else{
+                        ioEventAfterCPR = new IoEventAfterCPR(uuid, eventName, tid,
+                                pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
+                                filename, timeStamp, timeStamp, "names", true);
+                        FileNameToUUID.put(filename, uuid);
+                    }
                     eventList.add(ioEventAfterCPR);
                     if(eventList.size()>10000) {
                         System.out.println("Saving file... ");
@@ -90,13 +142,13 @@ public class TestMain {
                 else if(eventName.contains("TcpIp")||eventName.contains("UdpIp")){
                     int tid = jsonObject.get("threadID").getAsInt();
                     long timeStamp = jsonObject.get("TimeStamp").getAsLong();
-                    UUID uuid = UUID.randomUUID();
+                    boolean k = false;
                     Integer localAddress = jsonObject.get("arguments").getAsJsonObject().get("saddr").getAsInt();
                     Integer remoteAddress = jsonObject.get("arguments").getAsJsonObject().get("daddr").getAsInt();
                     Integer localPort = jsonObject.get("arguments").getAsJsonObject().get("sport").getAsInt();
                     Integer remotePort = jsonObject.get("arguments").getAsJsonObject().get("dport").getAsInt();
                     NetFlowObject netFlowObject = new NetFlowObject(
-                            uuid, transferIntIPToStringIP(localAddress), localPort, transferIntIPToStringIP(remoteAddress), remotePort,
+                            transferIntIPToStringIP(localAddress), localPort, transferIntIPToStringIP(remoteAddress), remotePort,
                             pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
                             timeStamp, eventName, tid);
                     netList.add(netFlowObject);

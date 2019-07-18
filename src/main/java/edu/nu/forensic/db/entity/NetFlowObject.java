@@ -28,7 +28,7 @@ public class NetFlowObject extends Object{
 
     private long startTimestampNanos;
 
-    public NetFlowObject(UUID id,String localAddress, Integer localPort, String remoteAddress, Integer remotePort, Integer ipProtocol) {
+    public NetFlowObject(UUID id, String localAddress, Integer localPort, String remoteAddress, Integer remotePort, Integer ipProtocol) {
         this.setId(id);
         this.localAddress = localAddress;
         this.localPort = localPort;
@@ -37,9 +37,8 @@ public class NetFlowObject extends Object{
         this.ipProtocol = ipProtocol;
     }
 
-    public NetFlowObject(UUID id, String localAddress, Integer localPort, String remoteAddress, Integer remotePort,
+    public NetFlowObject(String localAddress, Integer localPort, String remoteAddress, Integer remotePort,
                          UUID subjectUUID, long startTimestampNanos, String type, Integer threadId) {
-        this.setId(id);
         this.localAddress = localAddress;
         this.localPort = localPort;
         this.remoteAddress = remoteAddress;

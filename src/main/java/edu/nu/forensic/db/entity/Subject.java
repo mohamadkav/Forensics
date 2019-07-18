@@ -31,7 +31,7 @@ public class Subject {
 
     private String Usersid;
 
-    private String visibleWindowInfo;
+    private boolean visibleWindowInfo;
 
  //   private String privilegeLevel;
 
@@ -50,7 +50,7 @@ public class Subject {
     }
 
     public Subject(UUID uuid, String type, int cid, UUID parentSubject, Principal localPrincipal, Long startTimestampNanos, String cmdLine,
-                   String privilegeLevel, String Usersid, String visibleWindowInfo) {
+                   String privilegeLevel, String Usersid, boolean visibleWindowInfo) {
         this.uuid = uuid;
         this.type = type;
         this.cid = cid;
@@ -124,9 +124,9 @@ public class Subject {
         this.cmdLine = cmdLine;
     }
 
-    public void setVisibleWindowInfo(String visibleWindowInfo){this.visibleWindowInfo = visibleWindowInfo;}
+    public void setVisibleWindowInfo(boolean visibleWindowInfo){this.visibleWindowInfo = visibleWindowInfo;}
 
-    public String getVisibleWindowInfo(){return this.visibleWindowInfo;}
+    public boolean getVisibleWindowInfo(){return this.visibleWindowInfo;}
 
 //    public String getPrivilegeLevel() {
 //        return privilegeLevel;

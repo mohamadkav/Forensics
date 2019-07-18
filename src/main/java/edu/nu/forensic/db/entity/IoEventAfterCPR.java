@@ -37,6 +37,8 @@ public class IoEventAfterCPR {
 
     private String names;
 
+    private boolean needWritingToObjectTable;
+
 //    private Long location;
 //
 //    private Long size;
@@ -56,6 +58,19 @@ public class IoEventAfterCPR {
         this.startTimestampNanos = startTimestampNanos;
         this.endTimestampNanos = endTimestampNanos;
         this.names = names;
+    }
+
+    public IoEventAfterCPR(UUID id, String type, Integer threadId, UUID subjectUUID, String predicateObjectPath,
+                           long startTimestampNanos, long endTimestampNanos, String names, boolean writeToObjectTable) {
+        this.id = id;
+        this.type = type;
+        this.threadId = threadId;
+        this.subjectUUID = subjectUUID;
+        this.predicateObjectPath = predicateObjectPath;
+        this.startTimestampNanos = startTimestampNanos;
+        this.endTimestampNanos = endTimestampNanos;
+        this.names = names;
+        this.needWritingToObjectTable = writeToObjectTable;
     }
 
     public UUID getId() {
@@ -117,4 +132,8 @@ public class IoEventAfterCPR {
     public void setNames(String names) {
         this.names = names;
     }
+
+    public boolean getNeedToWrite(){return this.needWritingToObjectTable;}
+
+    public void setNeedWritingToObjectTable(boolean needWritingToObjectTable){this.needWritingToObjectTable = needWritingToObjectTable;}
 }

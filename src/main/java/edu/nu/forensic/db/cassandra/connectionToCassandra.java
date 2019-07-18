@@ -33,6 +33,7 @@ public class connectionToCassandra {
     private PreparedStatement psta;
     private PreparedStatement pstaObject;
     private PreparedStatement pstaEvent;
+    private PreparedStatement pstaNetwork;
 
     public connectionToCassandra(String nodeIP, String machineNum) {
         cluster = Cluster.builder().addContactPoint(nodeIP).build();
@@ -44,12 +45,12 @@ public class connectionToCassandra {
 
     private void createSubjectTable(){
         String sql = "CREATE TABLE IF NOT EXISTS test.subject"+machineNumber+" (" +
-                "uuid varchar PRIMARY KEY," +
+                "uuid uuid PRIMARY KEY," +
                 "name varchar," +
-                "timestamp varchar," +
-                "parentuuid varchar," +
+                "timestamp bigint," +
+                "parentuuid uuid," +
                 "Usersid varchar," +
-                "visibleWindow varchar)";
+                "visibleWindow boolean)";
         getSession().execute(sql);
         String insertDB = "insert into test.subject"+machineNumber+"(uuid ,name,timestamp,parentuuid,Usersid,visibleWindow) " +
                 "values(?,?,?,?,?,?)";
@@ -58,32 +59,41 @@ public class connectionToCassandra {
 
     private void createEventAndObjectTable(){
         String sqlEvent = "CREATE TABLE IF NOT EXISTS test.event"+machineNumber+" (" +
-                "uuid varchar PRIMARY KEY," +
-                "subjectuuid varchar," +
-                "objectuuid varchar," +
+                "timestamp bigint PRIMARY KEY," +
+                "subjectuuid uuid," +
+                "objectuuid uuid," +
                 "eventName varchar," +
-                "tid varchar," +
-                "timestamp varchar)";
+                "tid int)";
         getSession().execute(sqlEvent);
         String insertDBEvent = "insert into test.event"+machineNumber+"" +
-                "(uuid,subjectuuid,objectuuid,eventName,tid,timestamp) " +
-                "values(?,?,?,?,?,?)";
+                "(timestamp,subjectuuid,objectuuid,eventName,tid) " +
+                "values(?,?,?,?,?)";
         this.pstaEvent = getSession().prepare(insertDBEvent);
 
 
         //store entities
         String sqlObject = "CREATE TABLE IF NOT EXISTS test.object"+machineNumber+" (" +
-                "uuid varchar PRIMARY KEY," +
-                "mark varchar," +
-                "daddress varchar," +
-                "dport varchar," +
-                "saddress varchar," +
-                "sport varchar," +
+                "timestamp bigint PRIMARY KEY," +
+                "uuid uuid," +
                 "name varchar)";
         getSession().execute(sqlObject);
-        String insertDBObject = "insert into test.object"+machineNumber+"(uuid,mark,daddress,dport,saddress,sport,name) " +
-                "values(?,?,?,?,?,?,?)";
+        String insertDBObject = "insert into test.object"+machineNumber+"(timestamp,uuid,name) " +
+                "values(?,?,?)";
         this.pstaObject = getSession().prepare(insertDBObject);
+
+        String sqlNetwork = "CREATE TABLE IF NOT EXISTS test.network"+machineNumber+" (" +
+                "timestamp bigint PRIMARY KEY,"+
+                "subjectuuid uuid,"+
+                "eventName varchar,"+
+                "tid int,"+
+                "daddress varchar," +
+                "dport int," +
+                "saddress varchar," +
+                "sport int)";
+        getSession().execute(sqlNetwork);
+        String insertDBNetwork = "insert into test.network"+machineNumber+"(timestamp,subjectuuid,eventName,tid,daddress,dport,saddress,sport) " +
+                "values(?,?,?,?,?,?,?,?)";
+        this.pstaNetwork = getSession().prepare(insertDBNetwork);
     }
 
     public void insertSubjectData(Set<Subject> subjectList) {
@@ -94,8 +104,8 @@ public class connectionToCassandra {
                 BoundStatement boundSta = new BoundStatement(psta);
                 // you can see BatchStatement as a stl, boundSta is the class that can only be stored into batchStatement;
                 // boundSta.bind means add data according to psta's format;
-                boundSta.bind(subject.getUuid().toString(), subject.getCmdLine(), String.valueOf(subject.getStartTimestampNanos()),
-                        subject.getParentSubject()==null?null:subject.getParentSubject().toString(),
+                boundSta.bind(subject.getUuid(), subject.getCmdLine(), subject.getStartTimestampNanos(),
+                        subject.getParentSubject()==null?null:subject.getParentSubject(),
                         subject.getUsersid(), subject.getVisibleWindowInfo());
                 batchStatement.add(boundSta);
                 ++i;
@@ -104,6 +114,7 @@ public class connectionToCassandra {
                     batchStatement = new BatchStatement();
                 }
             }
+            getSession().execute(batchStatement);
             System.out.println("successful insertion！");
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -117,17 +128,19 @@ public class connectionToCassandra {
         //store event
             BatchStatement batchStatementEvent = new BatchStatement();
             BatchStatement batchStatementObject = new BatchStatement();
+
             int i = 0;
             for(IoEventAfterCPR event: eventList){
                 BoundStatement boundStaEvent = new BoundStatement(pstaEvent);
-                boundStaEvent.bind(UUID.randomUUID().toString(), event.getSubjectUUID().toString(), event.getId().toString(),
-                        event.getType(), String.valueOf(event.getThreadId()), String.valueOf(event.getStartTimestampNanos()));
+                boundStaEvent.bind(event.getStartTimestampNanos(), event.getSubjectUUID(), event.getId(), event.getType(), event.getThreadId());
                 batchStatementEvent.add(boundStaEvent);
 
-                BoundStatement boundStaObject = new BoundStatement(pstaObject);
-                boundStaObject.bind(event.getId().toString(),"N","1", "2", "3", "4", event.getPredicateObjectPath());
-                batchStatementObject.add(boundStaObject);
                 ++i;
+                if(event.getNeedToWrite()){
+                    BoundStatement boundStaObject = new BoundStatement(pstaObject);
+                    boundStaObject.bind(event.getStartTimestampNanos(), event.getId(), event.getPredicateObjectPath());
+                    batchStatementObject.add(boundStaObject);
+                }
                 if(i%50==0) {
                     getSession().execute(batchStatementEvent);
                     getSession().execute(batchStatementObject);
@@ -135,7 +148,10 @@ public class connectionToCassandra {
                     batchStatementEvent = new BatchStatement();
                 }
             }
-            System.out.println("successful insertion！");
+            getSession().execute(batchStatementEvent);
+            getSession().execute(batchStatementObject);
+            System.out.println("event successful insertion！");
+
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -147,31 +163,23 @@ public class connectionToCassandra {
             //store event
             BatchStatement batchStatementEvent = new BatchStatement();
 
-            //store entities
-            BatchStatement batchStatementObject = new BatchStatement();
-
             int i = 0;
             for(NetFlowObject netFlowObject: networkList){
-                BoundStatement boundStaEvent = new BoundStatement(pstaEvent);
-                boundStaEvent.bind(UUID.randomUUID().toString(), netFlowObject.getSubjectUUID().toString(), netFlowObject.getId().toString(),
-                        netFlowObject.getType(), String.valueOf(netFlowObject.getThreadId()), String.valueOf(netFlowObject.getStartTimestampNanos()));
+                BoundStatement boundStaEvent = new BoundStatement(pstaNetwork);
+                boundStaEvent.bind(netFlowObject.getStartTimestampNanos(), netFlowObject.getSubjectUUID(), netFlowObject.getType(),
+                        netFlowObject.getThreadId(), netFlowObject.getRemoteAddress(), netFlowObject.getRemotePort(),
+                        netFlowObject.getLocalAddress(), netFlowObject.getLocalPort());
                 batchStatementEvent.add(boundStaEvent);
 
-                BoundStatement boundStaObject = new BoundStatement(pstaObject);
-                boundStaObject.bind(netFlowObject.getId().toString(),"Y",netFlowObject.getRemoteAddress(), String.valueOf(netFlowObject.getRemotePort()),
-                        netFlowObject.getLocalAddress(), String.valueOf(netFlowObject.getLocalPort()), "network");
-                batchStatementObject.add(boundStaObject);
                 ++i;
                 if(i%50==0) {
                     getSession().execute(batchStatementEvent);
-                    getSession().execute(batchStatementObject);
-                    batchStatementObject = new BatchStatement();
                     batchStatementEvent = new BatchStatement();
                 }
             }
-            System.out.println("successful insertion！");
+            getSession().execute(batchStatementEvent);
+            System.out.println("network events successful insertion！");
         } catch (Exception e) {
-
             e.printStackTrace();
             System.exit(1);
         }
@@ -180,6 +188,6 @@ public class connectionToCassandra {
     public void close() {
         cluster.close();
         Map<Integer, Integer> count = new LinkedHashMap<>();
-        System.out.println("程序正常关闭！");
+        System.out.println("closed！");
     }
 }
