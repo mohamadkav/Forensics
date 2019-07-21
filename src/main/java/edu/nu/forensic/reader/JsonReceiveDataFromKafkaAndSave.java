@@ -155,6 +155,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                         String eventName = jsonObject.get("CallStack").getAsString();
                         int tid = jsonObject.get("threadID").getAsInt();
                         long timeStamp = jsonObject.get("TimeStamp").getAsLong();
+                        // use map uuid
                         Event event=new Event(UUID.randomUUID(),eventName,tid,tidToUUID.get(tid),null,timeStamp,eventName,false);
                         eventList.add(event);
                         if(eventList.size()>10000) {
@@ -200,7 +201,6 @@ class JsonReceiverThread extends Thread implements Runnable{
                         long timeStamp = jsonObject.get("TimeStamp").getAsLong();
                         String filename = jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString();
                         UUID uuid = UUID.randomUUID();
-                        //k = true means the map includes this key-value;
                         Event event;
                         if(fileNameToUUID.containsKey(filename)){
                             uuid = fileNameToUUID.get(filename);
@@ -278,7 +278,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                         Integer localPort = jsonObject.get("arguments").getAsJsonObject().get("sport").getAsInt();
                         Integer remotePort = jsonObject.get("arguments").getAsJsonObject().get("dport").getAsInt();
                         NetFlowObject netFlowObject = new NetFlowObject(
-                                transferIntIPToStringIP(localAddress), localPort, transferIntIPToStringIP(remoteAddress), remotePort,
+                                localAddress, localPort, remoteAddress, remotePort,
                                 tidToUUID.get(tid), timeStamp, eventName, tid);
                         netList.add(netFlowObject);
                         if(netList.size()>10000) {

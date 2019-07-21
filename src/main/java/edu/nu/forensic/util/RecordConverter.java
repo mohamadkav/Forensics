@@ -69,8 +69,8 @@ public class RecordConverter {
         return fileObjectRepository.save(fileObject);
     }
     public NetFlowObject saveAndConvertBBNNetFlowObjectToNetFlowObject(com.bbn.tc.schema.avro.cdm19.NetFlowObject bbnNetFlowObject){
-        NetFlowObject netFlowObject=new NetFlowObject(UUID.nameUUIDFromBytes(bbnNetFlowObject.getUuid().bytes()),bbnNetFlowObject.getLocalAddress()!=null?bbnNetFlowObject.getLocalAddress().toString():
-                null,bbnNetFlowObject.getLocalPort(),bbnNetFlowObject.getRemoteAddress()!=null?bbnNetFlowObject.getRemoteAddress().toString():null,bbnNetFlowObject.getRemotePort(),
+        NetFlowObject netFlowObject=new NetFlowObject(UUID.nameUUIDFromBytes(bbnNetFlowObject.getUuid().bytes()),bbnNetFlowObject.getLocalAddress()!=null?Integer.getInteger(bbnNetFlowObject.getLocalAddress().toString()):
+                null,bbnNetFlowObject.getLocalPort(),bbnNetFlowObject.getRemoteAddress()!=null?Integer.getInteger(bbnNetFlowObject.getRemoteAddress().toString()):null,bbnNetFlowObject.getRemotePort(),
                 bbnNetFlowObject.getIpProtocol());
         return netFlowObjectRepository.save(netFlowObject);
     }

@@ -15,6 +15,8 @@ public class Event {
 
     private String type;
 
+    private Integer typeNum;
+
     private Integer threadId;
 
 //    @ManyToOne
@@ -37,6 +39,7 @@ public class Event {
     private String names;
 
     private boolean needWritingToObjectTable;
+
 //    private Long location;
 //
 //    private Long size;
@@ -49,6 +52,17 @@ public class Event {
     public Event(UUID id, String type, Integer threadId, UUID subject, String predicateObjectPath, long timestampNanos, String names, boolean needWritingToObjectTable) {
         this.id = id;
         this.type = type;
+        this.threadId = threadId;
+        this.subjectUUID = subject;
+        this.predicateObjectPath = predicateObjectPath;
+        this.timestampNanos = timestampNanos;
+        this.names = names;
+        this.needWritingToObjectTable=needWritingToObjectTable;
+    }
+
+    public Event(UUID id, Integer typeNum, Integer threadId, UUID subject, String predicateObjectPath, long timestampNanos, String names, boolean needWritingToObjectTable) {
+        this.id = id;
+        this.typeNum = typeNum;
         this.threadId = threadId;
         this.subjectUUID = subject;
         this.predicateObjectPath = predicateObjectPath;
@@ -72,6 +86,10 @@ public class Event {
     public void setType(String type) {
         this.type = type;
     }
+
+    public int getTypeNum(){return typeNum;}
+
+    public void setTypeNum(Integer typeNum){this.typeNum = typeNum;}
 
     public Integer getThreadId() {
         return threadId;

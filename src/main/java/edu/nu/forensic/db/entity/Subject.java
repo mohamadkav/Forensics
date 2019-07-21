@@ -16,6 +16,8 @@ public class Subject {
 
     private String type;
 
+    private Integer typeNum;
+
     private int cid;
 
  //   @ManyToOne
@@ -55,12 +57,22 @@ public class Subject {
         this.type = type;
         this.cid = cid;
         this.parentSubjectUUID = parentSubject;
-        // this.localPrincipal = localPrincipal;
         this.startTimestampNanos = startTimestampNanos;
         this.cmdLine = cmdLine;
         this.Usersid = Usersid;
         this.visibleWindowInfo = visibleWindowInfo;
-        //   this.privilegeLevel = privilegeLevel;
+    }
+
+    public Subject(UUID uuid, Integer typeNum, int cid, UUID parentSubject,  Long startTimestampNanos, String cmdLine,
+                   String Usersid, boolean visibleWindowInfo) {
+        this.uuid = uuid;
+        this.typeNum = typeNum;
+        this.cid = cid;
+        this.parentSubjectUUID = parentSubject;
+        this.startTimestampNanos = startTimestampNanos;
+        this.cmdLine = cmdLine;
+        this.Usersid = Usersid;
+        this.visibleWindowInfo = visibleWindowInfo;
     }
 
     public UUID getUuid() {
@@ -78,6 +90,10 @@ public class Subject {
     public void setType(String type) {
         this.type = type;
     }
+
+    public Integer getTypeNum(){return typeNum;}
+
+    public void setTypeNum(Integer typeNum){this.typeNum = typeNum;}
 
     public int getCid() {
         return cid;

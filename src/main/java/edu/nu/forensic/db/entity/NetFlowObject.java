@@ -9,17 +9,19 @@ import java.util.UUID;
 public class NetFlowObject extends Object{
     private UUID id;
 
-    private String localAddress;
+    private Integer localAddress;
 
     private Integer localPort;
 
-    private String remoteAddress;
+    private Integer remoteAddress;
 
     private Integer remotePort;
 
     private Integer ipProtocol;
 
     private String type;
+
+    private Integer typeNum;
 
     private Integer threadId;
 
@@ -28,7 +30,7 @@ public class NetFlowObject extends Object{
 
     private long startTimestampNanos;
 
-    public NetFlowObject(UUID id, String localAddress, Integer localPort, String remoteAddress, Integer remotePort, Integer ipProtocol) {
+    public NetFlowObject(UUID id, Integer localAddress, Integer localPort, Integer remoteAddress, Integer remotePort, Integer ipProtocol) {
         this.setId(id);
         this.localAddress = localAddress;
         this.localPort = localPort;
@@ -37,7 +39,7 @@ public class NetFlowObject extends Object{
         this.ipProtocol = ipProtocol;
     }
 
-    public NetFlowObject(String localAddress, Integer localPort, String remoteAddress, Integer remotePort,
+    public NetFlowObject(Integer localAddress, Integer localPort, Integer remoteAddress, Integer remotePort,
                          UUID subjectUUID, long startTimestampNanos, String type, Integer threadId) {
         this.localAddress = localAddress;
         this.localPort = localPort;
@@ -46,6 +48,18 @@ public class NetFlowObject extends Object{
         this.subjectUUID = subjectUUID;
         this.startTimestampNanos = startTimestampNanos;
         this.type = type;
+        this.threadId = threadId;
+    }
+
+    public NetFlowObject(Integer localAddress, Integer localPort, Integer remoteAddress, Integer remotePort,
+                         UUID subjectUUID, long startTimestampNanos, Integer typeNum, Integer threadId) {
+        this.localAddress = localAddress;
+        this.localPort = localPort;
+        this.remoteAddress = remoteAddress;
+        this.remotePort = remotePort;
+        this.subjectUUID = subjectUUID;
+        this.startTimestampNanos = startTimestampNanos;
+        this.typeNum = typeNum;
         this.threadId = threadId;
     }
 
@@ -67,6 +81,10 @@ public class NetFlowObject extends Object{
     public void setType(String type) {
         this.type = type;
     }
+
+    public Integer getTypeNum(){return typeNum;}
+
+    public void setTypeNum(Integer typeNum){this.typeNum = typeNum;}
 
     public Integer getThreadId() {
         return threadId;
@@ -90,11 +108,11 @@ public class NetFlowObject extends Object{
         this.subjectUUID = subjectUUID;
     }
 
-    public String getLocalAddress() {
+    public Integer getLocalAddress() {
         return localAddress;
     }
 
-    public void setLocalAddress(String localAddress) {
+    public void setLocalAddress(int localAddress) {
         this.localAddress = localAddress;
     }
 
@@ -106,11 +124,11 @@ public class NetFlowObject extends Object{
         this.localPort = localPort;
     }
 
-    public String getRemoteAddress() {
+    public int getRemoteAddress() {
         return remoteAddress;
     }
 
-    public void setRemoteAddress(String remoteAddress) {
+    public void setRemoteAddress(int remoteAddress) {
         this.remoteAddress = remoteAddress;
     }
 

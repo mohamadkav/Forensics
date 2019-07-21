@@ -3,10 +3,7 @@ package edu.nu.forensic.util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.nu.forensic.db.cassandra.connectionToCassandra;
-import edu.nu.forensic.db.entity.Event;
-import edu.nu.forensic.db.entity.IoEventAfterCPR;
-import edu.nu.forensic.db.entity.NetFlowObject;
-import edu.nu.forensic.db.entity.Subject;
+import edu.nu.forensic.db.entity.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,7 +27,7 @@ public class TestMain {
         long start = System.currentTimeMillis();
         String file = "E:\\download\\2019-05-19-19-25-47.out";
         String machineNum = "2";
-        String IPaddress = "10.214.148.122";
+        String IPaddress = "10.214.148.128";
         String line = null;
         List<Subject> subjectList = new ArrayList<>();
         Map<Integer, UUID> pidToUUID = new HashMap<>();
@@ -39,13 +36,36 @@ public class TestMain {
         Map<String, UUID> FileNameToUUID = new HashMap<>();
         List<NetFlowObject> netList = new ArrayList<>();
         Set<String> eventNames = new HashSet<>();
+        Map<Integer, UUID> tidToUUID = new HashMap<>();
+        Map<String, Integer> eventNameToNum = EventNameToNum.FileIoDelete.getEventNameToNum();
         connectionToCassandra connectionToCassandra = new connectionToCassandra(IPaddress, machineNum);
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(file)));
         while((line = bufferedReader.readLine())!=null){
             try {
                 JsonObject jsonObject = new JsonParser().parse(line).getAsJsonObject();
                 if(line.contains("CallStack")){
-                    //To do: handle Keylogger and ScreenGrab
+                    String eventName = jsonObject.get("CallStack").getAsString();
+                    int tid = jsonObject.get("threadID").getAsInt();
+                    long timeStamp = jsonObject.get("TimeStamp").getAsLong();
+                    // use map uuid
+                    while(eventName.contains(",")){
+                        int k = eventName.indexOf(",");
+                        String tempEventName = eventName.substring(0,k);
+                        Event event=new Event(UUID.randomUUID(),eventNameToNum.get(tempEventName),tid,tidToUUID.get(tid),null,
+                                timeStamp,eventName,false);
+                        eventList.add(event);
+                        ++timeStamp;
+                        eventName = eventName.substring(k+1);
+                        System.out.println(eventName);
+                        System.out.println(tempEventName);
+                    }
+                    Event event=new Event(UUID.randomUUID(),eventNameToNum.get(eventName),tid,tidToUUID.get(tid),null,
+                            timeStamp,eventName,false);
+                    eventList.add(event);
+                    if(eventList.size()>10000) {
+                        connectionToCassandra.insertEventData(eventList);
+                        eventList=new ArrayList<>();
+                    }
                     continue;
                 }
                 String eventName = jsonObject.get("EventName").getAsString();
@@ -57,9 +77,9 @@ public class TestMain {
                     UUID uuid = UUID.randomUUID();
                     if(pidToUUID.containsKey(pid)) uuid = pidToUUID.get(pid);
                     else pidToUUID.put(pid, uuid);
-                    Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, "SUBJECT_PROCESS",
-                            pid, !pidToUUID.containsKey(parentPid)?null:pidToUUID.get(parentPid), null, timeStamp,
-                            jsonObject.get("arguments").getAsJsonObject().get("CommandLine").getAsString(), null,
+                    Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, eventNameToNum.get(eventName),
+                            pid, !pidToUUID.containsKey(parentPid)?null:pidToUUID.get(parentPid),  timeStamp,
+                            jsonObject.get("arguments").getAsJsonObject().get("CommandLine").getAsString(),
                             jsonObject.get("arguments").getAsJsonObject().get("UserSID").getAsString(),
                             visibleWindowPid.contains(pid)?true:false);
                     subjectList.add(subject);
@@ -82,12 +102,12 @@ public class TestMain {
                     if(FileNameToUUID.containsKey(filename)){
                         uuid = FileNameToUUID.get(filename);
                         FileNameToUUID.remove(filename);
-                        event = new Event(uuid, eventName, tid,
+                        event = new Event(uuid, eventNameToNum.get(eventName), tid,
                                 pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
                                 filename, timeStamp, "names", false);
                     }
                     else{
-                        event = new Event(uuid, eventName, tid,
+                        event = new Event(uuid, eventNameToNum.get(eventName), tid,
                                 pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
                                 filename, timeStamp, "names", true);
                     }
@@ -96,7 +116,7 @@ public class TestMain {
                     if(eventName.contains("FileIoRename")){
                         String newFileName = jsonObject.get("arguments").getAsJsonObject().get("NewFileName").getAsString();
                         FileNameToUUID.put(newFileName, uuid);
-                        Event newEvent = new Event(uuid, eventName, tid,
+                        Event newEvent = new Event(uuid, eventNameToNum.get(eventName), tid,
                                 pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
                                 newFileName, timeStamp,"names", true);
                         eventList.add(newEvent);
@@ -119,12 +139,12 @@ public class TestMain {
                     Event event;
                     if(FileNameToUUID.containsKey(filename)) {
                         uuid = FileNameToUUID.get(filename);
-                        event = new Event(uuid, eventName, tid,
+                        event = new Event(uuid, eventNameToNum.get(eventName), tid,
                                 pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
                                 filename, timeStamp, "names", false);
                     }
                     else{
-                        event = new Event(uuid, eventName, tid,
+                        event = new Event(uuid, eventNameToNum.get(eventName), tid,
                                 pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
                                 filename, timeStamp, "names", true);
                         FileNameToUUID.put(filename, uuid);
@@ -143,15 +163,14 @@ public class TestMain {
                 else if(eventName.contains("TcpIp")||eventName.contains("UdpIp")){
                     int tid = jsonObject.get("threadID").getAsInt();
                     long timeStamp = jsonObject.get("TimeStamp").getAsLong();
-                    boolean k = false;
                     Integer localAddress = jsonObject.get("arguments").getAsJsonObject().get("saddr").getAsInt();
                     Integer remoteAddress = jsonObject.get("arguments").getAsJsonObject().get("daddr").getAsInt();
                     Integer localPort = jsonObject.get("arguments").getAsJsonObject().get("sport").getAsInt();
                     Integer remotePort = jsonObject.get("arguments").getAsJsonObject().get("dport").getAsInt();
                     NetFlowObject netFlowObject = new NetFlowObject(
-                            transferIntIPToStringIP(localAddress), localPort, transferIntIPToStringIP(remoteAddress), remotePort,
+                            localAddress, localPort, remoteAddress, remotePort,
                             pidToUUID.containsKey(jsonObject.get("processID").getAsInt())?pidToUUID.get(jsonObject.get("processID").getAsInt()):UUID.randomUUID(),
-                            timeStamp, eventName, tid);
+                            timeStamp, eventNameToNum.get(eventName), tid);
                     netList.add(netFlowObject);
                     if(netList.size()>10000) {
                         System.out.println("Saving network... ");
