@@ -40,9 +40,12 @@ public class TestMain {
         Map<String, Integer> eventNameToNum = EventNameToNum.FileIoDelete.getEventNameToNum();
         connectionToCassandra connectionToCassandra = new connectionToCassandra(IPaddress, machineNum);
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(file)));
+
         while((line = bufferedReader.readLine())!=null){
             try {
+
                 JsonObject jsonObject = new JsonParser().parse(line).getAsJsonObject();
+
                 if(line.contains("CallStack")){
                     String eventName = jsonObject.get("CallStack").getAsString();
                     int tid = jsonObject.get("threadID").getAsInt();
@@ -68,7 +71,9 @@ public class TestMain {
                     }
                     continue;
                 }
+
                 String eventName = jsonObject.get("EventName").getAsString();
+
                 if(eventName.contains("ProcessStart")||eventName.contains("ProcessDCStart")){
                     int pid = jsonObject.get("arguments").getAsJsonObject().get("ProcessId").getAsInt();
                     int parentPid = jsonObject.get("processID").getAsInt();
@@ -190,6 +195,7 @@ public class TestMain {
                 e.printStackTrace();
             }
         }
+
         connectionToCassandra.insertEventData(eventList);
         connectionToCassandra.insertSubjectData(subjectList);
         connectionToCassandra.insertNetworkEvent(netList);

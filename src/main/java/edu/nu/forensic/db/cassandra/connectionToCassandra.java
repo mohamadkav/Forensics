@@ -40,11 +40,13 @@ public class connectionToCassandra {
     private int ttl = 8640000;
 
     public connectionToCassandra(String nodeIP, String machineNum) {
-        cluster = Cluster.builder().addContactPoint(nodeIP).build();
-        setSession(cluster.connect());
-        this.machineNumber = machineNum;
+        cluster = Cluster.builder().addContactPoint(nodeIP).build();    // we add this IP:contact into cassandra cluster
+        setSession(cluster.connect());  // generate and initialize a new conversation and use session to record connection
+        this.machineNumber = machineNum;    // machine Number used to identify this thread
         createSubjectTable();
         createEventAndObjectTable();
+        // 1.create table subject+threadID\event+threadID\object+threadID\network+threadID under keyspace test
+        // 2.create prepared statement for each table so as to use model conveniently
     }
 
     private void createSubjectTable(){
@@ -58,7 +60,6 @@ public class connectionToCassandra {
                 "visibleWindow boolean)" +
                 " WITH default_time_to_live = "+ttl +
                 " and compaction = {'class':'org.apache.cassandra.db.compaction.DateTieredCompactionStrategy'};";
-        System.out.println(sql.substring(1,194));
         getSession().execute(sql);
         String insertDB = "insert into test.subject"+machineNumber+"(uuid ,name,timestamp,parentuuid,Usersid,eventName,visibleWindow) " +
                 "values(?,?,?,?,?,?,?)";
