@@ -39,6 +39,7 @@ public class TestMain {
         Map<Integer, UUID> tidToUUID = new HashMap<>();
         Map<String, Integer> eventNameToNum = EventNameToNum.FileIoDelete.getEventNameToNum();
         connectionToCassandra connectionToCassandra = new connectionToCassandra(IPaddress, machineNum);
+
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(file)));
 
         while((line = bufferedReader.readLine())!=null){
@@ -80,7 +81,10 @@ public class TestMain {
                     long timeStamp = jsonObject.get("TimeStamp").getAsLong();
 //                    UUID uuid = UUID.fromString(machineNum+"-"+pid+"-"+timeStamp+"-"+pid+"-"+machineNum);
                     UUID uuid = UUID.randomUUID();
-                    if(pidToUUID.containsKey(pid)) uuid = pidToUUID.get(pid);
+                    if(pidToUUID.containsKey(pid)) {
+                        uuid = pidToUUID.get(pid);
+                        System.out.println(line);
+                    }
                     else pidToUUID.put(pid, uuid);
                     Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, eventNameToNum.get(eventName),
                             pid, !pidToUUID.containsKey(parentPid)?null:pidToUUID.get(parentPid),  timeStamp,

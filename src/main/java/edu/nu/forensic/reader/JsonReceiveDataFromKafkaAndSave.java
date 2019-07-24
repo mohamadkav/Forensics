@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import edu.nu.forensic.db.cassandra.connectionToCassandra;
 import edu.nu.forensic.db.entity.Event;
+import edu.nu.forensic.db.entity.EventNameToNum;
 import edu.nu.forensic.db.entity.NetFlowObject;
 import edu.nu.forensic.db.entity.Subject;
 import edu.nu.forensic.reducer.CPRStandAloneReducer;
@@ -76,7 +77,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                 consumed++; // use consumed to flag record number
                 if(consumed%10000==0)   // each 10000 records reported
                     System.err.println("Thread "+threadId+" consumed "+consumed);
-                String line=record.values(); // use String line to hold record
+                String line = record.value(); // use String line to hold record
                 try {
                     JsonObject jsonObject = new JsonParser().parse(line).getAsJsonObject(); // and parse line into JsonObject (each record in the form of a JsonObject)
 
@@ -88,12 +89,14 @@ class JsonReceiverThread extends Thread implements Runnable{
                         while(eventName.contains(",")){ // parse eventname, which may be composed of several strings and seperated by ','
                             int k = eventName.indexOf(",");
                             String tempEventName = eventName.substring(0, k);
-                            Event event = new Event(UUID.randomUUID(), eventNameToNum.get(tempEventName), tid, tidToUUID.get(tid), null, timeStamp, eventName, false);
+                            Event event = new Event(UUID.randomUUID(), eventNameToNum.get(tempEventName), tid, tidToUUID.get(tid),
+                                    null, timeStamp, eventName, false);
                             eventList.add(event);
                             ++timeStamp;
                             eventName = eventName.substring(k+1);
                         }
-                        Event event = new Event(UUID.randomUUID(), eventNameToNum.get(tempEventName), tid, tidToUUID.get(tid), null, timeStamp, eventName, false);
+                        Event event = new Event(UUID.randomUUID(), eventNameToNum.get(eventName), tid, tidToUUID.get(tid),
+                                null, timeStamp, eventName, false);
                         eventList.add(event);   // eventList hold all seperate event
                         if(eventList.size()>10000) {    // every 10000 of event should be inserted and eventList should be cleared.
                             connectionToCassandra.insertEventData(eventList);
@@ -132,7 +135,8 @@ class JsonReceiverThread extends Thread implements Runnable{
                         // feasible for thread, but inadequate for process. MARK. all threads belonging to process should be terminated. pls. delete process from pidToUUID
                         int tid = jsonObject.get("threadID").getAsInt();
                         long timeStamp = jsonObject.get("TimeStamp").getAsLong();
-                        Event event=new Event(UUID.randomUUID(),eventName,tid,tidToUUID.get(tid),null,timeStamp,eventName,false);
+                        Event event=new Event(UUID.randomUUID(),eventName,tid,tidToUUID.get(tid),
+                                null,timeStamp,eventName,false);
                         eventList.add(event);
                         if(eventList.size()>10000) {
                             connectionToCassandra.insertEventData(eventList);
@@ -223,7 +227,8 @@ class JsonReceiverThread extends Thread implements Runnable{
                         long timeStamp = jsonObject.get("TimeStamp").getAsLong();
                         String filename = jsonObject.get("arguments").getAsJsonObject().get("FileName").getAsString();
 
-                        Event event=new Event(UUID.randomUUID(), eventNameToNum.get(eventName), tid, tidToUUID.get(tid), filename, timeStamp, eventName, false);
+                        Event event=new Event(UUID.randomUUID(), eventNameToNum.get(eventName), tid, tidToUUID.get(tid),
+                                filename, timeStamp, eventName, false);
                         eventList.add(event);
                         if(eventList.size()>10000) {
                             System.out.println("Saving file... ");
@@ -239,8 +244,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                         Integer localPort = jsonObject.get("arguments").getAsJsonObject().get("sport").getAsInt();
                         Integer remotePort = jsonObject.get("arguments").getAsJsonObject().get("dport").getAsInt();
 
-                        NetFlowObject netFlowObject = new NetFlowObject(
-                                localAddress, localPort, remoteAddress, remotePort,
+                        NetFlowObject netFlowObject = new NetFlowObject(localAddress, localPort, remoteAddress, remotePort,
                                 tidToUUID.get(tid), timeStamp, eventNameToNum.get(eventName), tid);
 
                         netList.add(netFlowObject);
@@ -260,9 +264,8 @@ class JsonReceiverThread extends Thread implements Runnable{
                         long timeStamp = jsonObject.get("TimeStamp").getAsLong();
                         UUID uuid = UUID.randomUUID();
                         tidToUUID.put(tid, uuid);
-                        Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, eventNameToNum.get(eventName),
-                                tid, !pidToUUID.containsKey(parentPid)?null:pidToUUID.get(parentPid), null, timeStamp,
-                                null, null);
+                        Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, eventNameToNum.get(eventName), tid,
+                                !pidToUUID.containsKey(parentPid)?null:pidToUUID.get(parentPid),  timeStamp,"thread", null, false);
                         subjectList.add(subject);
                         if(subjectList.size()>10000) {
                             connectionToCassandra.insertSubjectData(subjectList);
@@ -284,9 +287,6 @@ class JsonReceiverThread extends Thread implements Runnable{
             );
             consumer.commitAsync();
         }
-        connectionToCassandra.insertEventData(eventList);
-        connectionToCassandra.insertSubjectData(subjectList);
-        connectionToCassandra.insertNetworkEvent(netList);
     }
     private static String transferIntIPToStringIP(Integer IP){
         String IP1 = String.valueOf(IP&0xff);
