@@ -60,8 +60,6 @@ public class TestMain {
                         eventList.add(event);
                         ++timeStamp;
                         eventName = eventName.substring(k+1);
-                        System.out.println(eventName);
-                        System.out.println(tempEventName);
                     }
                     Event event=new Event(UUID.randomUUID(),eventNameToNum.get(eventName),tid,tidToUUID.get(tid),null,
                             timeStamp,eventName,false);
@@ -81,11 +79,7 @@ public class TestMain {
                     long timeStamp = jsonObject.get("TimeStamp").getAsLong();
 //                    UUID uuid = UUID.fromString(machineNum+"-"+pid+"-"+timeStamp+"-"+pid+"-"+machineNum);
                     UUID uuid = UUID.randomUUID();
-                    if(pidToUUID.containsKey(pid)) {
-                        uuid = pidToUUID.get(pid);
-                        System.out.println(line);
-                    }
-                    else pidToUUID.put(pid, uuid);
+                    pidToUUID.put(pid, uuid);
                     Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, eventNameToNum.get(eventName),
                             pid, !pidToUUID.containsKey(parentPid)?null:pidToUUID.get(parentPid),  timeStamp,
                             jsonObject.get("arguments").getAsJsonObject().get("CommandLine").getAsString(),
