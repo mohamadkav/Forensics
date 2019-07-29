@@ -1,6 +1,7 @@
 package edu.nu.forensic.reducer;
 
 import edu.nu.forensic.db.entity.Event;
+import edu.nu.forensic.etw.EtwEventType;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +16,7 @@ public class CPRStandAloneReducer {
     private HashMap<String, HashMap<String, Stack<Event>>> stackMaps = new HashMap<>();
 
     public boolean canBeRemoved(Event event){
-        if(!event.getType().equals("FileIoRead")&& !event.getType().equals("FileIoWrite"))
+        if(event.getTypeNum()!= EtwEventType.FileIoRead.ordinal() && event.getTypeNum()!= EtwEventType.FileIoWrite.ordinal())
             return false;
         if(lastSavedEvent==null) {
             lastSavedEvent = event;
@@ -76,11 +77,11 @@ public class CPRStandAloneReducer {
             HashSet<Event> ioEventSubset = new HashSet<>();
             eventsEndAtKey.put(event.getThreadId().toString(), ioEventSubset);
         }
-        if (event.getType().equals("FileIoRead") ) {
+        if (event.getTypeNum()== EtwEventType.FileIoRead.ordinal() ) {
             eventsStartFromKey.get(event.getPredicateObjectPath()).add(event);
             eventsEndAtKey.get(event.getThreadId().toString()).add(event);
         }
-        else if (event.getNames().equals("FileIoWrite") ) {
+        else if (event.getTypeNum() == EtwEventType.FileIoWrite.ordinal()) {
             eventsStartFromKey.get(event.getThreadId().toString()).add(event);
             eventsEndAtKey.get(event.getPredicateObjectPath()).add(event);
         }
@@ -126,7 +127,7 @@ public class CPRStandAloneReducer {
     private boolean doStep2(Event event) {
         String u;
         String v;
-        if (event.getType().equals("FileIoRead") ) {
+        if (event.getTypeNum()!= EtwEventType.FileIoRead.ordinal()) {
             // fetch stack(file, thread)
             u = event.getPredicateObjectPath();
             v = event.getThreadId().toString();

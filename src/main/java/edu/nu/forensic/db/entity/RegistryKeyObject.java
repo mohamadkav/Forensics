@@ -1,17 +1,14 @@
 package edu.nu.forensic.db.entity;
 
 
-import javax.persistence.Entity;
 import java.util.UUID;
 
-@Entity
 public class RegistryKeyObject extends Object{
     private Long size;
 
     private String key;
 
     public RegistryKeyObject(UUID id,Long size, String key) {
-        this.setId(id);
         this.size = size;
         this.key = key;
     }

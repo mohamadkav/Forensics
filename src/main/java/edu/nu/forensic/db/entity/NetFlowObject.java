@@ -1,11 +1,8 @@
 package edu.nu.forensic.db.entity;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import java.util.UUID;
 
-@Entity
 public class NetFlowObject extends Object{
     private UUID id;
 

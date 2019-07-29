@@ -1,17 +1,8 @@
 package edu.nu.forensic.db.entity;
 
-import org.hibernate.annotations.Type;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import java.util.UUID;
 
-@Entity
 public class Subject {
-    @Id
-    @Type(type = "uuid-char")
     private UUID uuid;
 
     private String type;
@@ -28,7 +19,6 @@ public class Subject {
 
     private Long startTimestampNanos;
 
-    @Column(length = 2048)
     private String cmdLine;
 
     private String Usersid;
@@ -39,30 +29,6 @@ public class Subject {
 
     public Subject() {
     }
-
-    public Subject(UUID uuid, String type, int cid, UUID parentSubject, Principal localPrincipal, Long startTimestampNanos, String cmdLine, String privilegeLevel) {
-        this.uuid = uuid;
-        this.type = type;
-        this.cid = cid;
-        this.parentSubjectUUID = parentSubject;
-       // this.localPrincipal = localPrincipal;
-        this.startTimestampNanos = startTimestampNanos;
-        this.cmdLine = cmdLine;
-     //   this.privilegeLevel = privilegeLevel;
-    }
-
-    public Subject(UUID uuid, String type, int cid, UUID parentSubject, Principal localPrincipal, Long startTimestampNanos, String cmdLine,
-                   String privilegeLevel, String Usersid, boolean visibleWindowInfo) {
-        this.uuid = uuid;
-        this.type = type;
-        this.cid = cid;
-        this.parentSubjectUUID = parentSubject;
-        this.startTimestampNanos = startTimestampNanos;
-        this.cmdLine = cmdLine;
-        this.Usersid = Usersid;
-        this.visibleWindowInfo = visibleWindowInfo;
-    }
-
     public Subject(UUID uuid, Integer typeNum, int cid, UUID parentSubject,  Long startTimestampNanos, String cmdLine,
                    String Usersid, boolean visibleWindowInfo) {
         this.uuid = uuid;

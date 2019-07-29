@@ -26,21 +26,13 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-data-jpa")
-    compile("org.springframework.boot:spring-boot-starter-web")
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
-//    compile files("lib/tc-avro-1.0-SNAPSHOT-jar-with-dependencies.jar")
+    compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.6.0'
     compile group: 'org.apache.avro', name: 'avro', version: '1.9.0'
- //   compile group: 'org.apache.avro', name: 'avro-mapred', version: '1.7.7'
     compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13'
-  //  compile fileTree(dir: "/home/mohammad/Desktop/avro/dist/java", includes: ['*.jar'])
-    compile files("lib/tc-schema-1.0-SNAPSHOT.jar")
-// https://mvnrepository.com/artifact/com.datastax.cassandra/cassandra-driver-core
     compile group: 'com.datastax.cassandra', name: 'cassandra-driver-core', version: '3.7.1'
-    //  compile files("lib/tc-avro-1.0-SNAPSHOT-jar-with-dependencies.jar")
-  //  compile files("lib/kafkaclients-1.0-SNAPSHOT-jar-with-dependencies.jar")
     compile group: 'org.apache.kafka', name: 'kafka-clients', version: '2.1.0'
     testCompile("junit:junit")
 }

@@ -126,7 +126,6 @@ public class connectionToCassandra {
                 }
             }
             getSession().execute(batchStatement);
-            System.out.println("successful insertion！");
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -161,7 +160,6 @@ public class connectionToCassandra {
             }
             getSession().execute(batchStatementEvent);
             getSession().execute(batchStatementObject);
-            System.out.println("event successful insertion！");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -188,7 +186,6 @@ public class connectionToCassandra {
                 }
             }
             getSession().execute(batchStatementEvent);
-            System.out.println("network events successful insertion！");
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
