@@ -1,0 +1,156 @@
+1030727889 36 ThreadCSwitch
+1
+NewThreadId 0 4
+2429279289 67 FileIoRead
+4
+TTID 16 8
+FileObject 24 8
+FileKey 32 8
+FileName 40 0
+1030727889 1 ThreadStart
+2
+ProcessId 0 4
+TThreadId 4 4
+1030727889 3 ThreadDCStart
+2
+ProcessId 0 4
+TThreadId 4 4
+1030727889 2 ThreadEnd
+2
+ProcessId 0 4
+TThreadId 4 4
+749821213 3 ImageDCStart
+5
+ImageBase 0 8
+ImageSize 8 8
+ProcessId 16 4
+FileName 56 0
+Certificate 56 0
+2429279289 68 FileIoWrite
+4
+TTID 16 8
+FileObject 24 8
+FileKey 32 8
+FileName 40 0
+2429279289 32 FileIoFileCreate
+2
+FileObject 0 8
+FileName 8 0
+2429279289 0 FileIoName
+2
+FileObject 0 8
+FileName 8 0
+2429279289 64 FileIoCreate
+3
+FileObject 16 8
+ShareAccess 32 4
+FileName 40 0
+2429279289 71 FileIoRename
+5
+TTID 8 8
+FileObject 16 8
+FileKey 24 8
+OldFileName 32 0
+NewFileName 32 0
+749821213 10 ImageLoad
+5
+ImageBase 0 8
+ImageSize 8 8
+ProcessId 16 4
+FileName 56 0
+Certificate 56 0
+2586315456 11 TcpIpRecvIPV4
+5
+PID 0 4
+daddr 4 0
+saddr 4 0
+dport 4 0
+sport 4 0
+2586315456 13 TcpIpDisconnectIPV4
+5
+PID 0 4
+daddr 4 0
+saddr 4 0
+dport 4 0
+sport 4 0
+2586315456 10 TcpIpSendIPV4
+5
+PID 0 4
+daddr 4 0
+saddr 4 0
+dport 4 0
+sport 4 0
+1030727888 1 ProcessStart
+5
+ProcessId 8 4
+ParentId 12 4
+UserSID 48 0
+ImageFileName 48 0
+CommandLine 48 0
+1030727888 2 ProcessEnd
+2
+ProcessId 8 4
+ImageFileName 12 0
+1030727888 3 ProcessDCStart
+5
+ProcessId 8 4
+ParentId 12 4
+UserSID 48 0
+ImageFileName 48 0
+CommandLine 48 0
+3208270021 10 UdpIpSendIPV4
+5
+PID 0 4
+daddr 4 0
+saddr 4 0
+dport 4 0
+sport 4 0
+3208270021 11 UdpIpRecvIPV4
+5
+PID 0 4
+daddr 4 0
+saddr 4 0
+dport 4 0
+sport 4 0
+2586315456 12 TcpIpConnectIPV4
+5
+PID 0 4
+daddr 4 0
+saddr 4 0
+dport 4 0
+sport 4 0
+2429279289 66 FileIoClose
+3
+TTID 8 8
+FileObject 16 8
+FileKey 24 8
+2429279232 11 VisibleWindowInfo
+7
+Visible 0 4
+Toolbar 4 4
+Handle 8 8
+Left 16 8
+Top 24 8
+Right 32 8
+Bottom 40 8
+2429279235 12 FileMacroCheck
+2
+MacroResult 0 4
+FileName 4 0
+2429279235 13 IpConfig
+1
+Ip 0 0
+3740466758 32 Callstack
+0
+2429279289 70 FileIoDelete
+4
+TTID 8 8
+FileObject 16 8
+FileKey 24 8
+FileName 32 0
+2429279235 15 HealthCheck
+1
+CheckID 1 1
+2429279235 16 InitSignal
+1
+DeviceBootTime 1 1

@@ -18,6 +18,7 @@ import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.xerial.snappy.Snappy;
 
+import java.time.Duration;
 import java.util.*;
 
 public class JsonReceiveDataFromKafkaAndSave {
@@ -77,7 +78,7 @@ class JsonReceiverThread extends Thread implements Runnable{
 
     public void run(){
         while (true) {
-            ConsumerRecords<Long, byte[]> consumerRecords = consumer.poll(5000);  // receive records from kafka cluster, otherwise wait
+            ConsumerRecords<Long, byte[]> consumerRecords = consumer.poll(Duration.ofSeconds(5));  // receive records from kafka cluster, otherwise wait
             // 1000 is the time in milliseconds consumer will wait if no record is found at broker.
             consumerRecords.forEach(record -> { // traverse consumer records
                 consumed++; // use consumed to flag record number
@@ -289,6 +290,7 @@ class JsonReceiverThread extends Thread implements Runnable{
 
                             }
                         }catch (Exception e){
+                            e.printStackTrace();
                             System.out.println(eventRecord.getTimestamp());
                         }
                     }
