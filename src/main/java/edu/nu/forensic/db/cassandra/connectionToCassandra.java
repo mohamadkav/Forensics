@@ -4,6 +4,7 @@ import com.datastax.driver.core.*;
 import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.db.entity.NetFlowObject;
 import edu.nu.forensic.db.entity.Subject;
+import edu.nu.forensic.db.entity.LatestObject;
 
 import java.util.*;
 
@@ -59,6 +60,7 @@ public class connectionToCassandra {
                 "eventName int," +
                 "visibleWindow boolean)" +
                 " WITH default_time_to_live = "+ttl +
+                " and compression = {'sstable_compression': 'DeflateCompressor'}" +
                 " and compaction = {'class':'org.apache.cassandra.db.compaction.DateTieredCompactionStrategy'};";
         getSession().execute(sql);
         String insertDB = "insert into test.subject"+machineNumber+"(uuid ,name,timestamp,parentuuid,Usersid,eventName,visibleWindow) " +
@@ -73,6 +75,7 @@ public class connectionToCassandra {
                 "objectuuid uuid," +
                 "eventName int)" +
                 " WITH default_time_to_live = "+ttl +
+                " and compression = {'sstable_compression': 'DeflateCompressor'}" +
                 " and compaction = {'class':'org.apache.cassandra.db.compaction.DateTieredCompactionStrategy'};";
         getSession().execute(sqlEvent);
         String insertDBEvent = "insert into test.event"+machineNumber+"" +
@@ -86,6 +89,7 @@ public class connectionToCassandra {
                 "uuid uuid," +
                 "name varchar)" +
                 " WITH default_time_to_live = "+ttl +
+                " and compression = {'sstable_compression': 'DeflateCompressor'}" +
                 " and compaction = {'class':'org.apache.cassandra.db.compaction.DateTieredCompactionStrategy'};";
         getSession().execute(sqlObject);
         String insertDBObject = "insert into test.object"+machineNumber+"(timestamp,uuid,name) " +
@@ -100,6 +104,7 @@ public class connectionToCassandra {
                 "dport int," +
                 "sport int)" +
                 " WITH default_time_to_live = "+ttl +
+                " and compression = {'sstable_compression': 'DeflateCompressor'}" +
                 " and compaction = {'class':'org.apache.cassandra.db.compaction.DateTieredCompactionStrategy'};";
         getSession().execute(sqlNetwork);
         String insertDBNetwork = "insert into test.network"+machineNumber+"(timestamp,subjectuuid,eventName,daddress,dport,sport) " +
@@ -190,6 +195,80 @@ public class connectionToCassandra {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    public String eventObjectUUIDToFilename(Event event){
+        String filename = new String();
+        try{
+            List<LatestObject> latestObjectList = new ArrayList<>();
+            UUID uuidOfFile = event.getSubjectUUID();
+            long timestamp = 0;
+            String fileSearch = "select * from test.object"+ machineNumber +" where uuid=" + uuidOfFile + " allow filtering;";
+            ResultSet resultSet = getSession().execute(fileSearch);
+            Iterator<Row> rsIterator = resultSet.iterator();
+            while(rsIterator.hasNext()){
+                Row row = rsIterator.next();
+                LatestObject latestObject = new LatestObject(row.getUUID("uuid"), row.getString("name"), row.getLong("timestamp"));
+                if (timestamp < latestObject.getTimestampNanos()){
+                    timestamp = latestObject.getTimestampNanos();
+                    filename = latestObject.getName();
+                }
+                System.err.println(latestObjectList.size());
+                System.err.println("object TT   available:  " + latestObject.getTimestampNanos());
+                System.err.println("object NA   available:  " + latestObject.getName());
+                System.err.println("object ID   available:  " + latestObject.getId());
+                latestObjectList.add(latestObject);
+            }
+            System.err.println("list        size:   " + latestObjectList.size());
+            if(latestObjectList.size() == 0){
+                System.err.println("No valid filename");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return filename;
+    }
+
+    public Map<String, UUID> filenameToUUID(String filename){
+        List<String> possibleFilename = new ArrayList<>();
+        Map<String, Long> filenameToTimestamp = new HashMap<>();
+        Map<String, UUID> filenameToUUID = new HashMap<>();
+        try {
+            String fileSearch = "select * from test.object"+ machineNumber + ";";
+            ResultSet resultSet = getSession().execute(fileSearch);
+            Iterator<Row> rsIterator = resultSet.iterator();
+            while(rsIterator.hasNext()){
+                Row row = rsIterator.next();
+                LatestObject latestObject = new LatestObject(row.getUUID("uuid"), row.getString("name"), row.getLong("timestamp"));
+                if(latestObject.containsFilename(filename))     // object.name contains filename
+                {
+                    if(!possibleFilename.contains(latestObject.getName())){
+                        possibleFilename.add(latestObject.getName());
+                        filenameToTimestamp.put(latestObject.getName(), latestObject.getTimestampNanos());
+                        filenameToUUID.put(latestObject.getName(), latestObject.getId());
+                    } else if(latestObject.getTimestampNanos() > filenameToTimestamp.get(latestObject.getName())){
+                        filenameToTimestamp.replace(latestObject.getName(), latestObject.getTimestampNanos());
+                        filenameToUUID.replace(latestObject.getName(), latestObject.getId());
+                    }
+                }
+            }
+            System.err.println("possibleFilename    list    size:   " + possibleFilename.size());
+            if(possibleFilename.size() == 0){
+                System.err.println("No valid filename");
+            }
+//            Iterator iterator = possibleFilename.iterator();
+//            while(iterator.hasNext()){
+//                String thisFilename = iterator.next().toString();
+//                System.err.println(thisFilename);
+//                System.err.println(filenameToTimestamp.get(thisFilename));
+//                System.err.println(filenameToUUID.get(thisFilename));
+//            }
+        } catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return filenameToUUID;
     }
 
     public void close() {
