@@ -306,7 +306,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                 }
             }
             );
-            consumer.commitAsync();
+       //     consumer.commitAsync();
         }
     }
     private static String transferIntIPToStringIP(Integer IP){

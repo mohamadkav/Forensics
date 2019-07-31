@@ -134,7 +134,7 @@ public class connectionToCassandra {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            System.exit(1);
+          //  System.exit(1);
         }
     }
 
@@ -168,7 +168,7 @@ public class connectionToCassandra {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.exit(1);
+         //   System.exit(1);
         }
     }
 
@@ -193,7 +193,7 @@ public class connectionToCassandra {
             getSession().execute(batchStatementEvent);
         } catch (Exception e) {
             e.printStackTrace();
-            System.exit(1);
+         //   System.exit(1);
         }
     }
 
