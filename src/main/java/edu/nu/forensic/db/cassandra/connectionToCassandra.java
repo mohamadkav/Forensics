@@ -198,7 +198,7 @@ public class connectionToCassandra {
     }
 
     public String eventObjectUUIDToFilename(Event event){
-        String filename = new String();
+        String filename = "";
         try{
             List<LatestObject> latestObjectList = new ArrayList<>();
             UUID uuidOfFile = event.getSubjectUUID();
@@ -230,7 +230,7 @@ public class connectionToCassandra {
         return filename;
     }
 
-    public Map<String, UUID> filenameToUUID(String filename){
+    public Map<String, UUID> filenameToUUIDFuzzy(String filename){
         List<String> possibleFilename = new ArrayList<>();
         Map<String, Long> filenameToTimestamp = new HashMap<>();
         Map<String, UUID> filenameToUUID = new HashMap<>();
@@ -257,18 +257,82 @@ public class connectionToCassandra {
             if(possibleFilename.size() == 0){
                 System.err.println("No valid filename");
             }
-//            Iterator iterator = possibleFilename.iterator();
-//            while(iterator.hasNext()){
-//                String thisFilename = iterator.next().toString();
-//                System.err.println(thisFilename);
-//                System.err.println(filenameToTimestamp.get(thisFilename));
-//                System.err.println(filenameToUUID.get(thisFilename));
-//            }
         } catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
         return filenameToUUID;
+    }
+
+    public UUID filenameToUUIDExact(String filename){
+        UUID uuid = null;
+        try {
+            String fileSearch = "select * from test.object"+ machineNumber + " where name=" + filename + " allow filtering;";
+            ResultSet resultSet = getSession().execute(fileSearch);
+            Iterator<Row> rsIterator = resultSet.iterator();
+            Long timestamp = new Long(0);
+            while(rsIterator.hasNext()){
+                Row row = rsIterator.next();
+                if(row.getLong("timestamp") > timestamp){
+                    timestamp = row.getLong("timestamp");
+                    uuid = row.getUUID("uuid");
+                }
+            }
+            if(uuid == null)
+                throw new Exception("not recorded, how weird");
+        } catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return uuid;
+    }
+
+    public String eventToParentprocessname(Event event){
+        String parentprocessUUIDName = null;
+        try {
+            UUID uuid = event.getSubjectUUID();
+            Map<UUID, String> parentUUIDAndName = findSubject(uuid);  // on exact match
+            System.err.println(parentUUIDAndName);
+            while (parentUUIDAndName.entrySet().stream().findFirst().get().getValue() == null){
+                // parent is a thread, find the parent process of this thread
+                Iterator<UUID> iterator = parentUUIDAndName.keySet().iterator();
+                uuid = iterator.next();
+                parentUUIDAndName = findSubject(uuid);
+                System.err.println(parentUUIDAndName);
+                parentprocessUUIDName = parentUUIDAndName.entrySet().stream().findFirst().get().getValue();
+            }
+            // parent is a process
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return parentprocessUUIDName;
+    }
+
+    public Map<UUID, String> findSubject(UUID uuid){
+        Map<UUID, String> parentUUIDAndProcessname = new HashMap<>();
+        try{
+            String subjectSearch = "select * from test.subject"+machineNumber + " where uuid="+uuid+" allow filtering;";
+            ResultSet resultSet = getSession().execute(subjectSearch);
+            Iterator<Row> rsIterator = resultSet.iterator();
+            while(rsIterator.hasNext()){
+                Row row = rsIterator.next();
+                parentUUIDAndProcessname.put(row.getUUID("parentuuid"), row.getString("name"));
+            }
+            switch (parentUUIDAndProcessname.size()){   // maybe rule out necessity?
+                case 1:
+                    System.err.println("one exact subject found");
+                    break;
+                case 0:
+                    throw new Exception("no parent subject recorded");
+                default:
+                    throw new Exception("several parent subjects recorded");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return parentUUIDAndProcessname;
     }
 
     public void close() {
