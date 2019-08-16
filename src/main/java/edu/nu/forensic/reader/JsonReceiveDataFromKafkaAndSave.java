@@ -22,7 +22,7 @@ import java.time.Duration;
 import java.util.*;
 
 public class JsonReceiveDataFromKafkaAndSave {
-    private static final int NUM_SERVERS=1;
+    private static final int NUM_SERVERS=150;
 
     public static void main(String[] args) {
         List<Thread> threadList=new ArrayList<>(NUM_SERVERS);   // one threadlist
@@ -58,10 +58,11 @@ class JsonReceiverThread extends Thread implements Runnable{
     private CPRStandAloneReducer reducer=new CPRStandAloneReducer();
 
     public JsonReceiverThread(int threadId){    // creating JsonReceiverThread, each with an identifier as threadId (the same with its offset in threadList)
-
         this.threadId=threadId;
-        String IPaddress = "127.0.0.1";
-        connectionToCassandra=new connectionToCassandra(IPaddress, threadId+"");    // create new connection, providing threadId
+    }
+
+    public void run(){
+        connectionToCassandra=new connectionToCassandra(threadId);    // create new connection, providing threadId
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "MARPLE");
@@ -69,20 +70,15 @@ class JsonReceiverThread extends Thread implements Runnable{
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 600000);
+        props.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 6000000);
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 100000);
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 1);
         props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 1000);
         props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, 30000);
 
-
-
         consumer = new KafkaConsumer<>(props);  // use properties and define consumer
         consumer.subscribe(Collections.singletonList("abc"+threadId));   // allow consumer to subscribe only to ["MARPLE"+threadId] topic
         System.err.println("Consumer subscribed to topic MARPLE"+threadId);
-    }
-
-    public void run(){
         while (true) {
             ConsumerRecords<Long, byte[]> consumerRecords = consumer.poll(Duration.ofSeconds(5));  // receive records from kafka cluster, otherwise wait
             // 1000 is the time in milliseconds consumer will wait if no record is found at broker.
@@ -108,7 +104,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                                             null, eventRecord.getTimestamp(), eventRecord.getEtwEventType().name(), false);
                                     eventList.add(event);   // eventList hold all seperate event
                                     if (eventList.size() > 10000) {    // every 10000 of event should be inserted and eventList should be cleared.
-                                        connectionToCassandra.insertEventData(eventList);
+                                        connectionToCassandra.insertEventData(eventList,threadId);
                                         eventList = new ArrayList<>();
                                     }
                                     break;
@@ -131,7 +127,7 @@ class JsonReceiverThread extends Thread implements Runnable{
 
                                     subjectList.add(subject);
                                     if (subjectList.size() > 10000) {
-                                        connectionToCassandra.insertSubjectData(subjectList);
+                                        connectionToCassandra.insertSubjectData(subjectList,threadId);
                                         subjectList = new ArrayList<>();
                                     }
                                     break;
@@ -144,7 +140,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                                             null, eventRecord.getTimestamp(), eventRecord.getEtwEventType().name(), false);
                                     eventList.add(event);
                                     if (eventList.size() > 10000) {
-                                        connectionToCassandra.insertEventData(eventList);
+                                        connectionToCassandra.insertEventData(eventList,threadId);
                                         eventList = new ArrayList<>();
                                     }
                                     tidToUUID.remove(eventRecord.getThreadId());
@@ -192,7 +188,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                                     }
 
                                     if (eventList.size() > 10000) {
-                                        connectionToCassandra.insertEventData(eventList);
+                                        connectionToCassandra.insertEventData(eventList,threadId);
                                         eventList = new ArrayList<>();
                                     }
                                     break;
@@ -225,7 +221,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                                     if (!reducer.canBeRemoved(event))
                                         eventList.add(event);
                                     if (eventList.size() > 10000) {
-                                        connectionToCassandra.insertEventData(eventList);
+                                        connectionToCassandra.insertEventData(eventList,threadId);
                                         eventList = new ArrayList<>();
                                     }
                                     break;
@@ -240,7 +236,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                                             filename, eventRecord.getTimestamp(), eventRecord.getEtwEventType().name(), false);
                                     eventList.add(event);
                                     if (eventList.size() > 10000) {
-                                        connectionToCassandra.insertEventData(eventList);
+                                        connectionToCassandra.insertEventData(eventList,threadId);
                                         eventList = new ArrayList<>();
                                     }
                                     break;
@@ -265,7 +261,7 @@ class JsonReceiverThread extends Thread implements Runnable{
 
                                     netList.add(netFlowObject);
                                     if (netList.size() > 10000) {
-                                        connectionToCassandra.insertNetworkEvent(netList);
+                                        connectionToCassandra.insertNetworkEvent(netList,threadId);
                                         netList = new ArrayList<>();
                                     }
                                     break;
@@ -285,7 +281,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                                             !pidToUUID.containsKey(parentPid) ? null : pidToUUID.get(parentPid), eventRecord.getTimestamp(), null, null, false);
                                     subjectList.add(subject);
                                     if (subjectList.size() > 10000) {
-                                        connectionToCassandra.insertSubjectData(subjectList);
+                                        connectionToCassandra.insertSubjectData(subjectList,threadId);
                                         subjectList = new ArrayList<>();
                                     }
                                     break;

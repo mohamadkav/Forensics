@@ -31,7 +31,7 @@ public class EventFormat {
     }
 
     private static void loadFormat() {
-        try (Scanner scanner = new Scanner(new FileReader("format.txt"))) {
+        try (Scanner scanner = new Scanner(new FileReader("/format.txt"))) {
             while (scanner.hasNextLine()) {
                 // headLine looks like: 2429279289 67 FileIoRead
                 // which represents providerId, opcode, EventName

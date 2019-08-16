@@ -5,33 +5,28 @@ import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.db.entity.NetFlowObject;
 import edu.nu.forensic.db.entity.Subject;
 import edu.nu.forensic.db.entity.LatestObject;
+import edu.nu.forensic.reader.JsonReceiveDataFromKafkaAndSave;
 
 import java.util.*;
 
 public class connectionToCassandra {
-    private Cluster cluster;
+    private static Cluster cluster;
+    private static final int NUM_SERVERS=150;
+    private static final int NUM_SERVERS_PER_CONNECTION=15;
 
-    private Session session;
-
+    private static List<Session> sessions=new ArrayList<>();
+    static{
+        cluster = Cluster.builder().addContactPoint("127.0.0.1").build();
+        cluster.getConfiguration().getSocketOptions().setReadTimeoutMillis(300000);
+        for(int i=0;i< NUM_SERVERS/NUM_SERVERS_PER_CONNECTION;i++){
+            sessions.add(cluster.connect());
+            System.out.println("Session "+i+" added");
+        }
+    }
+    public Session getSession(int machineNum){
+        return sessions.get(machineNum/NUM_SERVERS_PER_CONNECTION);
+    }
 //    private int TTL = 8640000‬;
-
-    public Cluster getCluster() {
-        return cluster;
-    }
-
-    public void setCluster(Cluster cluster) {
-        this.cluster = cluster;
-    }
-
-    public Session getSession() {
-        return session;
-    }
-
-    public void setSession(Session session) {
-        this.session = session;
-    }
-
-    private String machineNumber;
 
     private PreparedStatement psta;
     private PreparedStatement pstaObject;
@@ -40,17 +35,17 @@ public class connectionToCassandra {
 
     private int ttl = 8640000;
 
-    public connectionToCassandra(String nodeIP, String machineNum) {
-        cluster = Cluster.builder().addContactPoint(nodeIP).build();    // we add this IP:contact into cassandra cluster
-        setSession(cluster.connect());  // generate and initialize a new conversation and use session to record connection
-        this.machineNumber = machineNum;    // machine Number used to identify this thread
-        createSubjectTable();
-        createEventAndObjectTable();
+    public connectionToCassandra(int machineNum) {
+   //     session=cluster.connect();  // generate and initialize a new conversation and use session to record connection
+   //     this.machineNumber = machineNum;    // machine Number used to identify this thread
+        createSubjectTable(machineNum);
+        createEventAndObjectTable(machineNum);
+
         // 1.create table subject+threadID\event+threadID\object+threadID\network+threadID under keyspace test
         // 2.create prepared statement for each table so as to use model conveniently
     }
 
-    private void createSubjectTable(){
+    private void createSubjectTable(int machineNumber){
         String sql = "CREATE TABLE IF NOT EXISTS test.subject"+machineNumber+" (" +
                 "uuid uuid PRIMARY KEY," +
                 "name varchar," +
@@ -62,13 +57,13 @@ public class connectionToCassandra {
                 " WITH default_time_to_live = "+ttl +
                 " and compression = {'sstable_compression': 'DeflateCompressor'}" +
                 " and compaction = {'class':'org.apache.cassandra.db.compaction.DateTieredCompactionStrategy'};";
-        getSession().execute(sql);
+        getSession(machineNumber).execute(sql);
         String insertDB = "insert into test.subject"+machineNumber+"(uuid ,name,timestamp,parentuuid,Usersid,eventName,visibleWindow) " +
                 "values(?,?,?,?,?,?,?)";
-        this.psta = getSession().prepare(insertDB);
+        this.psta = getSession(machineNumber).prepare(insertDB);
     }
 
-    private void createEventAndObjectTable(){
+    private void createEventAndObjectTable(int machineNumber){
         String sqlEvent = "CREATE TABLE IF NOT EXISTS test.event"+machineNumber+" (" +
                 "timestamp bigint PRIMARY KEY," +
                 "subjectuuid uuid," +
@@ -77,11 +72,11 @@ public class connectionToCassandra {
                 " WITH default_time_to_live = "+ttl +
                 " and compression = {'sstable_compression': 'DeflateCompressor'}" +
                 " and compaction = {'class':'org.apache.cassandra.db.compaction.DateTieredCompactionStrategy'};";
-        getSession().execute(sqlEvent);
+        getSession(machineNumber).execute(sqlEvent);
         String insertDBEvent = "insert into test.event"+machineNumber+"" +
                 "(timestamp,subjectuuid,objectuuid,eventName) " +
                 "values(?,?,?,?)";
-        this.pstaEvent = getSession().prepare(insertDBEvent);
+        this.pstaEvent = getSession(machineNumber).prepare(insertDBEvent);
 
         //store entities
         String sqlObject = "CREATE TABLE IF NOT EXISTS test.object"+machineNumber+" (" +
@@ -91,10 +86,10 @@ public class connectionToCassandra {
                 " WITH default_time_to_live = "+ttl +
                 " and compression = {'sstable_compression': 'DeflateCompressor'}" +
                 " and compaction = {'class':'org.apache.cassandra.db.compaction.DateTieredCompactionStrategy'};";
-        getSession().execute(sqlObject);
+        getSession(machineNumber).execute(sqlObject);
         String insertDBObject = "insert into test.object"+machineNumber+"(timestamp,uuid,name) " +
                 "values(?,?,?)";
-        this.pstaObject = getSession().prepare(insertDBObject);
+        this.pstaObject = getSession(machineNumber).prepare(insertDBObject);
 
         String sqlNetwork = "CREATE TABLE IF NOT EXISTS test.network"+machineNumber+" (" +
                 "timestamp bigint PRIMARY KEY,"+
@@ -106,13 +101,13 @@ public class connectionToCassandra {
                 " WITH default_time_to_live = "+ttl +
                 " and compression = {'sstable_compression': 'DeflateCompressor'}" +
                 " and compaction = {'class':'org.apache.cassandra.db.compaction.DateTieredCompactionStrategy'};";
-        getSession().execute(sqlNetwork);
+        getSession(machineNumber).execute(sqlNetwork);
         String insertDBNetwork = "insert into test.network"+machineNumber+"(timestamp,subjectuuid,eventName,daddress,dport,sport) " +
                 "values(?,?,?,?,?,?)";
-        this.pstaNetwork = getSession().prepare(insertDBNetwork);
+        this.pstaNetwork = getSession(machineNumber).prepare(insertDBNetwork);
     }
 
-    public void insertSubjectData(List<Subject> subjectList) {
+    public void insertSubjectData(List<Subject> subjectList, int machineNumber) {
         try{
             BatchStatement batchStatement = new BatchStatement();
             int i = 0;
@@ -126,11 +121,11 @@ public class connectionToCassandra {
                 batchStatement.add(boundSta);
                 ++i;
                 if(i%50==0) {
-                    getSession().execute(batchStatement);
+                    getSession(machineNumber).execute(batchStatement);
                     batchStatement = new BatchStatement();
                 }
             }
-            getSession().execute(batchStatement);
+            getSession(machineNumber).execute(batchStatement);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -138,7 +133,7 @@ public class connectionToCassandra {
         }
     }
 
-    public void insertEventData(List<Event> eventList) {
+    public void insertEventData(List<Event> eventList, int machineNumber) {
         try {
         //store event
             BatchStatement batchStatementEvent = new BatchStatement();
@@ -157,14 +152,14 @@ public class connectionToCassandra {
                     batchStatementObject.add(boundStaObject);
                 }
                 if(i%50==0) {
-                    getSession().execute(batchStatementEvent);
-                    getSession().execute(batchStatementObject);
+                    getSession(machineNumber).execute(batchStatementEvent);
+                    getSession(machineNumber).execute(batchStatementObject);
                     batchStatementObject = new BatchStatement();
                     batchStatementEvent = new BatchStatement();
                 }
             }
-            getSession().execute(batchStatementEvent);
-            getSession().execute(batchStatementObject);
+            getSession(machineNumber).execute(batchStatementEvent);
+            getSession(machineNumber).execute(batchStatementObject);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -172,7 +167,7 @@ public class connectionToCassandra {
         }
     }
 
-    public void insertNetworkEvent(List<NetFlowObject> networkList){
+    public void insertNetworkEvent(List<NetFlowObject> networkList, int machineNumber){
         try {
             //store event
             BatchStatement batchStatementEvent = new BatchStatement();
@@ -186,25 +181,25 @@ public class connectionToCassandra {
 
                 ++i;
                 if(i%50==0) {
-                    getSession().execute(batchStatementEvent);
+                    getSession(machineNumber).execute(batchStatementEvent);
                     batchStatementEvent = new BatchStatement();
                 }
             }
-            getSession().execute(batchStatementEvent);
+            getSession(machineNumber).execute(batchStatementEvent);
         } catch (Exception e) {
             e.printStackTrace();
          //   System.exit(1);
         }
     }
 
-    public String eventObjectUUIDToFilename(Event event){
+    public String eventObjectUUIDToFilename(Event event, int machineNumber){
         String filename = "";
         try{
             List<LatestObject> latestObjectList = new ArrayList<>();
             UUID uuidOfFile = event.getSubjectUUID();
             long timestamp = 0;
             String fileSearch = "select * from test.object"+ machineNumber +" where uuid=" + uuidOfFile + " allow filtering;";
-            ResultSet resultSet = getSession().execute(fileSearch);
+            ResultSet resultSet = getSession(machineNumber).execute(fileSearch);
             Iterator<Row> rsIterator = resultSet.iterator();
             while(rsIterator.hasNext()){
                 Row row = rsIterator.next();
@@ -230,13 +225,13 @@ public class connectionToCassandra {
         return filename;
     }
 
-    public Map<String, UUID> filenameToUUIDFuzzy(String filename){
+    public Map<String, UUID> filenameToUUIDFuzzy(String filename, int machineNumber){
         List<String> possibleFilename = new ArrayList<>();
         Map<String, Long> filenameToTimestamp = new HashMap<>();
         Map<String, UUID> filenameToUUID = new HashMap<>();
         try {
             String fileSearch = "select * from test.object"+ machineNumber + ";";
-            ResultSet resultSet = getSession().execute(fileSearch);
+            ResultSet resultSet = getSession(machineNumber).execute(fileSearch);
             Iterator<Row> rsIterator = resultSet.iterator();
             while(rsIterator.hasNext()){
                 Row row = rsIterator.next();
@@ -264,11 +259,11 @@ public class connectionToCassandra {
         return filenameToUUID;
     }
 
-    public UUID filenameToUUIDExact(String filename){
+    public UUID filenameToUUIDExact(String filename, int machineNumber){
         UUID uuid = null;
         try {
             String fileSearch = "select * from test.object"+ machineNumber + " where name=" + filename + " allow filtering;";
-            ResultSet resultSet = getSession().execute(fileSearch);
+            ResultSet resultSet = getSession(machineNumber).execute(fileSearch);
             Iterator<Row> rsIterator = resultSet.iterator();
             Long timestamp = new Long(0);
             while(rsIterator.hasNext()){
@@ -287,17 +282,17 @@ public class connectionToCassandra {
         return uuid;
     }
 
-    public String eventToParentprocessname(Event event){
+    public String eventToParentprocessname(Event event, int machineNumber){
         String parentprocessUUIDName = null;
         try {
             UUID uuid = event.getSubjectUUID();
-            Map<UUID, String> parentUUIDAndName = findSubject(uuid);  // on exact match
+            Map<UUID, String> parentUUIDAndName = findSubject(uuid,machineNumber);  // on exact match
             System.err.println(parentUUIDAndName);
             while (parentUUIDAndName.entrySet().stream().findFirst().get().getValue() == null){
                 // parent is a thread, find the parent process of this thread
                 Iterator<UUID> iterator = parentUUIDAndName.keySet().iterator();
                 uuid = iterator.next();
-                parentUUIDAndName = findSubject(uuid);
+                parentUUIDAndName = findSubject(uuid,machineNumber);
                 System.err.println(parentUUIDAndName);
                 parentprocessUUIDName = parentUUIDAndName.entrySet().stream().findFirst().get().getValue();
             }
@@ -309,11 +304,11 @@ public class connectionToCassandra {
         return parentprocessUUIDName;
     }
 
-    public Map<UUID, String> findSubject(UUID uuid){
+    public Map<UUID, String> findSubject(UUID uuid, int machineNumber){
         Map<UUID, String> parentUUIDAndProcessname = new HashMap<>();
         try{
             String subjectSearch = "select * from test.subject"+machineNumber + " where uuid="+uuid+" allow filtering;";
-            ResultSet resultSet = getSession().execute(subjectSearch);
+            ResultSet resultSet = getSession(machineNumber).execute(subjectSearch);
             Iterator<Row> rsIterator = resultSet.iterator();
             while(rsIterator.hasNext()){
                 Row row = rsIterator.next();

@@ -32,7 +32,7 @@ public class TestMain {
 
         long start = System.currentTimeMillis();
         String file = "2019-05-19-19-25-47.out";
-        String machineNum = "2";
+        int machineNum = 2;
         String IPaddress = "localhost";    // 10.214.148.128
         String line = null;
         List<Subject> subjectList = new ArrayList<>();
@@ -44,7 +44,7 @@ public class TestMain {
         Set<String> eventNames = new HashSet<>();
         Map<Integer, UUID> tidToUUID = new HashMap<>();
         Map<String, Integer> eventNameToNum = EventNameToNum.FileIoDelete.getEventNameToNum();
-        connectionToCassandra connectionToCassandra = new connectionToCassandra(IPaddress, machineNum);
+        connectionToCassandra connectionToCassandra = new connectionToCassandra(machineNum);
 
         // END common.
 
@@ -54,7 +54,7 @@ public class TestMain {
             List<UUID> subjectUUIDList = new ArrayList<>();
             String number = "12"; // ThreadEnd:12; 19 has no parent.
             String eventSearch = "select * from test.event"+ machineNum + " where eventname="+ number + " allow filtering;";
-            ResultSet resultSet = connectionToCassandra.getSession().execute(eventSearch);
+            ResultSet resultSet = connectionToCassandra.getSession(machineNum).execute(eventSearch);
 
             Iterator<Row> rsIterator = resultSet.iterator();
             while(rsIterator.hasNext()){
@@ -75,7 +75,7 @@ public class TestMain {
 
             Event event = new Event();
             event.setSubjectUUID(uuid);
-            String parentUUIDToName = connectionToCassandra.eventToParentprocessname(event);
+            String parentUUIDToName = connectionToCassandra.eventToParentprocessname(event,machineNum);
             System.err.println("parent process name: "+parentUUIDToName);
         } catch (Exception e){
             e.printStackTrace();
