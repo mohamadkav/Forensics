@@ -1,6 +1,7 @@
 package edu.nu.forensic.db.cassandra;
 
 import com.datastax.driver.core.*;
+import edu.nu.forensic.GlobalConfig;
 import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.db.entity.NetFlowObject;
 import edu.nu.forensic.db.entity.Subject;
@@ -11,20 +12,18 @@ import java.util.*;
 
 public class connectionToCassandra {
     private static Cluster cluster;
-    private static final int NUM_SERVERS=150;
-    private static final int NUM_SERVERS_PER_CONNECTION=15;
 
     private static List<Session> sessions=new ArrayList<>();
     static{
         cluster = Cluster.builder().addContactPoint("127.0.0.1").build();
         cluster.getConfiguration().getSocketOptions().setReadTimeoutMillis(300000);
-        for(int i=0;i< NUM_SERVERS/NUM_SERVERS_PER_CONNECTION;i++){
+        for(int i = 0; i< GlobalConfig.NUM_SERVERS/ GlobalConfig.NUM_SERVERS_PER_CONNECTION; i++){
             sessions.add(cluster.connect());
             System.out.println("Session "+i+" added");
         }
     }
     public Session getSession(int machineNum){
-        return sessions.get(machineNum/NUM_SERVERS_PER_CONNECTION);
+        return sessions.get(machineNum/GlobalConfig.NUM_SERVERS_PER_CONNECTION);
     }
 //    private int TTL = 8640000‬;
 
@@ -330,6 +329,21 @@ public class connectionToCassandra {
         return parentUUIDAndProcessname;
     }
 
+    public List<UUID> fileObjectsAccessedBySubject(UUID subjectUUID, int machineNumber){
+        List<UUID> returnList=new ArrayList<>();
+        try{
+            String fileSearch = "select objectuuid from test.event"+machineNumber+" where subjectuuid=" +subjectUUID.toString()+" allow filtering;";
+            ResultSet resultSet = getSession(machineNumber).execute(fileSearch);
+            Iterator<Row> rsIterator = resultSet.iterator();
+            while (rsIterator.hasNext()){
+                Row row=rsIterator.next();
+                returnList.add(row.getUUID("objectuuid"));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return returnList;
+    }
     public void close() {
         cluster.close();
         System.out.println("closed！");

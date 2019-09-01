@@ -2,6 +2,7 @@ package edu.nu.forensic.reader;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import edu.nu.forensic.GlobalConfig;
 import edu.nu.forensic.db.cassandra.connectionToCassandra;
 import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.db.entity.NetFlowObject;
@@ -22,11 +23,10 @@ import java.time.Duration;
 import java.util.*;
 
 public class JsonReceiveDataFromKafkaAndSave {
-    private static final int NUM_SERVERS=150;
 
     public static void main(String[] args) {
-        List<Thread> threadList=new ArrayList<>(NUM_SERVERS);   // one threadlist
-        for(int i=0;i<NUM_SERVERS;i++){
+        List<Thread> threadList=new ArrayList<>(GlobalConfig.NUM_SERVERS);   // one threadlist
+        for(int i=0;i<GlobalConfig.NUM_SERVERS;i++){
             Thread t=new Thread(new JsonReceiverThread(i)); // one server generate one JsonReceiverThread
             threadList.add(t);  //  threadList cantains each one of the JsonReceiverThread
             threadList.get(i).start();  // start each JsonReceiverThread after added
