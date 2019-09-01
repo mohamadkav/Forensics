@@ -2,14 +2,9 @@ package edu.nu.forensic.util;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import edu.nu.forensic.db.cassandra.connectionToCassandra;
+import edu.nu.forensic.db.cassandra.ConnectionToCassandra;
 import edu.nu.forensic.db.entity.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
@@ -44,7 +39,7 @@ public class TestMain {
         Set<String> eventNames = new HashSet<>();
         Map<Integer, UUID> tidToUUID = new HashMap<>();
         Map<String, Integer> eventNameToNum = EventNameToNum.FileIoDelete.getEventNameToNum();
-        connectionToCassandra connectionToCassandra = new connectionToCassandra(machineNum);
+        ConnectionToCassandra connectionToCassandra = new ConnectionToCassandra(machineNum);
 
         // END common.
 

@@ -1,22 +1,18 @@
 package edu.nu.forensic.reader;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import edu.nu.forensic.GlobalConfig;
-import edu.nu.forensic.db.cassandra.connectionToCassandra;
+import edu.nu.forensic.db.cassandra.ConnectionToCassandra;
 import edu.nu.forensic.db.entity.Event;
 import edu.nu.forensic.db.entity.NetFlowObject;
 import edu.nu.forensic.db.entity.Subject;
 import edu.nu.forensic.etw.*;
 import edu.nu.forensic.reducer.CPRStandAloneReducer;
-import jnr.ffi.annotations.In;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.LongDeserializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.xerial.snappy.Snappy;
 
 import java.time.Duration;
@@ -50,7 +46,7 @@ class JsonReceiverThread extends Thread implements Runnable{
     private Set<Integer> visibleWindowPid = new HashSet<>();
     private Set<String> eventNames = new HashSet<>();
 
-    private connectionToCassandra connectionToCassandra;
+    private ConnectionToCassandra connectionToCassandra;
 
     private Consumer<Long, byte[]> consumer;
     private long consumed=0;
@@ -62,9 +58,9 @@ class JsonReceiverThread extends Thread implements Runnable{
     }
 
     public void run(){
-        connectionToCassandra=new connectionToCassandra(threadId);    // create new connection, providing threadId
+        connectionToCassandra=new ConnectionToCassandra(threadId);    // create new connection, providing threadId
         Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, GlobalConfig.KAFKA_SERVER);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "MARPLE");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);

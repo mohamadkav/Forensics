@@ -1,5 +1,6 @@
 package edu.nu.forensic.etw;
 
+import edu.nu.forensic.GlobalConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class EventFormat {
     }
 
     private static void loadFormat() {
-        try (Scanner scanner = new Scanner(new FileReader("/format.txt"))) {
+        try (Scanner scanner = new Scanner(new FileReader(GlobalConfig.FORMAT_FILE_LOCATION))) {
             while (scanner.hasNextLine()) {
                 // headLine looks like: 2429279289 67 FileIoRead
                 // which represents providerId, opcode, EventName

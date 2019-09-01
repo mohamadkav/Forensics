@@ -10,12 +10,12 @@ import edu.nu.forensic.reader.JsonReceiveDataFromKafkaAndSave;
 
 import java.util.*;
 
-public class connectionToCassandra {
+public class ConnectionToCassandra {
     private static Cluster cluster;
 
     private static List<Session> sessions=new ArrayList<>();
     static{
-        cluster = Cluster.builder().addContactPoint("127.0.0.1").build();
+        cluster = Cluster.builder().addContactPoint(GlobalConfig.CASSANDRA_SERVER).build();
         cluster.getConfiguration().getSocketOptions().setReadTimeoutMillis(300000);
         for(int i = 0; i< GlobalConfig.NUM_SERVERS/ GlobalConfig.NUM_SERVERS_PER_CONNECTION; i++){
             sessions.add(cluster.connect());
@@ -34,7 +34,7 @@ public class connectionToCassandra {
 
     private int ttl = 8640000;
 
-    public connectionToCassandra(int machineNum) {
+    public ConnectionToCassandra(int machineNum) {
    //     session=cluster.connect();  // generate and initialize a new conversation and use session to record connection
    //     this.machineNumber = machineNum;    // machine Number used to identify this thread
         createSubjectTable(machineNum);
