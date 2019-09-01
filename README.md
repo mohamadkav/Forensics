@@ -14,9 +14,13 @@ Import to IntelliJ should be done using gradle import
 
 ### Configuration
 The configuration scheme is bad because it's just a class instead of using a dynamic config file.
+
 The class edu.nu.forensic.GlobalConfig is the part where you would do the configuration. Cassandra and Kafka can be configured easily.
+
 Number of hosts supported by our system should be indicated using NUM_SERVERS. This creates receivers for each queue (abc0, abc1,...).
+
 NUM_SERVERS_PER_CONNECTION indicates how many servers should use the same Scylladb conncection. We haven't found the optimal number, but I think it's okay to put this number 1/10 of NUM_SERVERS. So if NUM_SERVERS is 150, the recommend number for this parameter is 15.
+
 The last config is FORMAT_FILE_LOCATION which needs to be exactly the same one used in compress_linux project
 
 ### Running
