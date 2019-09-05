@@ -15,7 +15,7 @@ public class ConnectionToCassandra {
 
     private static List<Session> sessions=new ArrayList<>();
     static{
-        cluster = Cluster.builder().addContactPoint(GlobalConfig.CASSANDRA_SERVER).build();
+        cluster = Cluster.builder().addContactPoint(GlobalConfig.CASSANDRA_SERVER).withPort(GlobalConfig.CASSANDRA_PORT).build();
         cluster.getConfiguration().getSocketOptions().setReadTimeoutMillis(300000);
         for(int i = 0; i< GlobalConfig.NUM_SERVERS/ GlobalConfig.NUM_SERVERS_PER_CONNECTION; i++){
             sessions.add(cluster.connect());
