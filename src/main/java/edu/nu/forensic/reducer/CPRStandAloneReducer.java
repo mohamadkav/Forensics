@@ -1,20 +1,39 @@
 package edu.nu.forensic.reducer;
 
 import edu.nu.forensic.db.entity.Event;
+import edu.nu.forensic.db.entity.Subject;
 import edu.nu.forensic.etw.EtwEventType;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 public class CPRStandAloneReducer {
     private Event lastSavedEvent = null;
-    private HashMap<String, HashSet<Event>> eventsStartFromKey = new HashMap<>();
-    private HashMap<String, HashSet<Event>> eventsEndAtKey = new HashMap<>();
-    private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt = new HashMap<>();
-    private HashMap<String, HashMap<String, Stack<Event>>> stackMaps = new HashMap<>();
-
+    private HashMap<UUID, List<SubEvent>> eventsStartFromKey = new HashMap<>();
+    private HashMap<UUID, List<SubEvent>> eventsEndAtKey = new HashMap<>();
+    //private HashMap<String, HashSet<Integer>> fileToProcessesWhichHaveAccessedIt = new HashMap<>();
+    private HashMap<UUID, HashMap<UUID,Stack<SubEvent>>> stackMaps = new HashMap<>();
+    class SubEvent{
+        private UUID u;
+        private UUID v;
+        private long timeStamp;
+        public SubEvent(UUID u, UUID v, long timeStamp) {
+            this.u = u;
+            this.v = v;
+            this.timeStamp = timeStamp;
+        }
+    }
+    public boolean canBeRemoved(Subject subject){
+        UUID u=subject.getParentSubject();
+        UUID v=subject.getUuid();
+        SubEvent event=new SubEvent(u,v,subject.getStartTimestampNanos());
+        if(!eventsStartFromKey.containsKey(u))
+            eventsStartFromKey.put(u,new ArrayList<>());
+        eventsStartFromKey.get(u).add(event);
+        if(!eventsEndAtKey.containsKey(v))
+            eventsEndAtKey.put(v,new ArrayList<>());
+        eventsEndAtKey.get(v).add(event);
+        return canBeRemoved(event);
+    }
     public boolean canBeRemoved(Event event){
         if(event.getTypeNum()!= EtwEventType.FileIoRead.ordinal() && event.getTypeNum()!= EtwEventType.FileIoWrite.ordinal())
             return false;
@@ -29,20 +48,62 @@ public class CPRStandAloneReducer {
         }
         // o.w., we hit another time window.
         else {
-            boolean returnResult=doStep0(lastSavedEvent);
+            boolean returnResult;
+            SubEvent subEvent;
+            if(event.getTypeNum()==EtwEventType.FileIoRead.ordinal()) {
+                subEvent = new SubEvent(event.getId(), event.getSubjectUUID(), event.getTimestampNanos());
+                UUID u=event.getId();
+                UUID v=event.getSubjectUUID();
+                if(!eventsStartFromKey.containsKey(u))
+                    eventsStartFromKey.put(u,new ArrayList<>());
+                eventsStartFromKey.get(u).add(subEvent);
+                if(!eventsEndAtKey.containsKey(v))
+                    eventsEndAtKey.put(v,new ArrayList<>());
+                eventsEndAtKey.get(v).add(subEvent);
+            }
+            else { //e.g: write: if(event.getTypeNum()==EtwEventType.FileIoWrite.ordinal())
+                subEvent = new SubEvent(event.getSubjectUUID(), event.getId(), event.getTimestampNanos());
+                UUID u=event.getSubjectUUID();
+                UUID v=event.getId();
+                if(!eventsStartFromKey.containsKey(u))
+                    eventsStartFromKey.put(u,new ArrayList<>());
+                eventsStartFromKey.get(u).add(subEvent);
+                if(!eventsEndAtKey.containsKey(v))
+                    eventsEndAtKey.put(v,new ArrayList<>());
+                eventsEndAtKey.get(v).add(subEvent);
+            }
+            returnResult=canBeRemoved(subEvent);
             lastSavedEvent=event;
             return returnResult;
         }
 
     }
-
-    public void notifyFileDelete(String filename){
-        eventsStartFromKey.remove(filename);
-        eventsEndAtKey.remove(filename);
-        fileToProcessesWhichHaveAccessedIt.remove(filename);
-        stackMaps.remove(filename);
+    private boolean canBeRemoved(SubEvent e){
+        if(!stackMaps.containsKey(e.u)) {
+            HashMap<UUID,Stack<SubEvent>> newMap=new HashMap<>();
+            Stack<SubEvent> newStack=new Stack<>();
+            newStack.push(e);
+            newMap.put(e.v,newStack);
+            stackMaps.put(e.u,newMap);
+            return false;
+        }
+        SubEvent e_p=stackMaps.get(e.u).get(e.v).pop();
+        if(forward_check(e_p,e,e.v)&&backward_check(e_p,e,e.u)){
+            //merge(); We actually preserve the shadowed event and remove the other one.
+            stackMaps.get(e.u).get(e.v).push(e_p);
+            return true;
+        }
+        else
+            stackMaps.get(e.u).get(e.v).push(e);
+        return false;
     }
-    public void notifyFileRename(String oldFileName, String newFileName){
+
+/*    public void notifyUUIDDelete(UUID fileUUID){ //Results in dependency explosion
+        eventsStartFromKey.remove(fileUUID);
+        eventsEndAtKey.remove(fileUUID);
+        stackMaps.remove(fileUUID);
+    }*/
+/*    public void notifyFileRename(UUID oldFileName, String newFileName){
         if(eventsEndAtKey.containsKey(oldFileName)){
             eventsEndAtKey.put(newFileName,eventsEndAtKey.get(oldFileName));
             eventsEndAtKey.remove(oldFileName);
@@ -59,8 +120,8 @@ public class CPRStandAloneReducer {
             stackMaps.put(newFileName,stackMaps.get(oldFileName));
             stackMaps.remove(oldFileName);
         }
-    }
-    private boolean doStep0(Event event){
+    }*/
+    /*private boolean doStep0(Event event){
         if (!eventsStartFromKey.containsKey(event.getPredicateObjectPath())) {
             HashSet<Event> ioEventSubset = new HashSet<>();
             eventsStartFromKey.put(event.getPredicateObjectPath(), ioEventSubset);
@@ -154,23 +215,23 @@ public class CPRStandAloneReducer {
                 return false;
             }
         }
-    }
-    private boolean forward_check(Event e_p, Event e_l, String v) {
+    }*/
+    private boolean forward_check(SubEvent e_p, SubEvent e_l, UUID v) {
         //System.out.println("eventsStartFromKey.get(v).size() = "+ eventsStartFromKey.get(v).size());
-        for (Event ioEvent : eventsStartFromKey.get(v)) {
+        for (SubEvent subEvent : eventsStartFromKey.get(v)) {
             // time window of this event has overlapped the start time interval of e_p and e_l
-            if (!(ioEvent.getTimestampNanos() <= e_p.getTimestampNanos() || e_l.getTimestampNanos() <= ioEvent.getTimestampNanos()))
+            if (!(subEvent.timeStamp <= e_p.timeStamp || e_l.timeStamp <= subEvent.timeStamp))
                 return false;
         }
         //System.out.println("get forward");
         return true;
     }
 
-    private boolean backward_check(Event e_p, Event e_l, String u) {
+    private boolean backward_check(SubEvent e_p, SubEvent e_l, UUID u) {
         // System.out.println("eventsEndAtKey.get(u).size() = "+ eventsEndAtKey.get(u).size());
-        for (Event ioEvent : eventsEndAtKey.get(u)) {
+        for (SubEvent subEvent : eventsEndAtKey.get(u)) {
             // time window of this event has overlapped the end time interval of e_p and e_l
-            if (!(ioEvent.getTimestampNanos() <= e_p.getTimestampNanos() || e_l.getTimestampNanos() <= ioEvent.getTimestampNanos()))
+            if (!(subEvent.timeStamp <= e_p.timeStamp || e_l.timeStamp <= subEvent.timeStamp))
                 return false;
         }
         //System.out.println("get backward");

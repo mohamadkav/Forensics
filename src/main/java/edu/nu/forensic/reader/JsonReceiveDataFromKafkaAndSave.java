@@ -120,8 +120,8 @@ class JsonReceiverThread extends Thread implements Runnable{
                                             commandLine,
                                             (String) eventRecord.getArgument().get("UserSID"),
                                             visibleWindowPid.contains(pid) ? true : false);
-
-                                    subjectList.add(subject);
+                                    if(!reducer.canBeRemoved(subject))
+                                        subjectList.add(subject);
                                     if (subjectList.size() > 10000) {
                                         connectionToCassandra.insertSubjectData(subjectList,threadId);
                                         subjectList = new ArrayList<>();
@@ -139,8 +139,8 @@ class JsonReceiverThread extends Thread implements Runnable{
                                         connectionToCassandra.insertEventData(eventList,threadId);
                                         eventList = new ArrayList<>();
                                     }
+                                 //   reducer.notifyUUIDDelete(tidToUUID.get(eventRecord.getThreadId()));
                                     tidToUUID.remove(eventRecord.getThreadId());
-                                    reducer.notifyFileDelete(eventRecord.getThreadId() + ""); //Bad function naming though...
                                     break;
                                 }
                                 case FileIoRename:
@@ -166,12 +166,13 @@ class JsonReceiverThread extends Thread implements Runnable{
                                     //if the event name is fileIoRename, we should put new file name to object table, but I think it is not necessary to store event table;
                                     if (eventRecord.getEtwEventType().equals(EtwEventType.FileIoRename)) {
                                         String newFileName = (String) eventRecord.getArgument().get("NewFileName");
-                                        reducer.notifyFileRename(filename, newFileName);
+                                     //   reducer.notifyFileRename(filename, newFileName);
 
-                                        fileNameToUUID.put(newFileName, uuid);
-
-                                        Event newEvent = new Event(uuid, eventRecord.getEtwEventType().ordinal(), tid,
-                                                tidToUUID.get(tid), newFileName, timeStamp, eventRecord.getEtwEventType().name(), true);
+                                        uuid=fileNameToUUID.get(filename);
+                                        fileNameToUUID.put(newFileName, fileNameToUUID.get(filename));
+                                        fileNameToUUID.remove(filename);
+                                        Event newEvent = new Event(uuid, eventRecord.getEtwEventType().ordinal(), tid, //TODO: extremely bad design to do such thing. We basically put the filename change as string
+                                                tidToUUID.get(tid), filename+"----"+newFileName, timeStamp, eventRecord.getEtwEventType().name(), false);
 
                                         eventList.add(newEvent);
                                     }
@@ -179,7 +180,7 @@ class JsonReceiverThread extends Thread implements Runnable{
                                     else eventList.add(event);
 
                                     if (eventRecord.getEtwEventType().equals(EtwEventType.FileIoDelete)) {
-                                        reducer.notifyFileDelete(filename);
+                                    //    reducer.notifyUUIDDelete(fileNameToUUID.get(filename));
                                         fileNameToUUID.remove(filename);
                                     }
 
@@ -275,7 +276,8 @@ class JsonReceiverThread extends Thread implements Runnable{
                                     tidToUUID.put(tid, uuid);
                                     Subject subject = new edu.nu.forensic.db.entity.Subject(uuid, eventRecord.getEtwEventType().ordinal(), tid,
                                             !pidToUUID.containsKey(parentPid) ? null : pidToUUID.get(parentPid), eventRecord.getTimestamp(), null, null, false);
-                                    subjectList.add(subject);
+                                    if(!reducer.canBeRemoved(subject))
+                                        subjectList.add(subject);
                                     if (subjectList.size() > 10000) {
                                         connectionToCassandra.insertSubjectData(subjectList,threadId);
                                         subjectList = new ArrayList<>();
